@@ -1,0 +1,7 @@
+/* BONK! — menu scene */
+.logo-wrap{display:flex;flex-direction:column;align-items:center;animation:logoIn .9s cubic-bezier(.2,1.5,.4,1) both}
+.logo{width:min(72cqw,40cqh);height:auto;filter:drop-shadow(0 10px 18px #0006);animation:float 3.6s ease-in-out infinite}
+.tagline{margin-top:-2%;font-weight:900;font-size:clamp(15px,4.6cqmin,26px);color:#fff;
+         text-shadow:0 2px 0 #1a5fa8,0 0 12px #0008,2px 2px 0 #1a5fa8,-2px 2px 0 #1a5fa8,2px -2px 0 #1a5fa8,-2px -2px 0 #1a5fa8}
+.tagline em{font-style:normal;color:#ffe45c}
+.menu{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2cqmin,14px);width:100%;padding-left:34%;animation:menuIn .8s .25s cubic-bezier(.2,1.4,.4,1) both}

@@ -1,0 +1,51 @@
+/* BONK! — in-game HUD, controls, floating FX */
+#hud{justify-content:flex-start;gap:6px}
+.hud-top{width:100%;display:flex;justify-content:space-between;align-items:flex-start}
+.scorebox{background:linear-gradient(#173d6ee6,#0f2c52e6);border:3px solid #6fb6ff;border-radius:16px;padding:6px 14px 6px 10px;color:#fff;box-shadow:0 4px 0 #071a33,0 6px 14px #0006;display:flex;gap:10px;align-items:center}
+.scorebox img{width:clamp(28px,8cqmin,44px)}
+.scorebox .lbl{font-size:clamp(10px,2.8cqmin,13px);font-weight:800;letter-spacing:1px;opacity:.85;line-height:1}
+.scorebox .val{font-size:clamp(22px,6.5cqmin,34px);font-weight:900;line-height:1.05;text-shadow:0 2px 0 #0007}
+.scorebox .best{font-size:clamp(11px,3.2cqmin,15px);font-weight:800;color:#ffd23a;line-height:1}
+.hud-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.hud-right .row{display:flex;gap:8px;align-items:center}
+.hearts{display:flex;gap:4px}
+.hearts img{width:clamp(26px,7.5cqmin,40px);height:auto;transition:transform .2s;filter:drop-shadow(0 2px 2px #0006)}
+.hearts img.lost{animation:heartPop .5s ease both}
+.level-tag{font-weight:900;color:#fff;font-size:clamp(12px,3.6cqmin,17px);text-shadow:0 2px 0 #1a5fa8,0 0 8px #0008;background:#1a4c86b3;border:2px solid #fff;border-radius:999px;padding:3px 12px}
+.powerbar{display:flex;gap:6px;min-height:24px}
+.power{display:flex;align-items:center;gap:4px;background:#fff6;border:2px solid #fff;border-radius:999px;padding:2px 8px 2px 4px;font-weight:900;font-size:clamp(11px,3.2cqmin,15px);color:#1a4c86;position:relative;overflow:hidden}
+.power img{width:1.4em}
+.power i{position:absolute;left:0;top:0;bottom:0;background:#ffffff88;z-index:-1;transition:width .15s linear}
+.progress{width:70%;height:14px;border-radius:99px;background:#0f2c52b3;border:2px solid #fff;position:relative;margin-top:4px;box-shadow:0 2px 6px #0005}
+.progress i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(#ffe45c,#ff9a1f);transition:width .3s;box-shadow:inset 0 -2px 0 #b34e05}
+.progress img{position:absolute;right:-12px;top:50%;width:26px;transform:translateY(-50%) rotate(20deg);filter:drop-shadow(0 2px 2px #0006)}
+
+/* control buttons */
+.controls{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 3%);display:flex;justify-content:space-between;padding:0 5%;pointer-events:none}
+.ctl{width:clamp(70px,22cqmin,120px);height:clamp(70px,22cqmin,120px);pointer-events:auto;cursor:pointer;background:none;border:none;filter:drop-shadow(0 6px 10px #0007);transition:transform .08s,opacity .25s}
+.ctl.ghost{opacity:.35}
+.ctl img{width:100%;height:100%;object-fit:contain}
+.ctl.down{transform:scale(.92) translateY(3px)}
+.hint{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 30%);transform:translateX(-50%);text-align:center;color:#fff;font-weight:900;font-size:clamp(13px,3.8cqmin,18px);
+      text-shadow:0 2px 0 #1a5fa8,0 0 10px #0008;pointer-events:none;transition:opacity .5s}
+
+/* floating text & reactions */
+#fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.pop{position:absolute;font-weight:900;font-size:clamp(20px,6cqmin,34px);color:#fff;transform:translate(-50%,-50%);animation:popUp 1s ease-out forwards;
+     text-shadow:0 2px 0 #1a4c86,2px 2px 0 #1a4c86,-2px 2px 0 #1a4c86,2px -2px 0 #1a4c86,-2px -2px 0 #1a4c86,0 0 12px #0008;white-space:nowrap}
+.pop.coin{color:#ffe45c}
+.pop.bad{color:#ffd23a;font-size:clamp(28px,9cqmin,52px);text-shadow:0 3px 0 #b3300a,3px 3px 0 #b3300a,-3px 3px 0 #b3300a,3px -3px 0 #b3300a,-3px -3px 0 #b3300a,0 0 20px #ff5a00}
+.banner{position:absolute;left:50%;top:32%;transform:translate(-50%,-50%) scale(.3);font-weight:900;font-size:clamp(34px,12cqmin,70px);color:#ffd23a;
+     text-shadow:0 4px 0 #b3300a,4px 4px 0 #b3300a,-4px 4px 0 #b3300a,4px -4px 0 #b3300a,-4px -4px 0 #b3300a,0 0 30px #ff9a1f;animation:bannerIn 1.4s cubic-bezier(.2,1.6,.4,1) forwards;pointer-events:none;white-space:nowrap}
+.flash{position:absolute;inset:0;background:#ff3b1f;opacity:0;pointer-events:none;animation:flash .45s ease-out forwards}
+.shake{animation:shake .45s ease}
+.countdown{position:absolute;inset:0;display:none;place-items:center;pointer-events:none;z-index:4}
+.countdown.on{display:grid}
+.countdown span{font-size:clamp(90px,30cqmin,160px);font-weight:900;color:#ffd23a;text-shadow:0 6px 0 #b3300a,0 0 40px #ff9a1f;animation:count .9s ease-out both}
+
+@keyframes popUp{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}15%{opacity:1;transform:translate(-50%,-60%) scale(1.15)}30%{transform:translate(-50%,-65%) scale(1)}100%{opacity:0;transform:translate(-50%,-140%) scale(1)}}
+@keyframes bannerIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-8deg)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.15) rotate(3deg)}35%{transform:translate(-50%,-50%) scale(1) rotate(0)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%) scale(1)}}
+@keyframes flash{0%{opacity:.45}100%{opacity:0}}
+@keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-8px,4px)}40%{transform:translate(8px,-4px)}60%{transform:translate(-6px,3px)}80%{transform:translate(6px,-2px)}}
+@keyframes heartPop{0%{transform:scale(1)}40%{transform:scale(1.5) rotate(-15deg)}100%{transform:scale(1)}}
+@keyframes count{0%{opacity:0;transform:scale(2.2)}30%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(.8)}}

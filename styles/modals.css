@@ -1,0 +1,31 @@
+/* BONK! — modal dialogs */
+.modal{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#0a2a4ab3;backdrop-filter:blur(3px);pointer-events:auto;z-index:5}
+.modal.open{display:flex}
+.card{position:relative;width:min(84cqw,420px);background:linear-gradient(#fffdf7,#fff1d6 70%,#ffe6bd);border:6px solid #c98a44;outline:3px solid #fff3d6;border-radius:26px;
+      box-shadow:0 10px 0 #7a4a1c,0 22px 40px #0008,inset 0 2px 0 #fff;padding:26px 20px 18px;
+      color:var(--brown);text-align:center;animation:logoIn .5s cubic-bezier(.2,1.5,.4,1) both}
+.card::before{content:"";position:absolute;left:14px;right:14px;top:-3px;height:8px;border-radius:0 0 8px 8px;background:linear-gradient(#a86c2c,#c98a44);box-shadow:0 2px 0 #fff8}
+.card h2{display:inline-block;font-size:clamp(22px,6.4cqmin,32px);color:#fff;background:linear-gradient(#ff9a1f,#e2680a);padding:4px 24px;border-radius:12px;
+      box-shadow:0 4px 0 #8a3d02,0 6px 12px #0004;text-shadow:0 2px 0 #0005;margin:-46px 0 8px;position:relative}
+.card p{font-size:clamp(14px,4cqmin,18px);line-height:1.45;margin:6px 0;font-weight:700}
+.card .row{display:flex;justify-content:space-between;align-items:center;padding:10px 6px;border-bottom:2px dashed #e8c48f;font-weight:800;font-size:clamp(15px,4.4cqmin,20px)}
+.card .row:last-of-type{border-bottom:none}
+.card .stats{display:flex;justify-content:center;gap:18px;margin:8px 0 12px}
+.card .stat{display:flex;flex-direction:column;align-items:center;font-weight:900}
+.card .stat b{font-size:clamp(24px,8cqmin,40px);color:#e2680a;line-height:1}
+.card .stat span{font-size:clamp(11px,3.2cqmin,14px);letter-spacing:1px;opacity:.7}
+.card .stat img{width:clamp(30px,9cqmin,48px)}
+.card img.pose{width:min(40cqw,180px);margin:-8px auto 0;display:block;filter:drop-shadow(0 6px 8px #0005)}
+.card .newbest{display:inline-block;background:#ffd23a;color:#8a4b00;border-radius:999px;padding:3px 14px;font-weight:900;font-size:clamp(12px,3.6cqmin,16px);animation:pulse 1s infinite}
+.toggle{width:60px;height:32px;border-radius:999px;background:#c9c9c9;position:relative;cursor:pointer;transition:background .2s;border:none}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 4px #0004;transition:left .2s}
+.toggle.on{background:#4ec447}.toggle.on::after{left:31px}
+.card .close{margin-top:14px;padding:10px 34px;font-size:clamp(16px,4.6cqmin,22px)}
+.card .btn-row{justify-content:center;margin-top:4px}
+.card .btn-row .btn-sec{width:clamp(46px,12cqmin,62px);height:clamp(46px,12cqmin,62px);font-size:clamp(18px,5cqmin,26px)}
+.card .btns{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:12px}
+.card .btns .btn{width:min(60cqw,280px);padding:clamp(10px,3cqmin,16px) 0;font-size:clamp(18px,5.6cqmin,28px)}
+.card .btns .btn-row .btn{width:clamp(46px,12cqmin,62px);height:clamp(46px,12cqmin,62px);padding:0;font-size:clamp(18px,5cqmin,26px)}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;text-align:left;margin:8px 0 4px}
+.legend div{display:flex;align-items:center;gap:8px;font-weight:800;font-size:clamp(13px,3.8cqmin,17px)}
+.legend img{width:1.8em;height:1.8em;object-fit:contain}

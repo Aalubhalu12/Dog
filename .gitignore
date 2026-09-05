@@ -1,0 +1,7 @@
+node_modules/
+__pycache__/
+.DS_Store
+*.log
+.cache/
+# large source art is versioned via Git LFS or kept out of the repo — see art/README.md
+art/clips/*.mp4

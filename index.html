@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2f8fe0">
+<title>BONK! — Catch. Dodge. Don't get bonked.</title>
+<link rel="stylesheet" href="styles/main.css?v=0.8.3">
+</head>
+<body>
+<div id="backdrop"></div>
+<div id="stage">
+ <div id="shaker">
+  <canvas id="bg"></canvas>
+
+  <!-- ================= MENU ================= -->
+  <div class="scene active" id="sceneMenu">
+    <div class="topbar">
+      <div class="pill"><img src="assets/images/items/coin.webp" alt=""><span id="coins">0</span><span class="plus">+</span></div>
+      <div class="pill best-pill"><img src="assets/images/ui/trophy.webp" alt=""><span style="font-size:.75em;opacity:.8">BEST</span> <span id="best">0</span></div>
+      <button class="iconbtn" id="btnSettings" aria-label="Settings">⚙</button>
+    </div>
+    <div class="logo-wrap">
+      <img class="logo" src="assets/images/brand/logo.webp" alt="BONK!" draggable="false">
+      <div class="tagline">Catch. Dodge. <em>Don't get bonked.</em></div>
+    </div>
+    <div class="menu">
+      <button class="btn btn-primary pulse" id="btnPlay"><span>▶ PLAY</span><small id="btnPlaySub">Level 1</small></button>
+      <button class="btn btn-wood" id="btnLevels"><img src="assets/images/ui/star_gold.webp" alt=""><span>LEVELS</span><b id="menuStars">0/9</b></button>
+      <div class="btn-row">
+        <button class="btn btn-sec" id="btnHow" title="How to play">❓</button>
+        <button class="btn btn-sec" id="btnShop" title="Shop">🛍️</button>
+        <button class="btn btn-sec" id="btnSound" title="Sound">🔊</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LEVEL SELECT ================= -->
+  <div class="scene" id="sceneMap">
+    <div class="topbar">
+      <button class="iconbtn" id="mapBack" aria-label="Back">‹</button>
+      <div class="pill best-pill"><img src="assets/images/ui/star_gold.webp" alt=""><span id="mapStars">0 / 9</span></div>
+      <div class="pill"><img src="assets/images/items/coin.webp" alt=""><span id="mapCoins">0</span></div>
+    </div>
+    <div class="ls-hero">
+      <img class="ls-pup" id="lsPup" src="assets/images/puppy/puppy.webp" alt="">
+      <div class="ls-sign"><div class="ls-sign-top">🐾 Select Level 🐾</div><div class="ls-sign-sub">More Bones, More Fun!</div></div>
+    </div>
+    <div class="ls-spacer top"></div>
+    <div class="ls-grid-wrap">
+      <div class="ls-grid" id="lsGrid"></div>
+      <div class="ls-pager">
+        <button class="ls-arrow" id="lsPrev" aria-label="Previous page">‹</button>
+        <div class="ls-dots" id="lsDots"></div>
+        <button class="ls-arrow" id="lsNext" aria-label="Next page">›</button>
+      </div>
+    </div>
+    <div class="ls-spacer"></div>
+    <div class="ls-card" id="lsCard">
+      <div class="ls-thumb"><img id="lsThumb" src="assets/images/levels/thumb_1.webp" alt=""><span class="ls-lvl" id="lsTitle">Level 1</span></div>
+      <ul class="ls-info" id="lsInfo"></ul>
+    </div>
+    <button class="btn btn-play" id="lsPlay"><span class="paw">🐾</span><span class="tri">▶</span><span>Play</span><span class="paw">🐾</span></button>
+  </div>
+
+  <!-- ================= GAME HUD ================= -->
+  <div class="scene" id="hud">
+    <div class="hud-top">
+      <div class="scorebox">
+        <img src="assets/images/ui/trophy.webp" alt="">
+        <div>
+          <div class="lbl">SCORE</div>
+          <div class="val" id="hScore">0</div>
+          <div class="best">BEST <span id="hBest">0</span></div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="row">
+          <div class="pill"><img src="assets/images/items/coin.webp" alt=""><span id="hCoins">0</span></div>
+          <button class="iconbtn" id="btnPause" aria-label="Pause">❚❚</button>
+        </div>
+        <div class="row"><span class="level-tag" id="hLevel">LEVEL 1</span><div class="hearts" id="hearts"></div></div>
+        <div class="powerbar" id="powerbar"></div>
+      </div>
+    </div>
+    <div class="progress" title="Level progress"><i id="levelProgress"></i><img src="assets/images/items/bone.webp" alt=""></div>
+    <div class="goalchip" id="goalChip"><img src="assets/images/ui/star_grey.webp" alt=""><span id="goalText"></span><i id="goalBar"></i></div>
+    <div class="controls">
+      <button class="ctl" id="ctlL" aria-label="Left"><img src="assets/images/ui/btn_left.webp" alt="" draggable="false"></button>
+      <button class="ctl" id="ctlR" aria-label="Right"><img src="assets/images/ui/btn_right.webp" alt="" draggable="false"></button>
+    </div>
+    <div class="hint" id="hint">Catch the good.<br>Dodge the bad!</div>
+  </div>
+  <div id="fx"></div>
+  <div class="countdown" id="countdown"><span id="countNum">3</span></div>
+
+  <!-- ================= MODALS ================= -->
+  <div class="modal" id="modalHow">
+    <div class="card">
+      <h2>How to Play</h2>
+      <p>Hold ◀ ▶, drag, or use arrow keys.<br>Catch the good stuff, dodge the bad!</p>
+      <div class="legend">
+        <div><img src="assets/images/items/bone.webp" alt="">Bone +10</div><div><img src="assets/images/items/coin.webp" alt="">Coin +1</div>
+        <div><img src="assets/images/items/magnet.webp" alt="">Magnet pull</div><div><img src="assets/images/items/star.webp" alt="">2× Score</div>
+        <div><img src="assets/images/items/rock.webp" alt="">BONK! −1 ❤</div><div><img src="assets/images/items/bomb.webp" alt="">Dizzy −1 ❤</div>
+      </div>
+      <button class="btn btn-primary close" data-close>GOT IT!</button>
+    </div>
+  </div>
+
+  <div class="modal" id="modalSettings">
+    <div class="card">
+      <h2>Settings</h2>
+      <div class="row"><span>🔊 Sound</span><button class="toggle on" data-setting="sound"></button></div>
+      <div class="row"><span>📳 Vibration</span><button class="toggle on" data-setting="vib"></button></div>
+      <div class="row"><span>🌤 Parallax tilt</span><button class="toggle on" data-setting="tilt"></button></div>
+      <button class="btn btn-primary close" data-close>DONE</button>
+    </div>
+  </div>
+
+  <div class="modal" id="modalPause">
+    <div class="card">
+      <h2>Paused</h2>
+      <p>Take a breath, pup. 🐾</p>
+      <div class="btns">
+        <button class="btn btn-primary btn-green" id="btnResume"><span>▶ RESUME</span></button>
+        <button class="btn btn-primary" id="btnRestart"><span>↻ RESTART</span></button>
+        <div class="btn-row"><button class="btn btn-sec" id="btnPauseMap" title="Level map">🗺️</button><button class="btn btn-sec" id="btnQuit" title="Menu">🏠</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modalOver">
+    <div class="card">
+      <h2 id="overTitle">Game Over</h2>
+      <img class="pose" id="overPose" src="assets/images/puppy/puppy_dizzy.webp" alt="">
+      <div id="overBadge"></div>
+      <div class="stats">
+        <div class="stat"><img src="assets/images/ui/trophy.webp" alt=""><b id="oScore">0</b><span>SCORE</span></div>
+        <div class="stat"><img src="assets/images/items/bone.webp" alt=""><b id="oBones">0</b><span>BONES</span></div>
+        <div class="stat"><img src="assets/images/items/coin.webp" alt=""><b id="oCoins">0</b><span>COINS</span></div>
+      </div>
+      <div class="btns">
+        <button class="btn btn-primary btn-green" id="btnAgain"><span>↻ TRY AGAIN</span></button>
+        <div class="btn-row"><button class="btn btn-sec" id="btnOverMap" title="Level map">🗺️</button><button class="btn btn-sec" id="btnHome" title="Menu">🏠</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modalWin">
+    <div class="card">
+      <h2 id="winTitle">Level 1 Clear! 🎉</h2>
+      <div class="result-stars" id="winStars"></div>
+      <img class="pose" src="assets/images/puppy/puppy_yay.webp" alt="">
+      <ul class="goals" id="winGoals"></ul>
+      <div class="stats">
+        <div class="stat"><img src="assets/images/ui/trophy.webp" alt=""><b id="wScore">0</b><span>SCORE</span></div>
+        <div class="stat"><img src="assets/images/ui/heart.webp" alt=""><b id="wLives">0</b><span>LIVES LEFT</span></div>
+        <div class="stat"><img src="assets/images/items/coin.webp" alt=""><b id="wCoins">0</b><span>COINS</span></div>
+      </div>
+      <div class="btns">
+        <button class="btn btn-primary btn-green" id="btnContinue"><span>▶ NEXT LEVEL</span></button>
+        <div class="btn-row"><button class="btn btn-sec" id="btnWinRetry" title="Replay for more stars">↻</button><button class="btn btn-sec" id="btnWinMap" title="Level map">🗺️</button><button class="btn btn-sec" id="btnWinHome" title="Menu">🏠</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="version" id="appVersion"></div>
+ </div>
+  <div id="loader"><div><div class="paw">🐾</div><div class="bar"><i id="loadbar"></i></div></div></div>
+</div>
+
+<!-- core -->
+<script src="src/core/config.js?v=0.8.3"></script>
+<script src="src/core/storage.js?v=0.8.3"></script>
+<script src="src/core/assets.js?v=0.8.3"></script>
+<script src="src/core/audio.js?v=0.8.3"></script>
+<script src="src/core/input.js?v=0.8.3"></script>
+<!-- game data -->
+<script src="src/game/items.js?v=0.8.3"></script>
+<script src="src/game/levels.js?v=0.8.3"></script>
+<script src="src/game/goals.js?v=0.8.3"></script>
+<!-- game systems -->
+<script src="src/game/ambient.js?v=0.8.3"></script>
+<script src="src/game/background.js?v=0.8.3"></script>
+<script src="src/game/effects.js?v=0.8.3"></script>
+<script src="src/game/puppy.js?v=0.8.3"></script>
+<script src="src/game/spawner.js?v=0.8.3"></script>
+<script src="src/game/game.js?v=0.8.3"></script>
+<!-- ui + scenes -->
+<script src="src/ui/hud.js?v=0.8.3"></script>
+<script src="src/ui/modals.js?v=0.8.3"></script>
+<script src="src/scenes/menu.js?v=0.8.3"></script>
+<script src="src/scenes/map.js?v=0.8.3"></script>
+<script src="src/scenes/play.js?v=0.8.3"></script>
+<!-- bootstrap -->
+<script src="src/app.js?v=0.8.3"></script>
+</body>
+</html>
