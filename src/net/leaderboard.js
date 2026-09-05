@@ -71,8 +71,10 @@ const Leaderboard = (() => {
     const p = profile(), score = best(), serverBest = Save.get('lb.serverBest', 0);
     const req = { uid: p.uid, name: p.name, country: p.country, score: score > serverBest ? score : 0 };   // 0 = read-only, don't write
     calls++;
+    const gen = Save.generation;          // if the save is reset/replaced while we're in flight, drop the result (don't resurrect a wiped doc)
     inflight = adapter().fetch(req).then(res => {
       if (!res || !res.world) throw new Error('bad response');
+      if (Save.generation !== gen) return getCache();
       cache = { at: Date.now(), uid: p.uid, ...res }; setCache(cache);
       Save.update(d => { d.lb.lastWindow = windowKey(); d.lb.lastSyncAt = Date.now(); if (req.score) d.lb.serverBest = Math.max(d.lb.serverBest || 0, req.score);
         d.lb.rank = { world: res.world.rank || 0, country: res.country.rank || 0 }; });

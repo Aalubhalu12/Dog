@@ -30,7 +30,7 @@ const Save = (() => {
   const SCHEMA = 2;
   const KEY = () => CONFIG.STORAGE_PREFIX + 'save';
   const BAK = () => CONFIG.STORAGE_PREFIX + 'save_bak';
-  let doc = null, dirty = false, flushTimer = null;
+  let doc = null, dirty = false, flushTimer = null, generation = 0, persisted = false;   // generation bumps whenever the doc object is swapped (load/reset/replace)
 
   const fresh = () => ({
     v: SCHEMA, createdAt: Date.now(), updatedAt: Date.now(),
@@ -86,7 +86,7 @@ const Save = (() => {
       d = fresh(); source = 'fresh';
       if (hasLegacy()) { d.v = 1; d = migrate(d); source = 'legacy'; }
     } else d = migrate(d);
-    doc = d;
+    doc = d; generation++; persisted = source === 'main' || source === 'backup';   // doc is known to exist in storage
     if (source !== 'main') write(true);             // persist the recovered / migrated doc immediately
     if (hasLegacy()) clearLegacy();                 // old keys are now inside the doc (backup copy holds the pre-migration state)
     Events.emit('save:loaded', { source, doc });
@@ -100,11 +100,14 @@ const Save = (() => {
   }
   function flush() {
     flushTimer = null; if (!dirty || !doc) return;
-    dirty = false; doc.updatedAt = Date.now();
+    dirty = false;
     try {
-      const json = JSON.stringify(doc), prev = localStorage.getItem(KEY());
+      const prev = localStorage.getItem(KEY());
+      // Storage was wiped externally (QA "clear site data", tests) after we persisted: don't resurrect the old doc.
+      if (persisted && prev == null && localStorage.getItem(BAK()) == null) { generation++; return; }
+      doc.updatedAt = Date.now(); const json = JSON.stringify(doc);
       localStorage.setItem(BAK(), parse(prev) ? prev : json);   // backup = last known-good document (never a corrupt one)
-      localStorage.setItem(KEY(), json);
+      localStorage.setItem(KEY(), json); persisted = true;
     } catch (e) { console.warn('[Save] write failed', e); }
     Events.emit('save:written', { doc });
   }
@@ -118,10 +121,10 @@ const Save = (() => {
   /** Save.update(d => { d.coins += 5; }) — mutate the doc in one place, one write. */
   function update(fn) { if (!doc) load(); fn(doc); write(); return doc; }
 
-  function reset() { doc = fresh(); clearLegacy(); localStorage.removeItem(BAK()); write(true); Events.emit('save:reset', { doc }); }
+  function reset() { doc = fresh(); generation++; persisted = false; clearLegacy(); localStorage.removeItem(BAK()); write(true); Events.emit('save:reset', { doc }); }
   /** Replace the whole document (cloud restore). Runs migrations on the incoming doc. */
-  function replace(d) { doc = migrate(fill(d, {})); write(true); Events.emit('save:loaded', { source: 'replace', doc }); }
+  function replace(d) { doc = migrate(fill(d, {})); generation++; write(true); Events.emit('save:loaded', { source: 'replace', doc }); }
   function toJSON() { if (!doc) load(); return JSON.stringify(doc); }
 
-  return { SCHEMA, load, get, set, update, reset, replace, flush, toJSON, get doc() { return doc || load(); } };
+  return { SCHEMA, load, get, set, update, reset, replace, flush, toJSON, get doc() { return doc || load(); }, get generation() { return generation; } };
 })();

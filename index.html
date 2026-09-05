@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2f8fe0">
 <title>BONK! — Catch. Dodge. Don't get bonked.</title>
-<link rel="stylesheet" href="styles/main.css?v=0.11.0">
+<link rel="stylesheet" href="styles/main.css?v=0.11.1">
 </head>
 <body>
 <div id="backdrop"></div>
@@ -13,41 +13,28 @@
  <div id="shaker">
   <canvas id="bg"></canvas>
 
-  <!-- ================= HOME (logo + level select, per mockup) ================= -->
+  <!-- ================= HOME — exact replica of art/reference/home_mockup.png ================= -->
   <div class="scene" id="sceneMap">
-    <div class="topbar home-top">
-      <div class="top-l"><button class="iconbtn wood" id="btnSettings" aria-label="Settings">⚙</button><button class="iconbtn wood" id="btnSound" title="Sound">🔊</button></div>
-      <div class="logo-wrap"><img class="logo" src="assets/images/brand/logo.webp" alt="BONK!" draggable="false"><div class="tagline">CATCH · DODGE · PLAY</div></div>
-      <div class="top-r"><div class="pill"><img src="assets/images/items/coin.webp" alt=""><span id="mapCoins">0</span><span class="plus">+</span></div>
-        <div class="pill best-pill"><img src="assets/images/ui/star_gold.webp" alt=""><span id="mapStars">0 / 9</span></div></div>
+    <img class="hm-plate" src="assets/images/home/plate.webp" alt="" draggable="false">
+    <button class="hm-gear" id="btnSettings" aria-label="Settings">⚙</button>
+    <img class="hm-logo" src="assets/images/home/logo.webp" alt="BONK! Catch · Jump · Play" draggable="false">
+    <div class="hm-bones"><img src="assets/images/items/bone.webp" alt=""><span id="mapCoins">0</span><button class="plus" id="btnShop" aria-label="Shop">+</button></div>
+    <div class="hm-sign"><div class="hm-sign-top"><i>🐾</i>Select Level<i>🐾</i></div><div class="hm-sign-sub">More Bones, More Fun!</div></div>
+    <div class="hm-grid" id="lsGrid"></div>
+    <button class="hm-arrow l" id="lsPrev" aria-label="Previous page">◀</button>
+    <div class="hm-dots" id="lsDots"></div>
+    <button class="hm-arrow r" id="lsNext" aria-label="Next page">▶</button>
+    <div class="hm-card" id="lsCard">
+      <div class="hm-thumb"><img id="lsThumb" src="assets/images/levels/thumb_1.webp" alt=""><span class="hm-lvl" id="lsTitle">Level 1</span></div>
+      <ul class="hm-info" id="lsInfo"></ul>
     </div>
-    <div class="ls-hero">
-      <img class="ls-pup" id="lsPup" src="assets/images/puppy/puppy.webp" alt="">
-      <div class="ls-sign"><div class="ls-sign-top">🐾 Select Level 🐾</div><div class="ls-sign-sub">More Bones, More Fun!</div></div>
-    </div>
-    <div class="ls-spacer top"></div>
-    <div class="ls-grid-wrap">
-      <div class="ls-grid" id="lsGrid"></div>
-      <div class="ls-pager">
-        <button class="ls-arrow" id="lsPrev" aria-label="Previous page">‹</button>
-        <div class="ls-dots" id="lsDots"></div>
-        <button class="ls-arrow" id="lsNext" aria-label="Next page">›</button>
-      </div>
-    </div>
-    <div class="ls-spacer"></div>
-    <div class="ls-card" id="lsCard">
-      <div class="ls-thumb"><img id="lsThumb" src="assets/images/levels/thumb_1.webp" alt=""><span class="ls-lvl" id="lsTitle">Level 1</span></div>
-      <ul class="ls-info" id="lsInfo"></ul>
-    </div>
-    <div class="play-row">
-      <button class="signpost" id="btnShop" title="Shop"><span class="board">🛍️<br>Shop</span></button>
-      <button class="btn btn-play" id="lsPlay"><span class="paw">🐾</span><span class="tri">▶</span><span>Play</span><span class="paw">🐾</span></button>
-      <button class="signpost" id="btnBoard" title="Leaderboard"><span class="board">🏆<br>Ranks</span></button>
-    </div>
-    <div class="ls-foot"><button class="link-lite" id="btnHow">❓ How to play</button><span class="best-lite">🏆 Best <b id="best">0</b></span></div>
+    <button class="hm-post l" id="btnHow"><span>🐾<br>Good<br>Dogs<br>Go Further!</span></button>
+    <button class="hm-play" id="lsPlay"><span class="paw">🐾</span><span class="tri">▶</span><span class="txt">Play</span><span class="paw">🐾</span></button>
+    <button class="hm-post r" id="btnBoard"><span>You<br>Can<br>Do It!<br>♥</span></button>
+    <button class="hm-sound" id="btnSound" aria-label="Sound">🔊</button>
+    <span class="hm-hidden" id="mapStars">0 / 9</span><span class="hm-hidden" id="best">0</span>
   </div>
 
-  <!-- ================= GAME HUD ================= -->
   <div class="scene" id="hud">
     <!-- Compact HUD (≤15% of the stage): one row — pause+hearts | big score | coins+level — then a thin progress line and small chips -->
     <div class="hud-row">
@@ -173,35 +160,35 @@
 </div>
 
 <!-- core -->
-<script src="src/core/config.js?v=0.11.0"></script>
-<script src="src/core/events.js?v=0.11.0"></script>
-<script src="src/core/flags.js?v=0.11.0"></script>
-<script src="src/core/analytics.js?v=0.11.0"></script>
-<script src="src/core/save.js?v=0.11.0"></script>
-<script src="src/core/wallet.js?v=0.11.0"></script>
-<script src="src/core/storage.js?v=0.11.0"></script>
-<script src="src/core/assets.js?v=0.11.0"></script>
-<script src="src/core/audio.js?v=0.11.0"></script>
-<script src="src/core/input.js?v=0.11.0"></script>
-<script src="src/net/leaderboard.js?v=0.11.0"></script>
+<script src="src/core/config.js?v=0.11.1"></script>
+<script src="src/core/events.js?v=0.11.1"></script>
+<script src="src/core/flags.js?v=0.11.1"></script>
+<script src="src/core/analytics.js?v=0.11.1"></script>
+<script src="src/core/save.js?v=0.11.1"></script>
+<script src="src/core/wallet.js?v=0.11.1"></script>
+<script src="src/core/storage.js?v=0.11.1"></script>
+<script src="src/core/assets.js?v=0.11.1"></script>
+<script src="src/core/audio.js?v=0.11.1"></script>
+<script src="src/core/input.js?v=0.11.1"></script>
+<script src="src/net/leaderboard.js?v=0.11.1"></script>
 <!-- game data -->
-<script src="src/game/items.js?v=0.11.0"></script>
-<script src="src/game/goals.js?v=0.11.0"></script>
-<script src="src/game/levels.js?v=0.11.0"></script>
+<script src="src/game/items.js?v=0.11.1"></script>
+<script src="src/game/goals.js?v=0.11.1"></script>
+<script src="src/game/levels.js?v=0.11.1"></script>
 <!-- game systems -->
-<script src="src/game/ambient.js?v=0.11.0"></script>
-<script src="src/game/background.js?v=0.11.0"></script>
-<script src="src/game/effects.js?v=0.11.0"></script>
-<script src="src/game/puppy.js?v=0.11.0"></script>
-<script src="src/game/spawner.js?v=0.11.0"></script>
-<script src="src/game/game.js?v=0.11.0"></script>
-<script src="src/game/ftue.js?v=0.11.0"></script>
+<script src="src/game/ambient.js?v=0.11.1"></script>
+<script src="src/game/background.js?v=0.11.1"></script>
+<script src="src/game/effects.js?v=0.11.1"></script>
+<script src="src/game/puppy.js?v=0.11.1"></script>
+<script src="src/game/spawner.js?v=0.11.1"></script>
+<script src="src/game/game.js?v=0.11.1"></script>
+<script src="src/game/ftue.js?v=0.11.1"></script>
 <!-- ui + scenes -->
-<script src="src/ui/hud.js?v=0.11.0"></script>
-<script src="src/ui/modals.js?v=0.11.0"></script>
-<script src="src/scenes/map.js?v=0.11.0"></script>
-<script src="src/scenes/play.js?v=0.11.0"></script>
+<script src="src/ui/hud.js?v=0.11.1"></script>
+<script src="src/ui/modals.js?v=0.11.1"></script>
+<script src="src/scenes/map.js?v=0.11.1"></script>
+<script src="src/scenes/play.js?v=0.11.1"></script>
 <!-- bootstrap -->
-<script src="src/app.js?v=0.11.0"></script>
+<script src="src/app.js?v=0.11.1"></script>
 </body>
 </html>

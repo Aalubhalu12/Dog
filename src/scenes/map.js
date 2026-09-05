@@ -39,10 +39,13 @@ const MapScene = (() => {
       if (LEVELS[i].id > unlocked()) { Modals.toast('🔒 Clear the previous level first'); el.classList.remove('nudge'); void el.offsetWidth; el.classList.add('nudge'); return; }
       picked = true; select(i);
     });
-    $('#lsDots').innerHTML = Array.from({ length: pageCount() }, (_, p) => `<i class="${p === page ? 'on' : ''}">${p === page ? '🐾' : ''}</i>`).join('');
+    $('#lsDots').innerHTML = Array.from({ length: Math.max(4, pageCount()) }, (_, p) => `<i class="${p === page ? 'on' : ''}">${p === page ? '🐾' : ''}</i>`).join('');   // 4 dots like the mockup
     $('#lsPrev').disabled = page === 0; $('#lsNext').disabled = page >= pageCount() - 1;
+    $('#lsThumb') && ($('#lsThumb').style.visibility = 'visible');
   }
 
+  /** Compact goal text for the card's middle row (mockup: "Time: 60 seconds"). */
+  const goalRow = L => { const g = L.goal || {}; return ({ bonesIn: `${g.count} bones in ${g.seconds}s`, coins: `Coins: ${g.count}`, noBomb: 'No bombs hit', combo: `Combo ×${g.mult}`, nearMiss: `Near misses: ${g.count}`, goldBones: `Gold bones: ${g.count}`, power: `Power-ups: ${g.count}` })[g.type] || Goals.label(L); };
   function select(i) {
     selected = i; const L = LEVELS[i], st = Store.levelStars(L.id), locked = L.id > unlocked(), best = Store.levelBest(L.id);
     $('#lsGrid').querySelectorAll('.tile').forEach(t => t.classList.toggle('selected', +t.dataset.i === i));
@@ -50,11 +53,12 @@ const MapScene = (() => {
     const th = $('#lsThumb'); th.src = `assets/images/levels/thumb_${L.id}.webp`; th.onerror = () => { th.onerror = null; th.src = 'assets/images/levels/thumb_1.webp'; };
     th.parentElement.classList.toggle('locked', locked);
     const star = k => `<span class="mini"><img src="${Assets.url(st[k] ? 'star_gold' : 'star_grey')}" alt=""></span>`;
+    void star; void best;
+    // three rows exactly like the mockup card: bones goal · time/goal · lives
     $('#lsInfo').innerHTML = [
-      `<li class="${st[0] ? 'ok' : ''}"><img src="${Assets.url('bone')}" alt=""><span class="t">Score <b>${L.target.toLocaleString()}</b></span>${star(0)}</li>`,
-      `<li class="${st[1] ? 'ok' : ''}"><img src="${Assets.url('heart')}" alt=""><span class="t">Lives <b>${L.hearts}</b> · lose none</span>${star(1)}</li>`,
-      `<li class="${st[2] ? 'ok' : ''}"><span class="ic">🎯</span><span class="t" title="${Goals.label(L)}">${Goals.label(L)}</span>${star(2)}</li>`,
-      best ? `<li><img src="${Assets.url('trophy')}" alt=""><span class="t">Best <b>${best.toLocaleString()}</b></span></li>` : `<li><span class="ic">🐾</span><span class="t">${L.name}</span></li>`,
+      `<li class="${st[0] ? 'ok' : ''}"><img src="${Assets.url('bone')}" alt=""><span class="t">Score <b>${L.target.toLocaleString()}</b></span></li>`,
+      `<li class="${st[2] ? 'ok' : ''}"><span class="ic">🕒</span><span class="t" title="${Goals.label(L)}">${goalRow(L)}</span></li>`,
+      `<li class="${st[1] ? 'ok' : ''}"><img src="${Assets.url('heart')}" alt=""><span class="t">Lives: <b>${L.hearts}</b></span></li>`,
     ].join('');
     $('#lsPlay').disabled = locked;
   }
@@ -64,7 +68,7 @@ const MapScene = (() => {
     if (!picked || selected < 0 || selected >= LEVELS.length || LEVELS[selected].id > unlocked()) selected = cur;   // home opens on the level to continue
     page = Math.floor(selected / PER_PAGE);
     renderGrid(); select(selected);
-    $('#mapStars').textContent = `${Store.totalStars()} / ${LEVELS.length * 3}`;
+    $('#mapStars').textContent = `${Store.totalStars()} / ${LEVELS.length * 3}`;   // (hidden on the home replica; kept for tools/tests)
     $('#mapCoins').textContent = Store.coins().toLocaleString(); $('#best').textContent = Store.best().toLocaleString();
   }
 
@@ -85,8 +89,8 @@ const MapScene = (() => {
 
   return {
     bind,
-    enter() { BG.setAmp(CONFIG.PARALLAX.MENU_AMP); Ambient.setDensity({ birds: .7, walkers: .4, cars: .3 }); Ambient.reset(); render(); },
+    enter() { render(); },
     exit() {},
-    frame(now, dt, simOnly, renderDt) { if (!simOnly) BG.draw(now, renderDt || 1 / 60, {}); },
+    frame() {},   // home is a painted plate (assets/images/home/plate.webp) — nothing to draw on the canvas
   };
 })();

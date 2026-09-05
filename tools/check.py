@@ -123,7 +123,9 @@ if sync_playwright:
         pg = br.new_page(viewport={'width': 390, 'height': 844})
         pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
         pg.on('pageerror', lambda e: errs.append(str(e)))
-        ready = lambda: (pg.wait_for_function('document.querySelector("#loader.done")', timeout=20000), pg.wait_for_timeout(300))
+        # ready() also waits for the leaderboard boot-sync + debounced save to settle, so tests that clear localStorage aren't raced by it
+        ready = lambda: (pg.wait_for_function('document.querySelector("#loader.done")', timeout=20000), pg.wait_for_timeout(300),
+                         pg.evaluate('async () => { if (window.Leaderboard) await Leaderboard.syncIfDue("test"); Save.flush(); }'))
         pg.goto(url); ready()
         pg.evaluate("""() => { localStorage.clear(); localStorage.setItem('bonk_best','777'); localStorage.setItem('bonk_coins','123');
             localStorage.setItem('bonk_levels', JSON.stringify({1:{best:500,cleared:true,stars:[true,true,false]}})); localStorage.setItem('bonk_set_sound','false'); }""")
@@ -137,7 +139,7 @@ if sync_playwright:
         (ok if lv['n'] >= 3 and lv['bad'] and lv['good'] == 0 else bad)(f'levels from JSON {lv}')
         w = pg.evaluate('() => { const a = Wallet.add(99999, "t"); const s1 = Wallet.spend(5, "t"), s2 = Wallet.spend(1e9, "t"); return { a, s1, s2, c: Wallet.coins() }; }')
         (ok if w['a'] == 5123 and w['s1'] and not w['s2'] and w['c'] == 5118 else bad)(f'wallet bounds {w}')
-        pg.click('#lsPlay', force=True); pg.wait_for_timeout(4300)
+        pg.click('.tile[data-i="0"]', force=True); pg.wait_for_timeout(200); pg.click('#lsPlay', force=True); pg.wait_for_timeout(4300)   # home opens on L2 (seeded L1 cleared) — pick L1 explicitly
         pg.evaluate('Game.puppy.inv = 1e9; Game.state.score = Game.state.level.target'); pg.wait_for_timeout(2000)
         pg.click('#btnWinRetry', force=True); pg.wait_for_timeout(500)
         pg.evaluate('document.querySelector("#btnPause").click()'); pg.wait_for_timeout(300); pg.click('#btnQuit', force=True); pg.wait_for_timeout(300)
