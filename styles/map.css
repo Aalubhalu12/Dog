@@ -1,12 +1,12 @@
 /* BONK! — Level select screen (grid of wooden tiles, paged) + shared wood/goal pieces */
-#sceneMap{justify-content:flex-start;gap:clamp(6px,1.6cqmin,12px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 2%)}
-#sceneMap .ls-spacer{flex:1}
-#sceneMap .ls-spacer.top{flex:.6}
+#sceneMap{justify-content:flex-start;gap:clamp(4px,1.2cqmin,10px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 2%)}
+#sceneMap .ls-spacer{flex:.5}
+#sceneMap .ls-spacer.top{flex:.35}
 #sceneMap::after{content:none}
 
 /* ---- hero: puppy + hanging sign ---- */
-.ls-hero{position:relative;width:100%;display:flex;align-items:flex-end;justify-content:flex-end;min-height:clamp(84px,21cqmin,150px);margin-top:0}
-.ls-pup{position:absolute;left:0;bottom:-8%;width:clamp(100px,32cqmin,190px);filter:drop-shadow(0 8px 10px #0006);animation:menuIn .7s cubic-bezier(.2,1.4,.4,1) both}
+.ls-hero{position:relative;width:100%;display:flex;align-items:flex-end;justify-content:flex-end;min-height:clamp(70px,17cqmin,130px);margin-top:0}
+.ls-pup{position:absolute;left:0;bottom:-6%;width:clamp(96px,30cqmin,180px);filter:drop-shadow(0 8px 10px #0006);animation:menuIn .7s cubic-bezier(.2,1.4,.4,1) both}
 .ls-sign{position:relative;width:min(62cqw,320px);margin-right:1%;text-align:center;color:#fff3d6;padding:clamp(8px,2.2cqmin,14px) 14px clamp(6px,1.6cqmin,10px);
   background:linear-gradient(#b4773b,#8e5726 60%,#7a4a1c);border:4px solid #d9a466;border-radius:14px;box-shadow:0 6px 0 #4e2e10,0 10px 20px #0006,inset 0 2px 0 #f2c98f66;
   animation:logoIn .6s .1s cubic-bezier(.2,1.5,.4,1) both}
@@ -16,7 +16,7 @@
 .ls-sign-sub{display:inline-block;margin-top:4px;background:#fff3d6;color:#7a4a1c;font-weight:800;font-size:clamp(11px,3.2cqmin,15px);padding:2px 12px;border-radius:8px;box-shadow:0 2px 0 #c98a44}
 
 /* ---- tile grid ---- */
-.ls-grid-wrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1.6cqmin,12px);padding:clamp(8px,2.2cqmin,14px) 2.5%;border-radius:20px;
+.ls-grid-wrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:clamp(4px,1.2cqmin,8px);padding:clamp(6px,1.8cqmin,12px) 2.5% clamp(4px,1.2cqmin,8px);border-radius:20px;
   background:linear-gradient(#5db83fcc,#3f9a2ecc);border:3px solid #a4de55aa;box-shadow:0 6px 0 #2a6e1d99,0 10px 20px #0005,inset 0 2px 0 #fff4;flex:0 0 auto}
 .ls-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(6px,2cqmin,14px);width:100%}
 .tile{position:relative;aspect-ratio:1/1.05;border-radius:14px;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;
@@ -37,14 +37,14 @@
 .tile.nudge{animation:nudgeX .35s ease}
 .tile.soon{opacity:.55;cursor:default}
 
-.ls-pager{width:100%;display:flex;align-items:center;justify-content:space-between;padding:0;margin-top:0}
-.ls-arrow{width:clamp(38px,11cqmin,58px);height:clamp(38px,11cqmin,58px);border-radius:50%;border:3px solid #fff2c2;background:linear-gradient(#ffd54a,#f39a0f);color:#fff;font-weight:900;font-size:clamp(22px,7cqmin,36px);
+.ls-pager{width:100%;display:flex;align-items:center;justify-content:space-between;padding:0 1%;margin-top:0}
+.ls-arrow{width:clamp(32px,9cqmin,48px);height:clamp(32px,9cqmin,48px);border-radius:50%;border:3px solid #fff2c2;background:linear-gradient(#ffd54a,#f39a0f);color:#fff;font-weight:900;font-size:clamp(22px,7cqmin,36px);
   line-height:1;cursor:pointer;box-shadow:0 4px 0 #b86f0a,0 6px 12px #0005;text-shadow:0 2px 0 #0004;transition:transform .1s,opacity .2s}
 .ls-arrow:active{transform:translateY(3px);box-shadow:0 1px 0 #b86f0a}
 .ls-arrow[disabled]{opacity:.35;pointer-events:none}
 .ls-dots{display:flex;gap:8px;align-items:center;background:#5a2c0b99;border:2px solid #d9a466;border-radius:999px;padding:5px 12px;box-shadow:0 3px 6px #0005}
 .ls-dots i{width:12px;height:12px;border-radius:50%;background:#a86c2c;border:2px solid #fff3d6;box-shadow:0 2px 3px #0005;display:grid;place-items:center;font-size:9px;font-style:normal}
-.ls-dots i.on{background:#fff3d6;color:#7a4a1c;width:18px;height:18px}
+.ls-dots i.on{background:#fff3d6;color:#7a4a1c;width:16px;height:16px}
 
 /* ---- details card ---- */
 .ls-card{width:100%;display:flex;gap:clamp(8px,2.4cqmin,16px);align-items:center;padding:clamp(8px,2cqmin,14px);border-radius:18px;
@@ -62,7 +62,7 @@
 .ls-info li .mini{display:flex;gap:1px;margin-left:auto}.ls-info li .mini img{width:1.2em;height:1.2em}
 
 /* ---- big green PLAY ---- */
-.btn-play{width:min(62cqw,320px);padding:clamp(6px,2cqmin,12px) 0;margin-bottom:1%;flex:none;border-radius:22px;font-size:clamp(26px,8cqmin,42px);display:flex;align-items:center;justify-content:center;gap:10px;
+.btn-play{width:min(54cqw,300px);padding:clamp(6px,2cqmin,12px) 0;margin-bottom:1%;flex:none;border-radius:22px;font-size:clamp(26px,8cqmin,42px);display:flex;align-items:center;justify-content:center;gap:10px;
   background:linear-gradient(#8ee46a,#3fae37 55%,#2a8226);border:4px solid #e9ffdf;box-shadow:0 7px 0 #1e6b1a,0 12px 20px #0006,inset 0 3px 0 #fff8;color:#fff;animation:menuIn .6s .25s cubic-bezier(.2,1.4,.4,1) both}
 .btn-play:active{transform:translateY(5px);box-shadow:0 2px 0 #1e6b1a,0 4px 8px #0006}
 .btn-play .tri{font-size:.7em;margin-top:2px}

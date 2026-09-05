@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.10.1 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.11.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -64,7 +64,7 @@ bonk/
 │   │   ├── hud.js             #   HUD DOM binding (score, hearts, coins, goal chip, power timers)
 │   │   └── modals.js          #   modal open/close + fill (pause, game over, level clear w/ stars, settings)
 │   └── scenes/                # glue: user actions ⇄ Game events ⇄ UI
-│       ├── menu.js  map.js  play.js     # MenuScene · MapScene (level board) · PlayScene
+│       ├── map.js  # HOME + level board  map.js  play.js     # MenuScene · MapScene (level board) · PlayScene
 ├── data/
 │   └── levels/                # ★ L01.json … + index.json — one file per level
 ├── assets/                    # everything the game SHIPS (all WebP, ≈4 MB)

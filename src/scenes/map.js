@@ -1,5 +1,5 @@
 /**
- * BONK! — Level select scene ("Select Level" board)
+ * BONK! — HOME scene: logo + "Select Level" board (single screen, per mockup). Also used as the level map.
  * ---------------------------------------------------------------
  * Layout (matches the level-select mockup):
  *   hero      – puppy + hanging wooden "Select Level" sign
@@ -16,7 +16,7 @@
 const MapScene = (() => {
   const $ = s => document.querySelector(s);
   const PER_PAGE = 10, COLS = 5;
-  let app, page = 0, selected = 0;
+  let app, page = 0, selected = 0, picked = false;   // picked = player tapped a tile this session (else default to current level)
 
   const pageCount = () => Math.max(1, Math.ceil(LEVELS.length / PER_PAGE));
   const unlocked   = () => Store.highestUnlocked();
@@ -37,7 +37,7 @@ const MapScene = (() => {
     grid.querySelectorAll('.tile[data-i]').forEach(el => el.onclick = () => {
       const i = +el.dataset.i; SFX.click();
       if (LEVELS[i].id > unlocked()) { Modals.toast('🔒 Clear the previous level first'); el.classList.remove('nudge'); void el.offsetWidth; el.classList.add('nudge'); return; }
-      select(i);
+      picked = true; select(i);
     });
     $('#lsDots').innerHTML = Array.from({ length: pageCount() }, (_, p) => `<i class="${p === page ? 'on' : ''}">${p === page ? '🐾' : ''}</i>`).join('');
     $('#lsPrev').disabled = page === 0; $('#lsNext').disabled = page >= pageCount() - 1;
@@ -61,17 +61,20 @@ const MapScene = (() => {
 
   function render() {
     const cur = Math.min(unlocked(), LEVELS.length) - 1;
-    if (selected < 0 || selected >= LEVELS.length || LEVELS[selected].id > unlocked()) selected = cur;
+    if (!picked || selected < 0 || selected >= LEVELS.length || LEVELS[selected].id > unlocked()) selected = cur;   // home opens on the level to continue
     page = Math.floor(selected / PER_PAGE);
     renderGrid(); select(selected);
     $('#mapStars').textContent = `${Store.totalStars()} / ${LEVELS.length * 3}`;
-    $('#mapCoins').textContent = Store.coins().toLocaleString();
+    $('#mapCoins').textContent = Store.coins().toLocaleString(); $('#best').textContent = Store.best().toLocaleString();
   }
 
   function bind(a) {
     app = a;
-    $('#mapBack').onclick = () => { SFX.click(); app.goMenu(); };
-    $('#lsPlay').onclick  = () => { SFX.click(); app.goPlay(selected); };
+    $('#lsPlay').onclick  = () => { SFX.unlock(); SFX.click(); app.goPlay(selected); };
+    $('#btnHow').onclick = () => { SFX.click(); Modals.open('#modalHow'); };
+    $('#btnSettings').onclick = () => { SFX.click(); Modals.open('#modalSettings'); };
+    $('#btnShop').onclick = () => { SFX.click(); Modals.toast('🛍️ Shop coming soon!'); };
+    $('#btnBoard').onclick = () => { SFX.click(); Modals.leaderboard(); };
     $('#lsPrev').onclick  = () => { SFX.click(); page = Math.max(0, page - 1); renderGrid(); };
     $('#lsNext').onclick  = () => { SFX.click(); page = Math.min(pageCount() - 1, page + 1); renderGrid(); };
     // swipe between pages

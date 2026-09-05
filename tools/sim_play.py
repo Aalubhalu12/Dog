@@ -42,12 +42,12 @@ with sync_playwright() as p:
     ready=lambda: (pg.wait_for_function('document.querySelector("#loader.done")',timeout=20000), pg.wait_for_timeout(300))
     pg.goto(URL); ready(); pg.evaluate('localStorage.clear()'); pg.reload(); ready()
     # ---- menu
-    check('Menu loads, PLAY shows Level 1', 'Level 1' in pg.evaluate('document.querySelector("#btnPlay").textContent'))
+    check('Home loads, Level 1 selected', 'Level 1' in pg.evaluate('document.querySelector("#lsTitle").textContent'))
     check('Fresh save: 0 stars, 0 coins', pg.evaluate('Store.totalStars()===0 && Store.coins()===0'))
     check('Levels loaded from JSON (3)', pg.evaluate('LEVELS.length')==3)
     pg.evaluate(BOT)
     # ---- play L1..L3 via UI
-    pg.click('#btnPlay',force=True)
+    pg.click('#lsPlay',force=True)
     t_start=time.time(); levels_done=[]
     pg.evaluate('__bot.start()')
     for lvl in (1,2,3):
@@ -98,9 +98,9 @@ with sync_playwright() as p:
     coins=pg.evaluate('Store.coins()'); check('Coins persisted to wallet', coins>0, f'{coins} coins')
     # ---- persistence across reload + level board
     pg.reload(); ready()
-    per=pg.evaluate('() => ({ stars: Store.totalStars(), unlocked: Store.highestUnlocked(), coins: Store.coins(), play: document.querySelector("#btnPlay").textContent.trim(), menuStars: document.querySelector("#menuStars").textContent })')
+    per=pg.evaluate('() => ({ stars: Store.totalStars(), unlocked: Store.highestUnlocked(), coins: Store.coins(), play: document.querySelector("#lsTitle").textContent.trim(), menuStars: document.querySelector("#mapStars").textContent })')
     check('Reload: progress persisted', per['unlocked']>=2 and per['coins']==coins, json.dumps(per))
-    pg.click('#btnLevels',force=True); pg.wait_for_timeout(600)
+    pg.wait_for_timeout(300)
     board=pg.evaluate('() => ({ done: document.querySelectorAll(".tile.done").length, cur: document.querySelectorAll(".tile.current").length, locked: document.querySelectorAll(".tile.locked").length })')
     check('Level board reflects progress', board['done']>=1, json.dumps(board))
     pg.screenshot(path='/home/user/bonk/docs/screenshots/sim_board.jpg',quality=75,type='jpeg')

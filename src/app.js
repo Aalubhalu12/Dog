@@ -7,7 +7,7 @@
  */
 (() => {
   const $ = s => document.querySelector(s);
-  const SCENES = { menu: { obj: MenuScene, dom: 'sceneMenu' }, map: { obj: MapScene, dom: 'sceneMap' }, play: { obj: PlayScene, dom: 'hud' } };
+  const SCENES = { menu: { obj: MapScene, dom: 'sceneMap' }, map: { obj: MapScene, dom: 'sceneMap' }, play: { obj: PlayScene, dom: 'hud' } };   // home = level board (mockup)
   let current = null;
 
   const app = {
@@ -75,7 +75,7 @@
   loadAll.then(() => {
     BG.init();
     Input.bind({ leftBtn: $('#ctlL'), rightBtn: $('#ctlR'), dragSurface: $('#bg'), canvas: $('#bg') });
-    MenuScene.bind(app); MapScene.bind(app); PlayScene.bind(app); bindSettings();
+    MapScene.bind(app); PlayScene.bind(app); bindSettings();
     Leaderboard.init();                                              // local-first; syncs only inside daily windows
     $('#appVersion').textContent = 'v' + CONFIG.VERSION;
     app.go('menu');

@@ -103,7 +103,7 @@ if sync_playwright:
             pg.wait_for_timeout(900)
             if shot and name == 'phone': pg.screenshot(path=str(shots / 'menu.jpg'), quality=82, type='jpeg')
             if shot and name == 'desktop': pg.screenshot(path=str(shots / 'desktop_frame.jpg'), quality=82, type='jpeg')
-            pg.click('#btnLevels', force=True); pg.wait_for_timeout(700)
+            pg.wait_for_timeout(300)
             if shot and name == 'phone': pg.screenshot(path=str(shots / 'level_select.jpg'), quality=82, type='jpeg')
             pg.click('#lsPlay', force=True); pg.wait_for_timeout(4200)      # countdown → running
             pg.evaluate('Game.puppy.inv=1e9')
@@ -137,7 +137,7 @@ if sync_playwright:
         (ok if lv['n'] >= 3 and lv['bad'] and lv['good'] == 0 else bad)(f'levels from JSON {lv}')
         w = pg.evaluate('() => { const a = Wallet.add(99999, "t"); const s1 = Wallet.spend(5, "t"), s2 = Wallet.spend(1e9, "t"); return { a, s1, s2, c: Wallet.coins() }; }')
         (ok if w['a'] == 5123 and w['s1'] and not w['s2'] and w['c'] == 5118 else bad)(f'wallet bounds {w}')
-        pg.click('#btnLevels', force=True); pg.wait_for_timeout(400); pg.click('#lsPlay', force=True); pg.wait_for_timeout(4300)
+        pg.click('#lsPlay', force=True); pg.wait_for_timeout(4300)
         pg.evaluate('Game.puppy.inv = 1e9; Game.state.score = Game.state.level.target'); pg.wait_for_timeout(2000)
         pg.click('#btnWinRetry', force=True); pg.wait_for_timeout(500)
         pg.evaluate('document.querySelector("#btnPause").click()'); pg.wait_for_timeout(300); pg.click('#btnQuit', force=True); pg.wait_for_timeout(300)
