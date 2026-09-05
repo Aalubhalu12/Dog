@@ -17,7 +17,7 @@
  */
 const GOALS = Object.freeze({
   bonesIn: {
-    label: c => `${c.count} bones in first ${c.seconds}s`,
+    label: c => `${c.count} bones in first ${c.seconds}s`, short: c => `🦴 ${c.count} in ${c.seconds}s`,
     init: () => ({ n: 0, hit: false }),
     on: (ev, S, st, c, it) => { if (ev === 'catch' && it.type === 'bone' && S.time <= c.seconds) { st.n++; if (st.n >= c.count) st.hit = true; } },
     done: (S, st) => st.hit,
@@ -25,14 +25,14 @@ const GOALS = Object.freeze({
     progress: (S, st, c) => Math.min(1, st.n / c.count),
   },
   coins: {
-    label: c => `Collect ${c.count} coins`,
+    label: c => `Collect ${c.count} coins`, short: c => `🪙 ${c.count}`,
     init: () => ({ n: 0 }),
     on: (ev, S, st, c, it) => { if (ev === 'catch' && it.type === 'coin') st.n += it.def.coins || 1; },
     done: (S, st, c) => st.n >= c.count,
     progress: (S, st, c) => Math.min(1, st.n / c.count),
   },
   noBomb: {
-    label: () => `No bombs (never dizzy)`,
+    label: () => `No bombs (never dizzy)`, short: () => `💣 none`,
     survive: true,                       // "don't do X" goal: only counts as done when the level is cleared (HUD keeps it live)
     init: () => ({ ok: true }),
     on: (ev, S, st, c, it) => { if (ev === 'hit' && it.type === 'bomb') st.ok = false; },
@@ -40,28 +40,28 @@ const GOALS = Object.freeze({
     progress: (S, st) => st.ok ? 1 : 0,
   },
   combo: {
-    label: c => `Reach combo ×${c.mult}`,
+    label: c => `Reach combo ×${c.mult}`, short: c => `🔥 ×${c.mult}`,
     init: () => ({ hit: false }),
     on: (ev, S, st, c) => { if (ev === 'catch' && S.combo && S.combo.mult >= c.mult) st.hit = true; },
     done: (S, st) => st.hit,
     progress: (S, st, c) => st.hit ? 1 : Math.min(1, ((S.combo && S.combo.mult) || 1) / c.mult),
   },
   nearMiss: {
-    label: c => `${c.count} near misses (Phew!)`,
+    label: c => `${c.count} near misses (Phew!)`, short: c => `😅 ${c.count}`,
     init: () => ({ n: 0 }),
     on: (ev, S, st) => { if (ev === 'near') st.n++; },
     done: (S, st, c) => st.n >= c.count,
     progress: (S, st, c) => Math.min(1, st.n / c.count),
   },
   goldBones: {
-    label: c => `Catch ${c.count} gold bone${c.count > 1 ? 's' : ''}`,
+    label: c => `Catch ${c.count} gold bone${c.count > 1 ? 's' : ''}`, short: c => `✨ ${c.count}`,
     init: () => ({ n: 0 }),
     on: (ev, S, st, c, it) => { if (ev === 'catch' && it.type === 'goldbone') st.n++; },
     done: (S, st, c) => st.n >= c.count,
     progress: (S, st, c) => Math.min(1, st.n / c.count),
   },
   power: {
-    label: c => `Grab ${c.count} power-ups`,
+    label: c => `Grab ${c.count} power-ups`, short: c => `⚡ ${c.count}`,
     init: () => ({ n: 0 }),
     on: (ev, S, st, c, it) => { if (ev === 'catch' && it.def.kind === 'power') st.n++; },
     done: (S, st, c) => st.n >= c.count,
@@ -82,6 +82,7 @@ const Goals = {
     ];
   },
   label(L) { const g = L.goal; return g ? GOALS[g.type].label(g) : ''; },
+  short(L) { const g = L.goal; return g ? (GOALS[g.type].short || GOALS[g.type].label)(g) : ''; },
   progress(S) { return S.goal ? S.goal.def.progress(S, S.goal.st, S.goal.cfg) : 0; },
   failed(S) { return !!(S.goal && S.goal.def.failed && S.goal.def.failed(S, S.goal.st, S.goal.cfg)); },
 };

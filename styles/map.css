@@ -84,9 +84,10 @@
 .btn-wood b{font-size:.8em;background:#0003;border-radius:999px;padding:2px 10px}
 
 /* ---- HUD goal chip ---- */
-.goalchip{position:relative;display:flex;align-items:center;gap:6px;background:#0f2c52b3;border:2px solid #fff;border-radius:999px;padding:3px 12px 3px 6px;color:#fff;font-weight:800;
-  font-size:clamp(11px,3.2cqmin,14px);overflow:hidden;margin-top:4px;transition:opacity .4s,transform .3s;max-width:88%;white-space:nowrap}
-.goalchip img{width:1.5em;position:relative;z-index:1}
+.goalchip{position:relative;display:flex;align-items:center;gap:4px;background:#0f2c52b3;border:2px solid #fff;border-radius:999px;padding:1px 9px 1px 4px;color:#fff;font-weight:800;
+  font-size:clamp(10px,2.9cqmin,13px);overflow:hidden;transition:opacity .4s,transform .3s;max-width:50%;white-space:nowrap;text-overflow:ellipsis}
+.goalchip span{overflow:hidden;text-overflow:ellipsis}
+.goalchip img{width:1.35em;position:relative;z-index:1}
 .goalchip span{position:relative;z-index:1}
 .goalchip i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#ffd23a88,#ff9a1f88);transition:width .3s}
 .goalchip.done{border-color:#ffd23a;background:#3fae37cc}

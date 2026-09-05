@@ -14,7 +14,7 @@ adding `export`/`import` lines — the boundaries are already clean.
 │ scenes/           MenuScene · MapScene · PlayScene           │
 │                   (glue: user actions ⇄ Game events ⇄ UI)    │
 ├──────────────────────────────────────────────────────────────┤
-│ ui/               HUD · Modals            (DOM only)         │
+│ ui/               HUD (compact, ≤15 % of stage) · Modals     │
 ├──────────────────────────────────────────────────────────────┤
 │ game/             Game ─┬─ Puppy          FTUE (first-run hints)│
 │                         ├─ Spawner ── ITEMS / POWERS (data)  │

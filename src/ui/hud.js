@@ -10,7 +10,7 @@ const HUD = (() => {
   let comboKey = '';
   let zones = null, zoneW = 0;
   let goalState = '';
-  let lastPower = '';
+  let lastPower = '', lastScore = -1;
 
   function hearts(S, animLost) {
     el.hearts.innerHTML = '';
@@ -22,7 +22,8 @@ const HUD = (() => {
   function update(S) {
     el.score.textContent = S.score.toLocaleString(); el.coins.textContent = S.coins.toLocaleString();
     el.best.textContent = Math.max(S.score, Store.best()).toLocaleString();
-    el.level.textContent = `LEVEL ${S.level.id}`;
+    el.level.textContent = `LV ${S.level.id}`;
+    if (S.score !== lastScore) { lastScore = S.score; el.score.classList.remove('bump'); void el.score.offsetWidth; el.score.classList.add('bump'); }
     el.progress.style.width = (S.cleared ? 100 : Math.min(100, S.score / S.level.target * 100)) + '%';
     let html = '';
     for (const k in S.powers) if (S.powers[k] > 0) { const P = POWERS[k];
@@ -43,7 +44,7 @@ const HUD = (() => {
       const st = done ? 'done' : failed ? 'failed' : 'live';
       if (st !== goalState) { goalState = st; el.chip.classList.toggle('done', done); el.chip.classList.toggle('failed', failed); el.chip.classList.remove('hide');
         el.chip.querySelector('img').src = Assets.url(done ? 'star_gold' : 'star_grey');
-        if (done) { el.goalText.textContent = 'Goal complete!'; FX.pop(BG.W / 2, BG.H * .30, '⭐ GOAL!', 'bad'); }
+        if (done) { el.goalText.textContent = 'Goal ✓'; FX.pop(BG.W / 2, BG.H * .30, '⭐ GOAL!', 'bad'); }
         if (done || failed) setTimeout(() => el.chip.classList.add('hide'), 3000); }
     }
   }
@@ -62,7 +63,7 @@ const HUD = (() => {
     comboKey = ''; el.combo.classList.remove('on', 'max', 'pulse'); combo(S);
     hearts(S); el.hint.style.opacity = (S && S.levelIdx > 0) || !Store.ftueDone() ? 0 : 1; lastPower = null; goalState = ''; zones = null;
     el.chip.classList.remove('done', 'failed', 'hide'); el.chip.style.display = S.goal ? '' : 'none';
-    if (S.goal) { el.goalText.textContent = Goals.label(S.level); el.chip.querySelector('img').src = Assets.url('star_grey'); el.goalBar.style.width = '0%'; }
+    if (S.goal) { el.goalText.textContent = Goals.short(S.level); el.chip.title = Goals.label(S.level); el.chip.querySelector('img').src = Assets.url('star_grey'); el.goalBar.style.width = '0%'; }
     update(S);
   }
   function countdown(txt) {

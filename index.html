@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2f8fe0">
 <title>BONK! — Catch. Dodge. Don't get bonked.</title>
-<link rel="stylesheet" href="styles/main.css?v=0.9.5">
+<link rel="stylesheet" href="styles/main.css?v=0.9.6">
 </head>
 <body>
 <div id="backdrop"></div>
@@ -65,27 +65,27 @@
 
   <!-- ================= GAME HUD ================= -->
   <div class="scene" id="hud">
-    <div class="hud-top">
-      <div class="scorebox">
-        <img src="assets/images/ui/trophy.webp" alt="">
-        <div>
-          <div class="lbl">SCORE</div>
-          <div class="val" id="hScore">0</div>
-          <div class="best">BEST <span id="hBest">0</span></div>
-        </div>
+    <!-- Compact HUD (≤15% of the stage): one row — pause+hearts | big score | coins+level — then a thin progress line and small chips -->
+    <div class="hud-row">
+      <div class="hud-l">
+        <button class="hbtn" id="btnPause" aria-label="Pause">❚❚</button>
+        <div class="hearts" id="hearts"></div>
       </div>
-      <div class="hud-right">
-        <div class="row">
-          <div class="pill"><img src="assets/images/items/coin.webp" alt=""><span id="hCoins">0</span></div>
-          <button class="iconbtn" id="btnPause" aria-label="Pause">❚❚</button>
-        </div>
-        <div class="row"><span class="level-tag" id="hLevel">LEVEL 1</span><div class="hearts" id="hearts"></div></div>
-        <div class="powerbar" id="powerbar"></div>
+      <div class="hud-c">
+        <div class="score" id="hScore">0</div>
+        <div class="best">BEST <span id="hBest">0</span></div>
+      </div>
+      <div class="hud-r">
+        <div class="chip coin"><img src="assets/images/items/coin.webp" alt=""><span id="hCoins">0</span></div>
+        <span class="lvl" id="hLevel">LV 1</span>
       </div>
     </div>
     <div class="progress" title="Level progress"><i id="levelProgress"></i><img src="assets/images/items/bone.webp" alt=""></div>
-    <div class="goalchip" id="goalChip"><img src="assets/images/ui/star_grey.webp" alt=""><span id="goalText"></span><i id="goalBar"></i></div>
-    <div class="combo" id="combo"><div class="paws" id="comboPaws"></div><div class="mult" id="comboMult">×1</div></div>
+    <div class="hud-chips">
+      <div class="goalchip" id="goalChip"><img src="assets/images/ui/star_grey.webp" alt=""><span id="goalText"></span><i id="goalBar"></i></div>
+      <div class="powerbar" id="powerbar"></div>
+      <div class="combo" id="combo"><div class="paws" id="comboPaws"></div><div class="mult" id="comboMult">×1</div></div>
+    </div>
     <div class="ftue" id="ftue"><div class="bubble" id="ftueText"></div><div class="hand" id="ftueHand">👆</div></div>
     <div class="controls">
       <button class="ctl" id="ctlL" aria-label="Left"><img src="assets/images/ui/btn_left.webp" alt="" draggable="false"></button>
@@ -179,35 +179,35 @@
 </div>
 
 <!-- core -->
-<script src="src/core/config.js?v=0.9.5"></script>
-<script src="src/core/events.js?v=0.9.5"></script>
-<script src="src/core/flags.js?v=0.9.5"></script>
-<script src="src/core/analytics.js?v=0.9.5"></script>
-<script src="src/core/save.js?v=0.9.5"></script>
-<script src="src/core/wallet.js?v=0.9.5"></script>
-<script src="src/core/storage.js?v=0.9.5"></script>
-<script src="src/core/assets.js?v=0.9.5"></script>
-<script src="src/core/audio.js?v=0.9.5"></script>
-<script src="src/core/input.js?v=0.9.5"></script>
+<script src="src/core/config.js?v=0.9.6"></script>
+<script src="src/core/events.js?v=0.9.6"></script>
+<script src="src/core/flags.js?v=0.9.6"></script>
+<script src="src/core/analytics.js?v=0.9.6"></script>
+<script src="src/core/save.js?v=0.9.6"></script>
+<script src="src/core/wallet.js?v=0.9.6"></script>
+<script src="src/core/storage.js?v=0.9.6"></script>
+<script src="src/core/assets.js?v=0.9.6"></script>
+<script src="src/core/audio.js?v=0.9.6"></script>
+<script src="src/core/input.js?v=0.9.6"></script>
 <!-- game data -->
-<script src="src/game/items.js?v=0.9.5"></script>
-<script src="src/game/goals.js?v=0.9.5"></script>
-<script src="src/game/levels.js?v=0.9.5"></script>
+<script src="src/game/items.js?v=0.9.6"></script>
+<script src="src/game/goals.js?v=0.9.6"></script>
+<script src="src/game/levels.js?v=0.9.6"></script>
 <!-- game systems -->
-<script src="src/game/ambient.js?v=0.9.5"></script>
-<script src="src/game/background.js?v=0.9.5"></script>
-<script src="src/game/effects.js?v=0.9.5"></script>
-<script src="src/game/puppy.js?v=0.9.5"></script>
-<script src="src/game/spawner.js?v=0.9.5"></script>
-<script src="src/game/game.js?v=0.9.5"></script>
-<script src="src/game/ftue.js?v=0.9.5"></script>
+<script src="src/game/ambient.js?v=0.9.6"></script>
+<script src="src/game/background.js?v=0.9.6"></script>
+<script src="src/game/effects.js?v=0.9.6"></script>
+<script src="src/game/puppy.js?v=0.9.6"></script>
+<script src="src/game/spawner.js?v=0.9.6"></script>
+<script src="src/game/game.js?v=0.9.6"></script>
+<script src="src/game/ftue.js?v=0.9.6"></script>
 <!-- ui + scenes -->
-<script src="src/ui/hud.js?v=0.9.5"></script>
-<script src="src/ui/modals.js?v=0.9.5"></script>
-<script src="src/scenes/menu.js?v=0.9.5"></script>
-<script src="src/scenes/map.js?v=0.9.5"></script>
-<script src="src/scenes/play.js?v=0.9.5"></script>
+<script src="src/ui/hud.js?v=0.9.6"></script>
+<script src="src/ui/modals.js?v=0.9.6"></script>
+<script src="src/scenes/menu.js?v=0.9.6"></script>
+<script src="src/scenes/map.js?v=0.9.6"></script>
+<script src="src/scenes/play.js?v=0.9.6"></script>
 <!-- bootstrap -->
-<script src="src/app.js?v=0.9.5"></script>
+<script src="src/app.js?v=0.9.6"></script>
 </body>
 </html>
