@@ -38,7 +38,7 @@ class Puppy {
 
   reset() {
     Object.assign(this, {
-      x: .5, vx: 0, face: 1, faceVis: 1, pose: 'idle', poseT: 0, inv: 0, stun: 0,
+      x: .5, vx: 0, face: 1, faceVis: 1, prevFace: 1, turnT: 1, pose: 'idle', poseT: 0, inv: 0, stun: 0,
       squash: 1, lean: 0, bob: 0, hop: 0, hopV: 0,
       anim: 'idle', frame: 0,                     // current visual + fractional frame
       prevAnim: null, prevFrame: 0, blend: 0,     // crossfade remaining (1 → 0)
@@ -96,10 +96,13 @@ class Puppy {
     const newFace = sp > .05 ? (this.vx > 0 ? 1 : -1) : this.face;
     this.turnCooldown -= dt;
     if (newFace !== this.face && Math.abs(prevVx) > MAX * .35 && this.turnCooldown <= 0) { this.puffDust(3); this.turnCooldown = .4; }
-    this.face = newFace;
-    // faceVis runs 1 → -1 through 0 over ~90 ms (a quick turn, not a mirror snap)
-    this.faceVis += (this.face - this.faceVis) * Math.min(1, dt / .09 * 1.6);
-    if (Math.abs(this.face - this.faceVis) < .02) this.faceVis = this.face;
+    if (newFace !== this.face) {
+      // turn = a pivot: the body narrows to 35 % (never to a line → no blink), swaps facing at the narrowest
+      // point and widens out again. A turn mid-turn just reverses the pivot from where it is.
+      this.prevFace = this.face; this.turnT = this.turnT < 1 ? 1 - this.turnT : 0;
+    }
+    this.face = newFace; this.faceVis = this.face;
+    if (this.turnT < 1) this.turnT = Math.min(1, this.turnT + dt / .15);   // 150 ms turn
 
     // --- which visual should be showing? -----------------------------------
     if (this.poseT > 0) { this.poseT -= dt; if (this.poseT <= 0) this.pose = 'idle'; }
@@ -189,19 +192,26 @@ class Puppy {
     const k = Math.min(1, lift / (box.pw * .3));
     c.save(); c.globalAlpha = .28 - k * .10; c.fillStyle = '#143c0a'; c.beginPath(); c.ellipse(box.cx, gy + 2, box.pw * (.36 - k * .08), box.pw * (.08 - k * .02), 0, 0, 6.28); c.fill(); c.restore();
 
-    c.save(); c.translate(box.cx, gy - lift);
     const sideView = this.anim === 'run' || (this.blend > 0 && this.prevAnim === 'run');
-    c.rotate(sideView ? this.lean * .6 : 0);
-    // turn: scaleX eases through 0 (a quick pivot), never a mirror snap
     const frontView = this.anim === 'dizzy' && this.blend === 0;
-    c.scale((frontView ? 1 : this.faceVis) * this.squash, 2 - this.squash);
-
-    // cross-dissolve: alphas sum to 1 → no double exposure
-    const e = this.blend * this.blend * (3 - 2 * this.blend);           // smoothstep
-    if (this.blend > 0 && this.prevAnim) { c.globalAlpha = baseAlpha * e; this.drawVisual(c, this.prevAnim, this.prevFrame, t); }
-    c.globalAlpha = baseAlpha * (this.blend > 0 ? 1 - e : 1);
-    this.drawVisual(c, this.anim, this.frame, t);
-    c.restore(); c.globalAlpha = 1;
+    // turn pivot: width follows a V (1 → .45 → 1) over turnT and the facing swaps once, at the bottom of the V.
+    // The puppy is solid and single on every frame (no ghost, no two heads) and never collapses to a line (no blink);
+    // height rises a little as width drops so the volume feels preserved.
+    const tt = this.turnT, MINW = .45;
+    const wOf = u => 1 - (1 - MINW) * Math.sin(u * Math.PI);                 // 1 at u=0/1, MINW at u=.5
+    const passes = (tt < 1 && !frontView) ? [[tt < .5 ? this.prevFace : this.face, 1, wOf(tt)]] : [[frontView ? 1 : this.face, 1, 1]];
+    for (const [fx, a, wx] of passes) {
+      c.save(); c.translate(box.cx, gy - lift);
+      c.rotate(sideView ? this.lean * .6 : 0);
+      c.scale(fx * wx * this.squash, (2 - this.squash) * (1 + (1 - wx) * .10));
+      // cross-dissolve between animations: alphas sum to 1 → no double exposure
+      const e = this.blend * this.blend * (3 - 2 * this.blend);           // smoothstep
+      if (this.blend > 0 && this.prevAnim) { c.globalAlpha = baseAlpha * a * e; this.drawVisual(c, this.prevAnim, this.prevFrame, t); }
+      c.globalAlpha = baseAlpha * a * (this.blend > 0 ? 1 - e : 1);
+      this.drawVisual(c, this.anim, this.frame, t);
+      c.restore();
+    }
+    c.globalAlpha = 1;
 
     if (shieldActive) { c.save(); const R = box.pw * .62 + Math.sin(t * 4) * 3; const g = c.createRadialGradient(box.cx, box.cy, R * .55, box.cx, box.cy, R); g.addColorStop(0, '#7fe3ff00'); g.addColorStop(.85, '#7fe3ff55'); g.addColorStop(1, '#ffffffaa');
       c.fillStyle = g; c.beginPath(); c.ellipse(box.cx, box.cy, R, R * 1.08, 0, 0, 6.28); c.fill(); c.globalAlpha = .7; c.strokeStyle = '#dff6ff'; c.lineWidth = 2; c.stroke(); c.restore(); }

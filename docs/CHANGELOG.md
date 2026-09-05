@@ -2,6 +2,12 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.1] — 2026-09-05 — Turn "blink" fixed
+### Fixed
+- Turning used to ease scaleX through 0, so for a frame or two the puppy shrank to a line and looked like it blinked
+  out. The turn is now a pivot that only narrows to 45 %, swaps facing at the narrowest point and widens back out over
+  150 ms (height rises slightly to keep the volume). Solid and single on every frame — no gap, no ghost.
+
 ## [0.12.0] — 2026-09-05 — Puppy: true 24 fps, right expression per state, pseudo-3D relight
 ### Changed
 - **24 fps everywhere.** All five puppy sheets are consecutive real clip frames (no sub-sampling): idle 20 f
