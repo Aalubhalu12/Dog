@@ -154,8 +154,15 @@ const BG = (() => {
       ctx.globalAlpha = .95; ctx.drawImage(im, c.x * W - px * AMP * c.d * 3, c.y * H + Math.sin(t * .6 + c.y * 20) * 4 - py * AMP * c.d, w, h);
     }
     ctx.globalAlpha = 1;
-    if (ambient) Ambient.drawSky(ctx, t, px * AMP);
-    for (const L of theme.layers) if (!L.front && !L.mid) { drawCover(img(L.key), -px * AMP * L.depth, -py * AMP * L.depth * .5, L.depth, L.bottom, L.width); if (L.water) drawWater(L, -px * AMP * L.depth, -py * AMP * L.depth * .5, t); }
+    // Back layers. Birds are drawn right AFTER the mountains so they fly in front
+    // of the peaks (not hidden behind them) but still behind the village/meadow.
+    let birdsDrawn = false;
+    for (const L of theme.layers) if (!L.front && !L.mid) {
+      drawCover(img(L.key), -px * AMP * L.depth, -py * AMP * L.depth * .5, L.depth, L.bottom, L.width);
+      if (L.water) drawWater(L, -px * AMP * L.depth, -py * AMP * L.depth * .5, t);
+      if (ambient && !birdsDrawn && L.key === (theme.birdsAfter || 'mountains')) { Ambient.drawSky(ctx, t, px * AMP); birdsDrawn = true; }
+    }
+    if (ambient && !birdsDrawn) Ambient.drawSky(ctx, t, px * AMP);
 
     ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = .10 + Math.sin(t * .8) * .03;
     for (let i = 0; i < 4; i++) {

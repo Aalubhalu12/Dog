@@ -17,7 +17,7 @@ const Ambient = (() => {
     WALKER_EVERY: [3.5, 8], // seconds between walkers
     BIRD_FLOCK_EVERY: [5, 10],
     MAX_CARS: 2, MAX_WALKERS: 3, MAX_BIRDS: 9,
-    BIRD_BAND: [0.06, 0.30],// sky band for birds
+    BIRD_BAND: [0.08, 0.40],// sky band for birds (crosses the peaks, drawn in front of mountains)
   };
   let W = 0, H = 0, cars = [], walkers = [], birds = [];
   let density = { birds: 1, walkers: 1, cars: 1 };   // per-level, set via setDensity()
