@@ -1,7 +1,16 @@
 /* BONK! — menu scene */
 .logo-wrap{display:flex;flex-direction:column;align-items:center;animation:logoIn .9s cubic-bezier(.2,1.5,.4,1) both}
-.logo{width:min(72cqw,40cqh);height:auto;filter:drop-shadow(0 10px 18px #0006);animation:float 3.6s ease-in-out infinite}
-.tagline{margin-top:-2%;font-weight:900;font-size:clamp(15px,4.6cqmin,26px);color:#fff;
-         text-shadow:0 2px 0 #1a5fa8,0 0 12px #0008,2px 2px 0 #1a5fa8,-2px 2px 0 #1a5fa8,2px -2px 0 #1a5fa8,-2px -2px 0 #1a5fa8}
-.tagline em{font-style:normal;color:#ffe45c}
-.menu{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2cqmin,14px);width:100%;padding-left:34%;animation:menuIn .8s .25s cubic-bezier(.2,1.4,.4,1) both}
+.logo{width:min(66cqw,36cqh);height:auto;filter:drop-shadow(0 10px 18px #0006);animation:float 3.6s ease-in-out infinite}
+/* sticker-style tagline: cream pill, wood border, slight tilt */
+.tagline{margin-top:-3%;font-weight:900;font-size:clamp(13px,3.9cqmin,20px);color:#5a2c0b;background:linear-gradient(#fffdf7,#ffe9c4);
+         border:3px solid #c98a44;outline:2px solid #fff6;border-radius:999px;padding:4px 16px;transform:rotate(-2deg);box-shadow:0 4px 0 #a86c2c88,0 6px 14px #0004;white-space:nowrap}
+.tagline em{font-style:normal;color:#e2680a}
+/* bottom block: PLAY/LEVELS to the right of the puppy, then a full-width dock of labelled icon buttons */
+.menu-bottom{width:100%;display:flex;flex-direction:column;align-items:flex-end;padding-bottom:clamp(10px,2.4cqmin,18px);gap:clamp(8px,2.2cqmin,14px);animation:menuIn .8s .25s cubic-bezier(.2,1.4,.4,1) both}
+.dock{width:68%;display:flex;justify-content:space-around;align-items:flex-start;padding:clamp(5px,1.4cqmin,9px) 2% 2px;border-radius:22px;
+      background:linear-gradient(#fff6e5e6,#ffe6bde6);border:3px solid #fff;box-shadow:0 5px 0 #c98a4488,0 8px 18px #0004;backdrop-filter:blur(4px)}
+.dock-item{display:flex;flex-direction:column;align-items:center;gap:2px}
+.dock-item span{font-weight:900;font-size:clamp(9px,2.6cqmin,12px);color:#8a4b00;letter-spacing:.3px}
+.dock .btn-sec{width:clamp(40px,11cqmin,56px);height:clamp(40px,11cqmin,56px);font-size:clamp(17px,4.8cqmin,26px);box-shadow:0 4px 0 #0f3f7a,0 6px 12px #0004}
+.dock .btn-sec:active{transform:translateY(3px);box-shadow:0 1px 0 #0f3f7a,0 3px 8px #0004}
+.menu{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2cqmin,14px);width:68%}

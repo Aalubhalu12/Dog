@@ -15,7 +15,7 @@ const MenuScene = (() => {
     const pw = Math.min(W * .30, H * .20), ph = pw * fh / fw;
     const fi = Math.floor(t * 12) % N;              // 24-frame breathing loop from the clip, 12 fps
     const breathe = 1;
-    const x = W * .10 - ax * .6, gy = H * .91 - ay * .3;
+    const x = W * .02 - ax * .6, gy = H * .935 - ay * .3;   // front grass, bottom-left, beside the button column
     c.fillStyle = 'rgba(20,60,10,.28)'; c.beginPath(); c.ellipse(x + pw / 2, gy + 2, pw * .36, pw * .08, 0, 0, 6.28); c.fill();
     c.save(); c.translate(x + pw / 2, gy); c.scale(breathe, 2 - breathe);
     c.drawImage(sheet, fi * fw, 0, fw, fh, -pw / 2, -ph, pw, ph); c.restore();
