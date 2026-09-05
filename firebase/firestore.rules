@@ -1,0 +1,9 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Leaderboard collections are written ONLY by the Cloud Function (admin SDK). Clients read nothing directly —
+    // they always go through the function, which returns the bounded slices.
+    match /lb_world/{doc}   { allow read, write: if false; }
+    match /lb_country/{doc} { allow read, write: if false; }
+  }
+}

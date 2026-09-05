@@ -6,7 +6,7 @@
  * Item definitions live in src/game/items.js
  */
 const CONFIG = Object.freeze({
-  VERSION: '0.9.8',
+  VERSION: '0.10.0',
   STORAGE_PREFIX: 'bonk_',
 
   /** Player (puppy) */
@@ -45,6 +45,12 @@ const CONFIG = Object.freeze({
   },
   /** Near-miss: a hazard passes within this many puppy-widths of the puppy without hitting */
   NEAR_MISS: { MARGIN: 0.18, COINS: 1, COOLDOWN: 0.8 },
+
+  /** Leaderboard (src/net/leaderboard.js): local-first, server only in limited daily windows */
+  LEADERBOARD: {
+    SYNC_WINDOWS_PER_DAY: 2,   // 2 → one sync allowed in 00:00–11:59 and one in 12:00–23:59 (local time)
+    ENDPOINT: '',              // '' = mock population; Phase 5: 'https://<region>-<project>.cloudfunctions.net/leaderboard'
+  },
 
   /** Countdown sequence before a level starts */
   COUNTDOWN: ['3', '2', '1', 'GO!'],

@@ -76,6 +76,7 @@
     BG.init();
     Input.bind({ leftBtn: $('#ctlL'), rightBtn: $('#ctlR'), dragSurface: $('#bg'), canvas: $('#bg') });
     MenuScene.bind(app); MapScene.bind(app); PlayScene.bind(app); bindSettings();
+    Leaderboard.init();                                              // local-first; syncs only inside daily windows
     $('#appVersion').textContent = 'v' + CONFIG.VERSION;
     app.go('menu');
     $('#loader').classList.add('done');

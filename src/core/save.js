@@ -15,7 +15,9 @@
  *   ftue: { done: false },                     // first-time-user experience shown?
  *   shop: { owned: ['classic'], equipped: 'classic' },
  *   daily: { streak: 0, last: null },          // reserved: daily bonus (Phase 4)
- *   stats: { runs, wins, losses, bones, playSec }
+ *   stats: { runs, wins, losses, bones, playSec },
+ *   profile: { uid, name, country },          // leaderboard identity (anonymous; Firebase Auth uid later)
+ *   lb: { latest, best, serverBest, lastWindow, lastSyncAt, rank:{world,country} }   // see src/net/leaderboard.js
  * }
  *
  * Guarantees
@@ -38,6 +40,8 @@ const Save = (() => {
     shop: { owned: ['classic'], equipped: 'classic' },
     daily: { streak: 0, last: null },
     stats: { runs: 0, wins: 0, losses: 0, bones: 0, playSec: 0 },
+    profile: { uid: '', name: '', country: '' },
+    lb: { latest: 0, best: 0, serverBest: 0, lastWindow: null, lastSyncAt: 0, rank: { world: 0, country: 0 } },
   });
 
   /** Deep-fill missing fields from a template (new fields added in later versions get defaults). */

@@ -43,5 +43,27 @@ const Modals = (() => {
     // star chimes in sync with the pop animation
     S.stars.forEach((ok, i) => { if (ok) setTimeout(() => SFX.star1(i), 300 + i * 300); });
   }
-  return { open, close, closeAll, isOpen, toast, gameOver, levelClear };
+
+  // ---- leaderboard: opens instantly from cache + local best; re-renders if a sync lands while open ----
+  let lbBoard = 'world', lbUnsub = null;
+  function leaderboard() {
+    $('#lbCountryTab').textContent = `${Leaderboard.flag(Leaderboard.profile().country)} Country`;
+    document.querySelectorAll('.lb-tab').forEach(b => { b.classList.toggle('on', b.dataset.board === lbBoard); b.onclick = () => { SFX.click(); lbBoard = b.dataset.board; document.querySelectorAll('.lb-tab').forEach(x => x.classList.toggle('on', x === b)); renderBoard(); }; });
+    open('#modalBoard'); renderBoard();            // open first so the list has layout for the scroll-to-me
+    if (lbUnsub) lbUnsub(); lbUnsub = Events.on('lb:synced', () => { if (isOpen('#modalBoard')) renderBoard(); });
+    Leaderboard.syncIfDue('board');            // no-op unless a daily window is open and unused
+    Analytics.track('lb_open', { board: lbBoard });
+  }
+  const lbRow = r => `<div class="lb-row${r.me ? ' me' : ''}${r.rank && r.rank <= 3 ? ' r' + r.rank : ''}"><span class="rk">${r.rank ? (r.rank <= 3 ? ['🥇', '🥈', '🥉'][r.rank - 1] : '#' + r.rank.toLocaleString()) : '—'}</span><span class="nm"><span>${Leaderboard.flag(r.country)} ${esc(r.name)}</span>${r.me ? '<em>YOU</em>' : ''}</span><b class="sc">${(r.score || 0).toLocaleString()}</b></div>`;
+  const esc = t => String(t || '').replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
+  function renderBoard() {
+    const v = Leaderboard.view(lbBoard);
+    $('#lbMe').innerHTML = `<span class="lb-you">${v.me.rank ? '#' + v.me.rank.toLocaleString() : '🐾'}</span><span class="lb-yl">${v.me.rank ? 'YOUR RANK' : 'PLAY TO RANK'}</span><b>${v.me.score.toLocaleString()}</b>`;
+    let html = `<div class="lb-h">TOP 10</div>` + (v.top.length ? v.top.map(lbRow).join('') : `<div class="lb-dim">Top players appear after your first run</div>`);
+    if (!v.inTop) html += `<div class="lb-gap">···</div><div class="lb-h">NEAR YOU</div>` + v.around.map(lbRow).join('');
+    $('#lbList').innerHTML = html;
+    const list = $('#lbList'), me = list.querySelector('.lb-row.me');       // mid-pack: land on my neighbourhood, top 10 stays one flick above
+    list.scrollTop = me && !v.inTop ? Math.max(0, me.offsetTop - list.clientHeight * .55) : 0;
+  }
+  return { open, close, closeAll, isOpen, toast, gameOver, levelClear, leaderboard };
 })();

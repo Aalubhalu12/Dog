@@ -27,6 +27,7 @@ const MenuScene = (() => {
     $('#btnHow').onclick = () => { SFX.click(); Modals.open('#modalHow'); };
     $('#btnSettings').onclick = () => { SFX.click(); Modals.open('#modalSettings'); };
     $('#btnShop').onclick = () => { SFX.click(); Modals.toast('🛍️ Shop coming soon!'); };
+    $('#btnBoard').onclick = () => { SFX.click(); Modals.leaderboard(); };
   }
   return { bind, refresh, enter() { BG.setAmp(CONFIG.PARALLAX.MENU_AMP); Ambient.setDensity({ birds: .7, walkers: .5, cars: .4 }); Ambient.reset(); refresh(); },
            frame(now, dt, simOnly, renderDt) { if (!simOnly) BG.draw(now, renderDt || 1 / 60, { overlay: drawPuppy }); } };

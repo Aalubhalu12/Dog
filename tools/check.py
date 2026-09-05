@@ -25,7 +25,7 @@ def bad(msg): print('  ✗', msg); fail.append(msg)
 
 # 1. JS syntax -------------------------------------------------------------------------------
 print('1. JS syntax')
-for js in sorted(ROOT.glob('src/**/*.js')):
+for js in sorted(list(ROOT.glob('src/**/*.js')) + list(ROOT.glob('firebase/functions/*.js'))):
     r = subprocess.run(['node', '--check', str(js)], capture_output=True, text=True)
     (ok if r.returncode == 0 else bad)(f'{js.relative_to(ROOT)} {r.stderr.strip()[:200]}')
 
@@ -154,6 +154,15 @@ if sync_playwright:
         pg.close()
         br.close()
     srv.shutdown()
+
+# 7. leaderboard (client rules + Cloud Function contract) -------------------------------------------------
+print('7. leaderboard')
+import subprocess
+r = subprocess.run([sys.executable, str(ROOT / 'tools/test_leaderboard.py')], capture_output=True, text=True)
+(ok if r.returncode == 0 else bad)(f"tools/test_leaderboard.py: {r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr[-300:]}")
+if r.returncode: print(r.stdout[-1500:])
+r = subprocess.run(['node', '--test', 'test/'], cwd=ROOT / 'firebase/functions', capture_output=True, text=True)
+(ok if r.returncode == 0 else bad)('firebase/functions/test (node --test): ' + ' '.join(l for l in r.stdout.splitlines() if l.startswith('# pass') or l.startswith('# fail')))
 
 print('\nRESULT:', 'PASS ✅' if not fail else f'FAIL ❌ ({len(fail)})')
 sys.exit(1 if fail else 0)

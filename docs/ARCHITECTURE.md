@@ -134,3 +134,6 @@ Example — drop a rock on the puppy:
 const S = Game.state, W = BG.W, H = BG.H, def = ITEMS.rock;
 S.spawner.items.push({ type:'rock', def, x: Game.puppy.x*W, y: H*.5, size: W*def.size, vy: H*.5, rot:0, vr:1, wob:0, dead:false });
 ```
+
+- `src/net/leaderboard.js` — local-first leaderboard, cached server view, daily-window sync (see docs/LEADERBOARD.md)
+- `firebase/` — Cloud Function + Firestore indexes/rules for the leaderboard

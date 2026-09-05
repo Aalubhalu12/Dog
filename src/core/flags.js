@@ -17,6 +17,7 @@ const Flags = (() => {
     daily_bonus_enabled: false,
     ftue_enabled: true,
     combo_enabled: true,         // Phase 2
+    leaderboard_enabled: true,   // local-first leaderboard with daily sync windows
     paws_enabled: false,         // energy system — stays OFF (PHASE2_PLAN)
     analytics_debug: false,
     min_version: '0.0.0',

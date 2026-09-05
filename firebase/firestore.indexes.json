@@ -1,0 +1,5 @@
+{ "indexes": [
+  { "collectionGroup": "lb_world",   "queryScope": "COLLECTION", "fields": [ { "fieldPath": "score", "order": "DESCENDING" }, { "fieldPath": "at", "order": "ASCENDING" } ] },
+  { "collectionGroup": "lb_country", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "country", "order": "ASCENDING" }, { "fieldPath": "score", "order": "DESCENDING" }, { "fieldPath": "at", "order": "ASCENDING" } ] },
+  { "collectionGroup": "lb_country", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "country", "order": "ASCENDING" }, { "fieldPath": "score", "order": "ASCENDING" } ] }
+], "fieldOverrides": [] }
