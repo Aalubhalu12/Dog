@@ -6,7 +6,7 @@
  * Item definitions live in src/game/items.js
  */
 const CONFIG = Object.freeze({
-  VERSION: '0.9.0',
+  VERSION: '0.9.5',
   STORAGE_PREFIX: 'bonk_',
 
   /** Player (puppy) */
@@ -35,6 +35,16 @@ const CONFIG = Object.freeze({
     FLASH: true,
     VIBRATE_DEFAULT: true,
   },
+
+  /** Combo: consecutive catches (bones / gold bones / coins / power-ups) without a hit or a missed bone */
+  COMBO: {
+    STEP: 4,              // catches per multiplier step  (×2 after 4, ×3 after 8 … ×5 after 16)
+    MAX: 5,
+    MISS_RESETS: true,    // letting a bone hit the ground breaks the chain (hazards always do)
+    DECAY: 0,             // (reserved) seconds of inactivity before the chain drops — 0 = never
+  },
+  /** Near-miss: a hazard passes within this many puppy-widths of the puppy without hitting */
+  NEAR_MISS: { MARGIN: 0.18, COINS: 1, COOLDOWN: 0.8 },
 
   /** Countdown sequence before a level starts */
   COUNTDOWN: ['3', '2', '1', 'GO!'],

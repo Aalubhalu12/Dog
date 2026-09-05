@@ -5,7 +5,9 @@ const HUD = (() => {
   const $ = s => document.querySelector(s);
   const el = { score: $('#hScore'), best: $('#hBest'), coins: $('#hCoins'), hearts: $('#hearts'), level: $('#hLevel'),
                power: $('#powerbar'), progress: $('#levelProgress'), hint: $('#hint'), cd: $('#countdown'), cdNum: $('#countNum'),
-               chip: $('#goalChip'), goalText: $('#goalText'), goalBar: $('#goalBar'), ctlL: $('#ctlL'), ctlR: $('#ctlR'), stage: $('#stage') };
+               chip: $('#goalChip'), goalText: $('#goalText'), goalBar: $('#goalBar'), ctlL: $('#ctlL'), ctlR: $('#ctlR'), stage: $('#stage'),
+               combo: $('#combo'), comboPaws: $('#comboPaws'), comboMult: $('#comboMult') };
+  let comboKey = '';
   let zones = null, zoneW = 0;
   let goalState = '';
   let lastPower = '';
@@ -23,7 +25,9 @@ const HUD = (() => {
     el.level.textContent = `LEVEL ${S.level.id}`;
     el.progress.style.width = (S.cleared ? 100 : Math.min(100, S.score / S.level.target * 100)) + '%';
     let html = '';
-    for (const k in S.powers) if (S.powers[k] > 0) { const P = POWERS[k]; html += `<div class="power"><i style="width:${S.powers[k] / ITEMS[P.icon].dur * 100}%"></i><img src="${Assets.url(P.icon)}">${P.label}${S.powers[k].toFixed(0)}s</div>`; }
+    for (const k in S.powers) if (S.powers[k] > 0) { const P = POWERS[k];
+      html += k === 'shield' ? `<div class="power shield"><img src="${Assets.url('shield')}">🛡</div>`
+                             : `<div class="power"><i style="width:${S.powers[k] / ITEMS[P.icon].dur * 100}%"></i><img src="${Assets.url(P.icon)}">${P.label}${S.powers[k].toFixed(0)}s</div>`; }
     if (html !== lastPower) { el.power.innerHTML = html; lastPower = html; }
     if (Input.any || (S && S.time > 4)) el.hint.style.opacity = 0;   // hide on first input or after 4 s
     // arrow buttons go translucent while the puppy runs underneath them (canvas is below the DOM)
@@ -43,8 +47,20 @@ const HUD = (() => {
         if (done || failed) setTimeout(() => el.chip.classList.add('hide'), 3000); }
     }
   }
+  /** Combo paw-chain: STEP paws fill up, then the multiplier steps; hidden while the chain is empty. */
+  function combo(S, ev) {
+    const C = S.combo, K = CONFIG.COMBO, on = C.n > 0;
+    el.combo.classList.toggle('on', on); el.combo.classList.toggle('max', C.mult >= K.MAX);
+    const filled = C.n === 0 ? 0 : C.mult >= K.MAX ? K.STEP : (C.n % K.STEP === 0 ? K.STEP : C.n % K.STEP);
+    const key = `${C.mult}:${filled}`;
+    if (key !== comboKey) { comboKey = key;
+      let h = ''; for (let i = 0; i < K.STEP; i++) h += `<i class="${i < filled ? 'on' : ''}"></i>`; el.comboPaws.innerHTML = h;
+      el.comboMult.textContent = '×' + C.mult; }
+    if (ev === 'add' && (C.n % K.STEP === 0 || C.mult >= K.MAX)) { el.combo.classList.remove('pulse'); void el.combo.offsetWidth; el.combo.classList.add('pulse'); }
+  }
   function reset(S) {
-    hearts(S); el.hint.style.opacity = S && S.levelIdx > 0 ? 0 : 1; lastPower = null; goalState = ''; zones = null;
+    comboKey = ''; el.combo.classList.remove('on', 'max', 'pulse'); combo(S);
+    hearts(S); el.hint.style.opacity = (S && S.levelIdx > 0) || !Store.ftueDone() ? 0 : 1; lastPower = null; goalState = ''; zones = null;
     el.chip.classList.remove('done', 'failed', 'hide'); el.chip.style.display = S.goal ? '' : 'none';
     if (S.goal) { el.goalText.textContent = Goals.label(S.level); el.chip.querySelector('img').src = Assets.url('star_grey'); el.goalBar.style.width = '0%'; }
     update(S);
@@ -53,5 +69,5 @@ const HUD = (() => {
     if (txt == null) { el.cd.classList.remove('on'); return; }
     el.cd.classList.add('on'); el.cdNum.textContent = txt; el.cdNum.style.animation = 'none'; void el.cdNum.offsetWidth; el.cdNum.style.animation = '';
   }
-  return { update, hearts, reset, countdown };
+  return { update, hearts, reset, countdown, combo };
 })();

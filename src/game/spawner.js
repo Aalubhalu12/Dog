@@ -41,8 +41,12 @@ class Spawner {
     this.timer = Spawner.lerp(L.spawn[0], L.spawn[1], p) * (.8 + Math.random() * .4);
   }
 
-  /** @param onCatch(item) – called when an item touches the puppy */
-  update(dt, time, puppy, powers, onCatch) {
+  /**
+   * @param onCatch(item)   – item touched the puppy
+   * @param onMiss(item)    – a good item hit the ground (combo-breaker for bones)
+   * @param onNear(item)    – a hazard passed close by without touching (near-miss)
+   */
+  update(dt, time, puppy, powers, onCatch, onMiss, onNear) {
     this.timer -= dt; if (this.timer <= 0) this.spawn(time);
     const box = puppy.box, W = BG.W, H = BG.H, clamp = (v, a, b) => v < a ? a : v > b ? b : v;
     for (const it of this.items) {
@@ -61,7 +65,10 @@ class Spawner {
       }
       const r = it.size * .36, nx = clamp(it.x, box.x, box.x + box.w), ny = clamp(it.y, box.y, box.y + box.h);
       if (it.y > box.y - r && Math.hypot(it.x - nx, it.y - ny) < r) { it.dead = true; onCatch(it); continue; }
-      if (it.y > H + it.size) it.dead = true;
+      // near-miss: a hazard's centre passes the puppy's mid-height within MARGIN puppy-widths of its body, never touching
+      if (it.def.kind === 'hazard' && !it.near && it.y > box.cy) { it.near = true;
+        const gap = Math.abs(it.x - box.cx) - box.w * .5 - r; if (gap > 0 && gap < box.pw * CONFIG.NEAR_MISS.MARGIN && puppy.inv <= 0 && onNear) onNear(it); }
+      if (it.y > H * CONFIG.PUPPY.GROUND_Y + it.size * .5) { it.dead = true; if (it.def.kind !== 'hazard' && onMiss) onMiss(it); }
     }
     this.items = this.items.filter(i => !i.dead);
   }
@@ -70,7 +77,8 @@ class Spawner {
     for (const it of this.items) {
       const im = Assets.img(it.type); if (!im) continue;
       const s = it.size, h = s * im.height / im.width;
-      if (it.def.kind === 'power') { c.save(); c.globalAlpha = .35 + Math.sin(t * 6 + it.wob) * .15; c.fillStyle = it.type === 'star' ? '#ffe45c' : '#7fe3ff'; c.beginPath(); c.arc(it.x, it.y, s * .7, 0, 6.28); c.fill(); c.restore(); }
+      if (it.def.kind === 'power' || it.def.glow) { c.save(); c.globalAlpha = .35 + Math.sin(t * 6 + it.wob) * .15; c.fillStyle = it.def.glow || (it.type === 'star' ? '#ffe45c' : '#7fe3ff'); c.beginPath(); c.arc(it.x, it.y, s * .7, 0, 6.28); c.fill(); c.restore(); }
+      if (it.def.rare) { c.save(); for (let i = 0; i < 3; i++) { const a = t * 4 + i * 2.09, rr = s * .62; c.globalAlpha = .5 + Math.sin(t * 9 + i) * .4; c.fillStyle = '#fff'; c.beginPath(); c.arc(it.x + Math.cos(a) * rr, it.y + Math.sin(a) * rr * .6, s * .05, 0, 6.28); c.fill(); } c.restore(); }
       // ground shadow: appears in the last third of the fall, tightens & darkens as the item approaches the ground line
       const gy = BG.H * CONFIG.PUPPY.GROUND_Y, near = 1 - Math.min(1, Math.max(0, (gy - it.y) / (BG.H * .33)));
       if (near > 0) { c.save(); c.globalAlpha = .22 * near; c.fillStyle = '#1e3a0a'; c.beginPath(); c.ellipse(it.x, gy + 2, s * (.55 - .2 * near), s * (.13 - .05 * near), 0, 0, 6.28); c.fill(); c.restore(); }

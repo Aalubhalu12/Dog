@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2f8fe0">
 <title>BONK! — Catch. Dodge. Don't get bonked.</title>
-<link rel="stylesheet" href="styles/main.css?v=0.9.0">
+<link rel="stylesheet" href="styles/main.css?v=0.9.5">
 </head>
 <body>
 <div id="backdrop"></div>
@@ -85,6 +85,8 @@
     </div>
     <div class="progress" title="Level progress"><i id="levelProgress"></i><img src="assets/images/items/bone.webp" alt=""></div>
     <div class="goalchip" id="goalChip"><img src="assets/images/ui/star_grey.webp" alt=""><span id="goalText"></span><i id="goalBar"></i></div>
+    <div class="combo" id="combo"><div class="paws" id="comboPaws"></div><div class="mult" id="comboMult">×1</div></div>
+    <div class="ftue" id="ftue"><div class="bubble" id="ftueText"></div><div class="hand" id="ftueHand">👆</div></div>
     <div class="controls">
       <button class="ctl" id="ctlL" aria-label="Left"><img src="assets/images/ui/btn_left.webp" alt="" draggable="false"></button>
       <button class="ctl" id="ctlR" aria-label="Right"><img src="assets/images/ui/btn_right.webp" alt="" draggable="false"></button>
@@ -100,6 +102,8 @@
       <h2>How to Play</h2>
       <p>Hold ◀ ▶, drag, or use arrow keys.<br>Catch the good stuff, dodge the bad!</p>
       <div class="legend">
+        <div><img src="assets/images/items/goldbone.webp" alt="">Gold bone +50</div>
+        <div><img src="assets/images/items/shield.webp" alt="">Shield: blocks one hit</div>
         <div><img src="assets/images/items/bone.webp" alt="">Bone +10</div><div><img src="assets/images/items/coin.webp" alt="">Coin +1</div>
         <div><img src="assets/images/items/magnet.webp" alt="">Magnet pull</div><div><img src="assets/images/items/star.webp" alt="">2× Score</div>
         <div><img src="assets/images/items/rock.webp" alt="">BONK! −1 ❤</div><div><img src="assets/images/items/bomb.webp" alt="">Dizzy −1 ❤</div>
@@ -141,6 +145,7 @@
         <div class="stat"><img src="assets/images/items/bone.webp" alt=""><b id="oBones">0</b><span>BONES</span></div>
         <div class="stat"><img src="assets/images/items/coin.webp" alt=""><b id="oCoins">0</b><span>COINS</span></div>
       </div>
+      <div class="minirow" id="oExtra"></div>
       <div class="btns">
         <button class="btn btn-primary btn-green" id="btnAgain"><span>↻ TRY AGAIN</span></button>
         <div class="btn-row"><button class="btn btn-sec" id="btnOverMap" title="Level map">🗺️</button><button class="btn btn-sec" id="btnHome" title="Menu">🏠</button></div>
@@ -159,6 +164,7 @@
         <div class="stat"><img src="assets/images/ui/heart.webp" alt=""><b id="wLives">0</b><span>LIVES LEFT</span></div>
         <div class="stat"><img src="assets/images/items/coin.webp" alt=""><b id="wCoins">0</b><span>COINS</span></div>
       </div>
+      <div class="minirow" id="wExtra"></div>
       <div class="btns">
         <button class="btn btn-primary btn-green" id="btnContinue"><span>▶ NEXT LEVEL</span></button>
         <div class="btn-row"><button class="btn btn-sec" id="btnWinRetry" title="Replay for more stars">↻</button><button class="btn btn-sec" id="btnWinMap" title="Level map">🗺️</button><button class="btn btn-sec" id="btnWinHome" title="Menu">🏠</button></div>
@@ -173,34 +179,35 @@
 </div>
 
 <!-- core -->
-<script src="src/core/config.js?v=0.9.0"></script>
-<script src="src/core/events.js?v=0.9.0"></script>
-<script src="src/core/flags.js?v=0.9.0"></script>
-<script src="src/core/analytics.js?v=0.9.0"></script>
-<script src="src/core/save.js?v=0.9.0"></script>
-<script src="src/core/wallet.js?v=0.9.0"></script>
-<script src="src/core/storage.js?v=0.9.0"></script>
-<script src="src/core/assets.js?v=0.9.0"></script>
-<script src="src/core/audio.js?v=0.9.0"></script>
-<script src="src/core/input.js?v=0.9.0"></script>
+<script src="src/core/config.js?v=0.9.5"></script>
+<script src="src/core/events.js?v=0.9.5"></script>
+<script src="src/core/flags.js?v=0.9.5"></script>
+<script src="src/core/analytics.js?v=0.9.5"></script>
+<script src="src/core/save.js?v=0.9.5"></script>
+<script src="src/core/wallet.js?v=0.9.5"></script>
+<script src="src/core/storage.js?v=0.9.5"></script>
+<script src="src/core/assets.js?v=0.9.5"></script>
+<script src="src/core/audio.js?v=0.9.5"></script>
+<script src="src/core/input.js?v=0.9.5"></script>
 <!-- game data -->
-<script src="src/game/items.js?v=0.9.0"></script>
-<script src="src/game/goals.js?v=0.9.0"></script>
-<script src="src/game/levels.js?v=0.9.0"></script>
+<script src="src/game/items.js?v=0.9.5"></script>
+<script src="src/game/goals.js?v=0.9.5"></script>
+<script src="src/game/levels.js?v=0.9.5"></script>
 <!-- game systems -->
-<script src="src/game/ambient.js?v=0.9.0"></script>
-<script src="src/game/background.js?v=0.9.0"></script>
-<script src="src/game/effects.js?v=0.9.0"></script>
-<script src="src/game/puppy.js?v=0.9.0"></script>
-<script src="src/game/spawner.js?v=0.9.0"></script>
-<script src="src/game/game.js?v=0.9.0"></script>
+<script src="src/game/ambient.js?v=0.9.5"></script>
+<script src="src/game/background.js?v=0.9.5"></script>
+<script src="src/game/effects.js?v=0.9.5"></script>
+<script src="src/game/puppy.js?v=0.9.5"></script>
+<script src="src/game/spawner.js?v=0.9.5"></script>
+<script src="src/game/game.js?v=0.9.5"></script>
+<script src="src/game/ftue.js?v=0.9.5"></script>
 <!-- ui + scenes -->
-<script src="src/ui/hud.js?v=0.9.0"></script>
-<script src="src/ui/modals.js?v=0.9.0"></script>
-<script src="src/scenes/menu.js?v=0.9.0"></script>
-<script src="src/scenes/map.js?v=0.9.0"></script>
-<script src="src/scenes/play.js?v=0.9.0"></script>
+<script src="src/ui/hud.js?v=0.9.5"></script>
+<script src="src/ui/modals.js?v=0.9.5"></script>
+<script src="src/scenes/menu.js?v=0.9.5"></script>
+<script src="src/scenes/map.js?v=0.9.5"></script>
+<script src="src/scenes/play.js?v=0.9.5"></script>
 <!-- bootstrap -->
-<script src="src/app.js?v=0.9.0"></script>
+<script src="src/app.js?v=0.9.5"></script>
 </body>
 </html>

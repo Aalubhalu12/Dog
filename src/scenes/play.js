@@ -5,6 +5,8 @@ const PlayScene = (() => {
   const $ = s => document.querySelector(s);
   let app;
 
+  let retryArmed = 0;
+  const armInstantRetry = () => { retryArmed = performance.now(); };
   const pause = () => { if (!Game.inProgress || Game.paused) return; Game.pause(); Modals.open('#modalPause'); Analytics.track('pause', { id: Game.state.level.id, at: Math.round(Game.state.time) }); };
   const togglePause = (onlyPause) => { if (Modals.isOpen('#modalPause')) { if (!onlyPause) { Modals.close('#modalPause'); Game.resume(); } } else pause(); };
 
@@ -16,8 +18,11 @@ const PlayScene = (() => {
       onHUD: HUD.update,
       onLifeLost: S => HUD.hearts(S, true),
       onLevelClear: Modals.levelClear,
-      onGameOver: Modals.gameOver,
+      onGameOver: S => { Modals.gameOver(S); armInstantRetry(); },
+      onCombo: HUD.combo,
     });
+    // Instant retry: on the game-over card, press R / Enter / Space (desktop) — the TRY AGAIN button is already the primary tap target.
+    window.addEventListener('keydown', e => { if (Modals.isOpen('#modalOver') && ['r', 'R', 'Enter', ' '].includes(e.key)) { e.preventDefault(); $('#btnAgain').click(); } });
     Input.setActiveCheck(() => Game.active && !Game.paused);
     Input.setPauseHandler(togglePause);
     $('#btnPause').onclick = () => { SFX.click(); pause(); };
@@ -34,7 +39,7 @@ const PlayScene = (() => {
     $('#btnPauseMap').onclick = () => { SFX.click(); app.goMap(); };
   }
   return { bind,
-    enter(levelIdx) { BG.setAmp(CONFIG.PARALLAX.GAME_AMP); Game.start(levelIdx); },
-    exit() { Game.stop(); },
-    frame(now, dt, simOnly, renderDt) { if (dt > 0) Game.update(dt); if (!simOnly) BG.draw(now, renderDt || 1 / 60, { overlay: (c, t) => Game.draw(c, t) }); } };
+    enter(levelIdx) { BG.setAmp(CONFIG.PARALLAX.GAME_AMP); Game.start(levelIdx); FTUE.start(levelIdx); },
+    exit() { Game.stop(); FTUE.stop(); },
+    frame(now, dt, simOnly, renderDt) { if (dt > 0) { Game.update(dt); FTUE.update(dt); } if (!simOnly) BG.draw(now, renderDt || 1 / 60, { overlay: (c, t) => Game.draw(c, t) }); } };
 })();

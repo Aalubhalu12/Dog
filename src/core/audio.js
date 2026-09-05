@@ -63,6 +63,11 @@ const SFX = (() => {
     bomb:  () => { noise(.45, 1, 400); tone(120, 30, .5, 'sawtooth', .9); tone(900, 200, .3, 'sine', .4, .05); setTimeout(lib.dizzy, 250); setTimeout(lib.whimper, 420); },
     dizzy: () => { for (let i = 0; i < 6; i++) tone(500 + (i % 2) * 200, 500 + ((i + 1) % 2) * 200, .12, 'sine', .3, i * .11); },
     heart: () => tone(200, 120, .3, 'sine', .7),
+    goldbone: () => { [784, 1047, 1319, 1568].forEach((f, i) => tone(f, f, .16, 'triangle', .55, i * .06)); tone(2093, 2637, .3, 'sine', .3, .25); },
+    shield:   () => { tone(400, 900, .18, 'sine', .5); tone(900, 1400, .25, 'triangle', .4, .12); },
+    shieldPop:() => { noise(.12, .5, 2500); tone(1200, 300, .22, 'triangle', .6); },
+    combo:    (n = 1) => { const f = 660 * Math.pow(1.122, Math.min(n, 8)); tone(f, f * 1.25, .09, 'square', .22); },   // rises with the chain
+    phew:     () => { noise(.16, .18, 900); tone(520, 700, .16, 'sine', .3, .04); },
     star1: (i = 0) => { const f = [784, 988, 1319][i] || 1319; tone(f, f, .22, 'triangle', .55); tone(f * 2, f * 2, .18, 'sine', .25, .02); },
     click: () => tone(800, 600, .06, 'square', .3),
     count: () => tone(880, 880, .1, 'square', .4),

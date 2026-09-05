@@ -1,5 +1,5 @@
 # BONK! — Status & Next Steps
-_Updated 2026-09-05 · current build **v0.9.0** (Phase 1 done) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
+_Updated 2026-09-05 · current build **v0.9.5** (Phases 1–2 done) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
 
 ---
 
@@ -26,6 +26,9 @@ _Updated 2026-09-05 · current build **v0.9.0** (Phase 1 done) · roadmap refere
 
 ### Phase 1 — Foundation (v0.9.0) ✅
 - Save v2 (versioned doc + migration + backup/corrupt recovery), Wallet, Levels as JSON with validator, Analytics buffer + export, Flags, Events, Reset progress, extended `tools/check.py`
+
+### Phase 2 — Core Fun (v0.9.5) ✅
+- Combo ×1–×5 with paw-chain HUD, near-miss "Phew!", gold bone + shield biscuit, new goal types, richer result screens + instant retry, FTUE hints
 
 ### Infra
 - Modular vanilla JS (no build step), server on :8080, public tunnel link for phone testing, Playwright screenshot checks

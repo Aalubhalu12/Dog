@@ -49,3 +49,29 @@
 @keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-8px,4px)}40%{transform:translate(8px,-4px)}60%{transform:translate(-6px,3px)}80%{transform:translate(6px,-2px)}}
 @keyframes heartPop{0%{transform:scale(1)}40%{transform:scale(1.5) rotate(-15deg)}100%{transform:scale(1)}}
 @keyframes count{0%{opacity:0;transform:scale(2.2)}30%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(.8)}}
+
+/* combo paw-chain */
+.combo{display:flex;align-items:center;gap:8px;pointer-events:none;opacity:0;transform:scale(.7);transition:opacity .25s,transform .25s;background:#0f2c52b3;border:2px solid #fff;border-radius:999px;padding:3px 12px 3px 8px;margin-top:2px}
+.combo.on{opacity:1;transform:scale(1)}
+.combo .paws{display:flex;gap:3px}
+.combo .paws i{width:clamp(14px,4.2cqmin,22px);height:clamp(14px,4.2cqmin,22px);border-radius:50%;background:#0f2c5266;border:2px solid #fff9;display:grid;place-items:center;font-size:.7em;transition:transform .15s,background .15s}
+.combo .paws i.on{background:linear-gradient(#ffe45c,#ff9a1f);border-color:#fff;box-shadow:0 0 8px #ffd23a;transform:scale(1.15)}
+.combo .paws i.on::after{content:"🐾";font-size:clamp(9px,2.6cqmin,13px);filter:drop-shadow(0 1px 0 #0006)}
+.combo .mult{font-weight:900;color:#ffd23a;font-size:clamp(16px,4.8cqmin,26px);text-shadow:0 2px 0 #b3300a,2px 2px 0 #b3300a,-2px 2px 0 #b3300a,2px -2px 0 #b3300a,-2px -2px 0 #b3300a,0 0 14px #ff9a1f;line-height:1}
+.combo.pulse .mult{animation:comboPulse .35s ease}
+.combo.max .mult{color:#fff;text-shadow:0 2px 0 #c9720a,2px 2px 0 #c9720a,-2px 2px 0 #c9720a,2px -2px 0 #c9720a,-2px -2px 0 #c9720a,0 0 20px #ffd23a}
+@keyframes comboPulse{0%{transform:scale(1)}40%{transform:scale(1.5) rotate(-6deg)}100%{transform:scale(1)}}
+.pop.lost{color:#ff8a80;font-size:clamp(16px,4.6cqmin,24px)}
+.pop.phew{color:#c8f5ff;font-size:clamp(20px,6cqmin,32px);text-shadow:0 2px 0 #1a4c86,2px 2px 0 #1a4c86,-2px 2px 0 #1a4c86,2px -2px 0 #1a4c86,-2px -2px 0 #1a4c86,0 0 14px #7fe3ff}
+.pop.gold{color:#fff4b0;font-size:clamp(24px,7.5cqmin,44px);text-shadow:0 3px 0 #b36b05,3px 3px 0 #b36b05,-3px 3px 0 #b36b05,3px -3px 0 #b36b05,-3px -3px 0 #b36b05,0 0 22px #ffd23a}
+.power.shield{background:#7fe3ff88;border-color:#fff}
+
+/* FTUE — first-time hints */
+.ftue{position:absolute;left:50%;bottom:34%;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:3}
+.ftue.on{display:flex;animation:ftueIn .35s cubic-bezier(.2,1.4,.4,1) both}
+.ftue .bubble{background:#fffdf7;color:var(--brown);border:4px solid #c98a44;border-radius:18px;padding:8px 16px;font-weight:900;font-size:clamp(14px,4.2cqmin,20px);box-shadow:0 5px 0 #7a4a1c,0 10px 20px #0006;text-align:center;max-width:78cqw;line-height:1.3;position:relative}
+.ftue .bubble::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:8px solid transparent;border-top:10px solid #c98a44}
+.ftue .hand{font-size:clamp(30px,10cqmin,52px);filter:drop-shadow(0 4px 6px #0007);animation:handSwipe 1.4s ease-in-out infinite}
+.ftue.nohand .hand{display:none}
+@keyframes handSwipe{0%,100%{transform:translateX(-30px) rotate(-10deg)}50%{transform:translateX(30px) rotate(10deg)}}
+@keyframes ftueIn{0%{opacity:0;transform:translateX(-50%) scale(.6)}100%{opacity:1;transform:translateX(-50%) scale(1)}}

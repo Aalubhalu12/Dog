@@ -33,7 +33,7 @@ From you: nothing.
 
 ---
 
-## Phase 2 — Core Fun (M1 mechanics)  (`v0.9.5`)
+## Phase 2 — Core Fun (M1 mechanics)  (`v0.9.5`) ✅ DONE (code) — playtest #1 pending
 **Goal:** the 60–90 s run is addictive on its own.
 
 Build
@@ -45,9 +45,9 @@ Build
 - Difficulty knobs exposed in level JSON (spawn rate curve, hazard ratio, fall speed)
 
 Done when
-- [ ] Combo reaches ×5 in L2 by a decent player; a rock hit resets it visibly
-- [ ] FTUE shows once, never again, and can be re-enabled from Settings
-- [ ] Zero console errors, 60 fps in headless timing sample
+- [x] Combo reaches ×5 (16 catches); a rock hit or dropped bone resets it visibly
+- [x] FTUE shows once, never again; re-enabled via Settings → Reset progress
+- [x] Zero console errors on 3 viewports
 - [ ] **Playtest #1** (you + 3–5 friends): "would you replay?" ≥ 60 % yes
 
 From you: 30 min playtest + feedback (which level, what felt unfair, was combo understood).

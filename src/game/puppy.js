@@ -176,7 +176,7 @@ class Puppy {
     c.drawImage(sheet, fi * fw, 0, fw, fh, -dw / 2, -dh, dw, dh);
   }
 
-  draw(c, t, magnetActive) {
+  draw(c, t, magnetActive, shieldActive) {
     const box = this.box, gy = this.groundY, lift = this.bob + this.hop;
     for (const d of this.dust) { c.save(); c.globalAlpha = (1 - d.t / d.life) * .35; c.fillStyle = '#e8d9b5'; c.beginPath(); c.arc(d.x, d.y, d.r * (1 + d.t * 2), 0, 6.28); c.fill(); c.restore(); }
 
@@ -199,6 +199,8 @@ class Puppy {
     this.drawVisual(c, this.anim, this.frame, t);
     c.restore(); c.globalAlpha = 1;
 
+    if (shieldActive) { c.save(); const R = box.pw * .62 + Math.sin(t * 4) * 3; const g = c.createRadialGradient(box.cx, box.cy, R * .55, box.cx, box.cy, R); g.addColorStop(0, '#7fe3ff00'); g.addColorStop(.85, '#7fe3ff55'); g.addColorStop(1, '#ffffffaa');
+      c.fillStyle = g; c.beginPath(); c.ellipse(box.cx, box.cy, R, R * 1.08, 0, 0, 6.28); c.fill(); c.globalAlpha = .7; c.strokeStyle = '#dff6ff'; c.lineWidth = 2; c.stroke(); c.restore(); }
     if (magnetActive) { c.save(); c.globalAlpha = .16 + Math.sin(t * 8) * .05; c.fillStyle = '#7fe3ff'; c.beginPath(); c.arc(box.cx, box.cy, this.W * .20 + Math.sin(t * 5) * 5, 0, 6.28); c.fill(); c.restore(); }
   }
 }

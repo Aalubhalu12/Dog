@@ -6,7 +6,7 @@
  *   Analytics.export()             // JSON string of the buffered events (Settings → "Export log")
  *   Analytics.summary()            // quick funnel numbers for playtests
  *
- * Every event carries: t (ms since epoch), s (session id), sid (seconds since session start), ver.
+ * Every event carries: ev (name), t (ms since epoch), s (session id), sid (seconds since session start), ver — these reserved keys override props.
  * The last MAX events persist in localStorage (key <prefix>alog) so a playtest log survives reloads.
  *
  * Event catalogue (keep in sync with docs/LAUNCH_PLAN.md §3.4):
@@ -18,12 +18,12 @@ const Analytics = (() => {
   const MAX = 500, KEY = () => CONFIG.STORAGE_PREFIX + 'alog';
   const sinks = []; let buf = [], session = Math.random().toString(36).slice(2, 8), t0 = Date.now(), debug = false;
 
-  try { buf = JSON.parse(localStorage.getItem(KEY()) || '[]'); if (!Array.isArray(buf)) buf = []; } catch (e) { buf = []; }
+  try { buf = JSON.parse(localStorage.getItem(KEY()) || '[]'); if (!Array.isArray(buf) || (buf.length && !buf[0].ev)) buf = []; /* drop pre-0.9.5 logs */ } catch (e) { buf = []; }
   let persistTimer = null;
   const persist = () => { persistTimer = null; try { localStorage.setItem(KEY(), JSON.stringify(buf.slice(-MAX))); } catch (e) {} };
 
   function track(name, props = {}) {
-    const ev = { n: name, t: Date.now(), s: session, sid: Math.round((Date.now() - t0) / 1000), ver: CONFIG.VERSION, ...props };
+    const ev = { ...props, ev: name, t: Date.now(), s: session, sid: Math.round((Date.now() - t0) / 1000), ver: CONFIG.VERSION };   // reserved keys win over props
     buf.push(ev); if (buf.length > MAX) buf = buf.slice(-MAX);
     if (!persistTimer) persistTimer = setTimeout(persist, 250);
     if (debug) console.log('[analytics]', name, props);
@@ -31,7 +31,7 @@ const Analytics = (() => {
     return ev;
   }
   function addSink(fn) { sinks.push(fn); return () => { const i = sinks.indexOf(fn); if (i >= 0) sinks.splice(i, 1); }; }
-  function events(filter) { return filter ? buf.filter(e => e.n === filter) : buf.slice(); }
+  function events(filter) { return filter ? buf.filter(e => e.ev === filter) : buf.slice(); }
   function clear() { buf = []; persist(); }
   function exportJSON() { return JSON.stringify({ exportedAt: new Date().toISOString(), version: CONFIG.VERSION, session, events: buf }, null, 0); }
 
@@ -39,9 +39,9 @@ const Analytics = (() => {
   function summary() {
     const by = {}; const L = id => by[id] || (by[id] = { starts: 0, wins: 0, losses: 0, retries: 0, dur: 0, ends: 0, stars: 0 });
     for (const e of buf) {
-      if (e.n === 'level_start') L(e.id).starts++;
-      if (e.n === 'level_end') { const l = L(e.id); l.ends++; l.dur += e.duration || 0; l.stars += e.starsN || 0; e.result === 'win' ? l.wins++ : l.losses++; }
-      if (e.n === 'retry') L(e.id).retries++;
+      if (e.ev === 'level_start') L(e.id).starts++;
+      if (e.ev === 'level_end') { const l = L(e.id); l.ends++; l.dur += e.duration || 0; l.stars += e.starsN || 0; e.result === 'win' ? l.wins++ : l.losses++; }
+      if (e.ev === 'retry') L(e.id).retries++;
     }
     for (const id in by) { const l = by[id]; l.winRate = l.ends ? +(l.wins / l.ends).toFixed(2) : 0; l.avgDuration = l.ends ? Math.round(l.dur / l.ends) : 0; l.avgStars = l.ends ? +(l.stars / l.ends).toFixed(2) : 0; delete l.dur; }
     return { sessions: new Set(buf.map(e => e.s)).size, events: buf.length, levels: by };

@@ -24,6 +24,17 @@ That's it. The level board, HUD, star goals, clear card and `Store.recordLevel` 
 A level file with problems is **skipped with a console error** instead of breaking the game; `Levels.validate(obj)` returns the list of problems.
 `getLevel(i)` clamps to the last entry, so "Keep playing" after the final level replays it (endless).
 
+### Goal types available for `"goal"`
+| type | fields | example |
+|---|---|---|
+| `bonesIn` | `count`, `seconds` | 8 bones in the first 30 s |
+| `coins` | `count` | collect 12 coins |
+| `noBomb` | — | never get dizzy |
+| `power` | `count` | grab 4 power-ups |
+| `combo` | `mult` | reach combo ×3 |
+| `nearMiss` | `count` | 3 near misses |
+| `goldBones` | `count` | catch 2 gold bones |
+
 ## 2. Add a falling item
 
 1. Sprite → `assets/images/items/<key>.webp` (transparent, ~260 px wide).

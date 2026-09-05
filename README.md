@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.9.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.9.5 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -53,7 +53,8 @@ bonk/
 │   │   ├── items.js           #   ★ ITEM catalogue + POWERS (data only)
 │   │   ├── levels.js          #   loads + validates data/levels/*.json into LEVELS
 │   │   ├── goals.js           #   ★ GOALS registry — 3rd-star objectives per level
-│   │   ├── game.js            #   Game controller: score, lives, powers, catch rules, star evaluation, flow
+│   │   ├── game.js            #   Game controller: score, lives, powers, combo, near-miss, shield, star evaluation, flow
+│   │   ├── ftue.js            #   first-time hints (move / catch / dodge / combo), once per save
 │   │   ├── puppy.js           #   Puppy: physics, sheet animation (idle/run/yay/bonk/dizzy), draw
 │   │   ├── spawner.js         #   Spawner: item spawning / natural falling / magnet / collisions
 │   │   ├── background.js      #   BG: parallax renderer + THEMES + camera framing
@@ -71,7 +72,7 @@ bonk/
 │   │   ├── bg/                # parallax layers: sky, clouds, mountains, village (+water_mask), meadow, road, foreground_wide, trees
 │   │   ├── ambient/           # bird sheet, walker sheets, cars
 │   │   ├── puppy/             # sprite sheets cut from AI video: run 16f · idle/yay/bonk/dizzy 24f + still poses
-│   │   ├── items/             # one sprite per item key (bone, coin, magnet, star, rock, bomb)
+│   │   ├── items/             # one sprite per item key (bone, goldbone, coin, magnet, star, shield, rock, bomb)
 │   │   ├── ui/                # board, arrows, hearts, stars, lock, trophy, paw badge
 │   │   ├── levels/            # thumb_<id>.webp — level-select thumbnails
 │   │   └── brand/             # logo
@@ -130,10 +131,15 @@ Full recipes with code: **[docs/ADDING_CONTENT.md](docs/ADDING_CONTENT.md)**
 | 🪙 Coin | +1 coin (persisted) |
 | 🧲 Magnet | 6 s — pulls bones & coins toward the puppy |
 | ⭐ Star | 8 s — 2× score |
+| 🦴✨ Gold bone | +50 (rare, sparkles) |
+| 🛡 Shield biscuit | absorbs the next hit — no heart lost, combo kept |
 | 🪨 Rock | **BONK!** −1 ❤, short stun |
 | 💣 Bomb | **DIZZY!** −1 ❤, longer stun |
 
 3 hearts per level · 1.6 s invincibility after a hit · clear a level by reaching its `target` score · "Keep playing" carries score/coins forward and restores 1 heart.
+
+**Combo:** every catch (bone, gold bone, coin, power-up) adds a paw to the chain; 4 paws = next multiplier, up to **×5** on bone score. Getting hit or letting a bone touch the ground breaks it.
+**Near-miss:** a rock/bomb that just brushes past = "PHEW!" +1 coin.
 
 **Stars per level:** ⭐ reach the target · ⭐ don't lose a heart · ⭐ level-specific goal (`src/game/goals.js`). Stars are sticky and saved per level; the level board and PLAY button use them.
 

@@ -19,7 +19,9 @@
     "rock": 22,
     "bomb": 9,
     "magnet": 5,
-    "star": 4
+    "star": 4,
+    "shield": 3,
+    "goldbone": 2
   },
   "theme": "meadow",
   "ambient": {

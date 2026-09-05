@@ -34,3 +34,8 @@
 .card .links{display:flex;gap:6px;align-items:center}
 .card .link{background:none;border:none;font:inherit;font-weight:800;color:var(--blue-dk);text-decoration:underline;cursor:pointer;padding:2px 4px}
 .card .link.danger{color:#c62828}
+
+.card .minirow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:-4px 0 8px;min-height:1.2em}
+.card .minirow span{background:#ffe6bd;border:2px solid #e8c48f;border-radius:999px;padding:2px 10px;font-weight:800;font-size:clamp(11px,3.3cqmin,14px);color:#8a4b00}
+.card .minirow span.hot{background:linear-gradient(#ffe45c,#ffb52e);border-color:#e2680a;color:#7a3400}
+.card .key{font-size:clamp(10px,3cqmin,12px);opacity:.6;margin-top:-6px}

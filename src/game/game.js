@@ -14,7 +14,8 @@ const Game = (() => {
     return {
       level: L, levelIdx, time: 0,
       score: carry ? carry.score : 0, coins: carry ? carry.coins : 0, bones: carry ? carry.bones : 0,
-      lives: carry ? carry.lives : L.hearts, mult: 1, powers: { magnet: 0, star: 0 },
+      lives: carry ? carry.lives : L.hearts, mult: 1, powers: { magnet: 0, star: 0, shield: 0 },
+      combo: { n: 0, mult: 1, best: 0, bestMult: 1 }, nearMisses: 0, shieldSaves: 0, nearCd: 0,
       spawner: new Spawner(L), cleared: false, over: false, lastHit: null,
     };
   }
@@ -50,20 +51,46 @@ const Game = (() => {
     if (!running || paused || S.over) return;
     S.time += dt;
     puppy.update(dt);
-    for (const k in S.powers) if (S.powers[k] > 0) { S.powers[k] -= dt; if (S.powers[k] <= 0) { S.powers[k] = 0; if (k === 'star') S.mult = 1; } }
-    S.spawner.update(dt, S.time, puppy, S.powers, onCatch);
+    for (const k in S.powers) if (S.powers[k] > 0 && k !== 'shield') { S.powers[k] -= dt; if (S.powers[k] <= 0) { S.powers[k] = 0; if (k === 'star') S.mult = 1; } }
+    if (S.nearCd > 0) S.nearCd -= dt;
+    S.spawner.update(dt, S.time, puppy, S.powers, onCatch, onMiss, onNear);
     FX.update(dt);
     hooks.onHUD && hooks.onHUD(S);
     if (!S.cleared && S.score >= S.level.target) { S.cleared = true; onLevelClear(); }
+  }
+
+  // --- combo ------------------------------------------------------------------
+  const comboOn = () => Flags.get('combo_enabled');
+  function comboAdd() {
+    if (!comboOn()) return;
+    const C = S.combo, K = CONFIG.COMBO; C.n++;
+    const mult = Math.min(K.MAX, 1 + Math.floor(C.n / K.STEP));
+    if (mult > C.mult) { C.mult = mult; FX.banner(`COMBO ×${mult}!`); SFX.combo(mult + 3); FX.vibrate(25); Analytics.track('combo_step', { id: S.level.id, mult, n: C.n }); }
+    else if (C.n > 1) SFX.combo(C.n % K.STEP);
+    if (C.n > C.best) C.best = C.n; if (C.mult > C.bestMult) C.bestMult = C.mult;
+    hooks.onCombo && hooks.onCombo(S, 'add');
+  }
+  function comboBreak(reason) {
+    if (!comboOn()) return; const C = S.combo; if (C.n === 0) return;
+    if (C.mult > 1) { FX.pop(puppy.box.cx, puppy.box.y - 30, 'COMBO LOST', 'lost'); Analytics.track('combo_break', { id: S.level.id, n: C.n, mult: C.mult, reason }); }
+    C.n = 0; C.mult = 1; hooks.onCombo && hooks.onCombo(S, 'break');
+  }
+  function onMiss(it) { if (it.def.kind === 'score' && CONFIG.COMBO.MISS_RESETS) comboBreak('miss'); }
+  function onNear(it) {
+    if (S.nearCd > 0 || S.over) return; S.nearCd = CONFIG.NEAR_MISS.COOLDOWN; S.nearMisses++;
+    const box = puppy.box; FX.pop(box.cx, box.y - box.h * .9, 'PHEW!', 'phew'); SFX.phew(); FX.vibrate(10);
+    if (CONFIG.NEAR_MISS.COINS) { S.coins += CONFIG.NEAR_MISS.COINS; Store.addCoins(CONFIG.NEAR_MISS.COINS); FX.pop(it.x, box.y - 10, '+1', 'coin'); }
+    Goals.event(S, 'near', it);
   }
 
   function onCatch(it) {
     const d = it.def, box = puppy.box, tx = it.x, ty = box.y - 10;
     if (d.kind !== 'hazard') {
       puppy.squash = 1.18; if (d.pose) puppy.setPose(d.pose, d.poseTime);
-      if (d.kind === 'score') { const v = d.score * S.mult; S.score += v; S.bones++; FX.pop(tx, ty, d.popText.replace('{v}', v), d.popClass); if (Math.random() < .5) FX.pop(tx, ty - 40, 'YAY!', 'bad'); FX.vibrate(15); }
+      comboAdd(); const cm = S.combo.mult;
+      if (d.kind === 'score') { const v = d.score * S.mult * cm; S.score += v; S.bones++; FX.pop(tx, ty, d.popText.replace('{v}', v), d.popClass); if (d.rare) { FX.burst(tx, ty, d.particles, 24, 1.6); FX.vibrate([20, 30, 20]); } else if (Math.random() < .5 && cm === 1) FX.pop(tx, ty - 40, 'YAY!', 'bad'); FX.vibrate(15); }
       if (d.kind === 'coin')  { S.coins += d.coins; Store.addCoins(d.coins); FX.pop(tx, ty, d.popText, d.popClass); }
-      if (d.kind === 'power') { S.powers[d.power] = d.dur; if (POWERS[d.power].multiplier) S.mult = POWERS[d.power].multiplier; FX.banner(d.banner); FX.vibrate(20); }
+      if (d.kind === 'power') { S.powers[d.power] = d.dur || 1; if (POWERS[d.power].multiplier) S.mult = POWERS[d.power].multiplier; FX.banner(d.banner); FX.vibrate(20); }
       FX.burst(tx, ty, d.particles, d.kind === 'coin' ? 6 : 12, d.kind === 'power' ? 1.3 : 1); SFX.play(d.sfx);
       Goals.event(S, 'catch', it);
       // puppy voice: a soft yip on bones, an occasional one on coins, a content wuff on power-ups — rate-limited so it never chatters
@@ -73,6 +100,12 @@ const Game = (() => {
       }
     } else {
       if (puppy.inv > 0) return;
+      if (S.powers.shield > 0) {   // the biscuit takes the hit: no heart lost, no stun, combo survives
+        S.powers.shield = 0; S.shieldSaves++; puppy.inv = .8; puppy.squash = 1.25;
+        FX.banner('SHIELDED!'); FX.burst(tx, ty, ['#7fe3ff', '#fff', '#ffd23a'], 22, 1.6); SFX.shieldPop(); FX.vibrate([20, 20, 20]);
+        Goals.event(S, 'shielded', it); Analytics.track('shield_save', { id: S.level.id }); return;
+      }
+      comboBreak('hit');
       S.lives--; S.lastHit = d.hit; Goals.event(S, 'hit', it); puppy.inv = CONFIG.PUPPY.INVINCIBLE_TIME; puppy.vx *= .2; puppy.stun = d.stun; puppy.setPose(d.pose, d.poseTime);
       FX.banner(d.banner); FX.burst(tx, ty, d.particles, 18, 1.5); FX.flash(); FX.shake(); SFX.play(d.sfx); SFX.heart();
       FX.vibrate(d.hit === 'bonk' ? [40, 30, 60] : [60, 40, 60, 40, 80]);
@@ -96,12 +129,12 @@ const Game = (() => {
   function endRun(result) {
     if (!S || S.ended) return; S.ended = true;
     const duration = Math.round((performance.now() - S.startedAt) / 1000);
-    Analytics.track('level_end', { id: S.level.id, result, score: S.score, stars: S.stars || Goals.stars(S), starsN: (S.stars || []).filter(Boolean).length, coins: S.coins, bones: S.bones, duration, heartsLost: S.heartsLost || 0 });
+    Analytics.track('level_end', { id: S.level.id, result, score: S.score, stars: S.stars || Goals.stars(S), starsN: (S.stars || []).filter(Boolean).length, coins: S.coins, bones: S.bones, duration, heartsLost: S.heartsLost || 0, comboBest: S.combo.best, comboMult: S.combo.bestMult, nearMisses: S.nearMisses, shieldSaves: S.shieldSaves });
     Store.bumpStat(result === 'win' ? 'wins' : result === 'lose' ? 'losses' : 'quits'); Store.bumpStat('bones', S.bones); Store.bumpStat('playSec', duration);
   }
 
   // --- draw ----------------------------------------------------------------
-  function draw(c, t) { if (!S) return; puppy.draw(c, t, S.powers.magnet > 0); S.spawner.draw(c, t); FX.draw(c); }
+  function draw(c, t) { if (!S) return; puppy.draw(c, t, S.powers.magnet > 0, S.powers.shield > 0); S.spawner.draw(c, t); FX.draw(c); }
 
   return {
     init(h) { hooks = h; }, start, update, draw, continueNext,

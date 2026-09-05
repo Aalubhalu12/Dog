@@ -16,7 +16,7 @@ adding `export`/`import` lines — the boundaries are already clean.
 ├──────────────────────────────────────────────────────────────┤
 │ ui/               HUD · Modals            (DOM only)         │
 ├──────────────────────────────────────────────────────────────┤
-│ game/             Game ─┬─ Puppy                             │
+│ game/             Game ─┬─ Puppy          FTUE (first-run hints)│
 │                         ├─ Spawner ── ITEMS / POWERS (data)  │
 │                         ├─ FX                                │
 │                         ├─ GOALS (3rd-star rules, data)      │
@@ -55,7 +55,8 @@ requestAnimationFrame
 {
   level, levelIdx, time,
   score, coins, bones, lives, mult,
-  powers: { magnet: secondsLeft, star: secondsLeft },
+  powers: { magnet: secondsLeft, star: secondsLeft, shield: 0|1 },
+  combo: { n, mult, best, bestMult }, nearMisses, shieldSaves,
   spawner,               // Spawner instance (items live in spawner.items)
   cleared, over, lastHit, isNewBest
 }
@@ -71,6 +72,7 @@ requestAnimationFrame
 | `onLifeLost(S)` | after a hazard hit |
 | `onLevelClear(S)` | target reached (after the banner delay) |
 | `onGameOver(S)` | lives hit 0 (after the fall delay) |
+| `onCombo(S, 'add'|'break')` | combo chain changed (HUD paw-chain) |
 
 ## Persistence (`Save` → `Wallet` → `Store`)
 

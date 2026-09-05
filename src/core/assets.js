@@ -19,6 +19,7 @@ const Assets = (() => {
     // items (keys must match src/game/items.js)
     bone: 'items/bone.webp', coin: 'items/coin.webp', magnet: 'items/magnet.webp',
     star: 'items/star.webp', rock: 'items/rock.webp', bomb: 'items/bomb.webp',
+    goldbone: 'items/goldbone.webp', shield: 'items/shield.webp',
     // ui
     heart: 'ui/heart.webp', heart_empty: 'ui/heart_empty.webp', trophy: 'ui/trophy.webp', board: 'ui/board.webp', star_gold: 'ui/star_gold.webp', star_grey: 'ui/star_grey.webp', badge_paw: 'ui/badge_paw.webp', lock: 'ui/lock.webp',
     btn_left: 'ui/btn_left.webp', btn_right: 'ui/btn_right.webp',
