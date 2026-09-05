@@ -6,7 +6,7 @@
  * Item definitions live in src/game/items.js
  */
 const CONFIG = Object.freeze({
-  VERSION: '0.9.6',
+  VERSION: '0.9.7',
   STORAGE_PREFIX: 'bonk_',
 
   /** Player (puppy) */

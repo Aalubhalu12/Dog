@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.9.6 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.9.7 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -158,7 +158,7 @@ python3 tools/check.py
 ```
 Checks JS syntax, every asset reference, level JSON files, `?v=` cache tags vs `CONFIG.VERSION`, then plays the game headless on 3 viewports asserting zero console errors, refreshes `docs/screenshots/`, and exercises the data layer (save migration, corrupt-save recovery, wallet bounds, analytics events, reset, flags). Needs `pip install playwright && python3 -m playwright install chromium` for the browser part (skipped gracefully otherwise).
 
-**Release checklist:** bump `VERSION` in `src/core/config.js` → same value in every `?v=` in `index.html` and in this README → add a `docs/CHANGELOG.md` entry → `python3 tools/check.py` green.
+**Release checklist:** bump `VERSION` in `src/core/config.js` → same value in every `?v=` in `index.html`, in the `@import`s of `styles/main.css` and in this README → add a `docs/CHANGELOG.md` entry → `python3 tools/check.py` green.
 
 ## 📜 Changelog
 See **[docs/CHANGELOG.md](docs/CHANGELOG.md)**.

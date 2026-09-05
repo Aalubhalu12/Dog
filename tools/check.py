@@ -69,6 +69,9 @@ ver = re.search(r"VERSION\s*:\s*'([\d.]+)'", (ROOT / 'src/core/config.js').read_
 for src, v in re.findall(r'(?:src|href)="((?:src|styles)/[\w/.\-]+)\?v=([\d.]+)"', html):
     (ok if (ROOT / src).exists() else bad)(src)
     if v != ver: bad(f'{src} cache tag ?v={v} != CONFIG.VERSION {ver}')
+for imp, v in re.findall(r'@import url\("([\w./-]+)\?v=([\d.]+)"\)', (ROOT / 'styles/main.css').read_text()):
+    (ok if (ROOT / 'styles' / imp).exists() else bad)(f'styles/{imp}')
+    if v != ver: bad(f'styles/main.css @import {imp} cache tag ?v={v} != CONFIG.VERSION {ver}')
 readme_ver = re.search(r'\*\*Version:\*\* ([\d.]+)', (ROOT / 'README.md').read_text())
 if readme_ver and readme_ver.group(1) != ver: bad(f'README version {readme_ver.group(1)} != {ver}')
 ok(f'CONFIG.VERSION = {ver}')
