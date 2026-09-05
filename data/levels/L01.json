@@ -1,0 +1,36 @@
+{
+  "id": 1,
+  "name": "Sunny Meadow",
+  "target": 400,
+  "hearts": 3,
+  "spawn": [
+    1.0,
+    0.62
+  ],
+  "speed": [
+    0.28,
+    0.4
+  ],
+  "ramp": 60,
+  "safeTime": 3,
+  "weights": {
+    "bone": 36,
+    "coin": 30,
+    "rock": 16,
+    "bomb": 6,
+    "magnet": 6,
+    "star": 6
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 0.6,
+    "walkers": 0,
+    "cars": 0
+  },
+  "goal": {
+    "type": "bonesIn",
+    "count": 8,
+    "seconds": 30
+  },
+  "notes": "Quiet morning: just birds. Teaches catch + dodge."
+}

@@ -23,7 +23,8 @@ adding `export`/`import` lines — the boundaries are already clean.
 │                         └─ LEVELS (data)                     │
 │                   BG (parallax, THEMES) · Ambient (bg life)  │
 ├──────────────────────────────────────────────────────────────┤
-│ core/             CONFIG · Store · Assets · SFX · Input      │
+│ core/             CONFIG · Events · Flags · Analytics        │
+│                   Save → Wallet → Store · Assets · SFX · Input│
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -71,11 +72,36 @@ requestAnimationFrame
 | `onLevelClear(S)` | target reached (after the banner delay) |
 | `onGameOver(S)` | lives hit 0 (after the fall delay) |
 
-## Persistence (`Store`)
+## Persistence (`Save` → `Wallet` → `Store`)
 
-localStorage keys are prefixed `bonk_`:
-`best`, `coins`, `levels` (`{ [id]: { best, cleared, stars:[b,b,b] } }` — stars are sticky, merged in `Store.recordLevel`), `set_sound`, `set_vib`, `set_tilt`.
-Planned (Phase 1 of `PHASES.md`): a single versioned `bonk_save` object with migrations; the cloud save in Phase 5 syncs that blob.
+One versioned document in localStorage: **`bonk_save`** (`v: 2`) plus **`bonk_save_bak`** (last known-good copy).
+
+```
+{ v, createdAt, updatedAt, best, coins,
+  levels: { [id]: { best, cleared, stars:[b,b,b], plays } },
+  settings: { sound, vib, tilt, music }, ftue: { done }, shop: { owned, equipped },
+  daily: { streak, last }, stats: { runs, wins, losses, quits, bones, playSec } }
+```
+- `Save` — load (with migrations from the v1 scattered keys `bonk_best/coins/levels/set_*`), debounced write, backup, corrupt-recovery, `get/set/update/reset/replace/toJSON`. Cloud save (Phase 5) calls `Save.replace(doc)` / `Save.toJSON()`.
+- `Wallet` — the only writer of `coins`; bounded (+5000 per add, never negative), emits `coins` events, logs `coins_earned/spent`.
+- `Store` — the facade the rest of the game uses (`best`, `levelStars`, `recordLevel`, `highestUnlocked`, `setting`, `stat`, `resetAll`).
+- `Events` — pub/sub (`coins`, `progress`, `best`, `setting`, `save:loaded|written|corrupt|reset`, `flag`).
+
+## Levels (`data/levels/*.json`)
+
+`Levels.load()` runs at boot (parallel with asset loading): reads `index.json`, fetches each file, validates
+(`Levels.validate`), normalises defaults and fills the global `LEVELS` array. Invalid files are skipped with a console error.
+
+## Analytics & flags
+
+`Analytics.track(name, props)` → ring buffer (500 events, persisted in `bonk_alog`) + sinks (Phase 5: GA4).
+Emitted by the game: `session_start · level_start · level_end{result: win|lose|quit, score, stars, duration, heartsLost} · retry{from} · continue · quit · pause · coins_spent · reset_progress · error`.
+`Flags.get(key)` → defaults in `flags.js`, overridable via URL `?flag_<key>=…` and later Remote Config (`Flags.apply`).
+
+## Boot sequence (`app.js`)
+
+`Save.load()` → `Analytics.track('session_start')` → `Promise.all([Levels.load(), Assets.load()])` → `BG.init()` → bind scenes → menu.
+A load failure shows a retry screen instead of a blank page.
 
 ## Responsive stage
 

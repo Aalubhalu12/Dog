@@ -31,6 +31,18 @@
         if (key === 'tilt') BG.setTilt(on); if (key === 'sound') syncSound(on); };
     });
     syncSound(Store.setting('sound')); BG.setTilt(Store.setting('tilt'));
+    // data actions
+    $('#btnExportLog').onclick = () => {
+      SFX.click(); const data = Analytics.export();
+      try { const blob = new Blob([data], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `bonk-log-${Date.now()}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+      catch (e) { console.log(data); }
+      if (navigator.clipboard) navigator.clipboard.writeText(data).catch(() => {});
+      Modals.toast('📋 Log exported (also copied)'); console.table(Analytics.summary().levels);
+    };
+    $('#btnResetProgress').onclick = () => {
+      SFX.click(); if (!confirm('Reset ALL progress, coins and stars? This cannot be undone.')) return;
+      Store.resetAll(); Analytics.track('reset_progress'); Modals.closeAll(); app.goMenu(); Modals.toast('Progress reset');
+    };
     $('#btnSound').onclick = () => { const tg = $('[data-setting="sound"]'); tg.classList.toggle('on'); const on = tg.classList.contains('on'); Store.setSetting('sound', on); syncSound(on); SFX.click(); };
   }
 
@@ -48,7 +60,19 @@
     requestAnimationFrame(frame);
   }
 
-  Assets.load(p => { $('#loadbar').style.width = (p * 100) + '%'; }).then(() => {
+  // --- boot: save → levels → assets → scenes -------------------------------
+  Events.on('save:corrupt', () => setTimeout(() => Modals.toast('⚠️ Save was damaged — started fresh'), 1500));
+  Events.on('save:loaded', ({ source }) => { if (source === 'backup') setTimeout(() => Modals.toast('♻️ Restored from backup save'), 1500); });
+  Save.load();                                                       // migrates v1 keys, recovers backups
+  Analytics.debug = Flags.get('analytics_debug');
+  Analytics.track('session_start', { best: Store.best(), coins: Store.coins(), stars: Store.totalStars(), unlocked: Store.highestUnlocked() });
+
+  const loadAll = Promise.all([
+    Levels.load(),
+    Assets.load(p => { $('#loadbar').style.width = (p * 100) + '%'; }),
+  ]);
+  loadAll.catch(err => { console.error(err); const l = $('#loader'); l.innerHTML = `<div style="color:#fff;font-weight:800;padding:24px;text-align:center">😿 Could not load the game.<br><small>${String(err.message || err)}</small><br><br><button onclick="location.reload()" style="font:inherit;padding:8px 20px;border-radius:12px;border:0">Retry</button></div>`; });
+  loadAll.then(() => {
     BG.init();
     Input.bind({ leftBtn: $('#ctlL'), rightBtn: $('#ctlR'), dragSurface: $('#bg'), canvas: $('#bg') });
     MenuScene.bind(app); MapScene.bind(app); PlayScene.bind(app); bindSettings();

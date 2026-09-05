@@ -10,6 +10,8 @@ What it does
   4. starts a throw-away static server, loads the game headless on 3 viewports,
      walks menu → levels → play → pause → resume, asserts ZERO console errors / page errors
   5. saves fresh screenshots to docs/screenshots/ (menu / level_select / gameplay / desktop_frame)
+  6. data layer: v1 → v2 save migration, corrupt-save recovery, level JSON validation, wallet bounds,
+     analytics events for a full run (level_start / level_end / retry / quit), reset progress, URL flags
 Exit code 0 = all green.
 """
 import os, re, subprocess, sys, threading, http.server, socketserver, functools, time, pathlib
@@ -42,6 +44,24 @@ for u in sorted(shipped - used):
     if re.search(r'thumb_\d+\.webp$', u): continue        # thumbnails are built dynamically per level id
     print('  ! unreferenced:', u)
 
+# 2b. level data files
+print('2b. level data')
+import json
+idx = json.loads((ROOT / 'data/levels/index.json').read_text())
+prev = 0
+for f in idx['levels']:
+    fp = ROOT / 'data/levels' / f
+    if not fp.exists(): bad(f'{f} listed in index.json but missing'); continue
+    try: L = json.loads(fp.read_text())
+    except Exception as e: bad(f'{f}: invalid JSON ({e})'); continue
+    req = ['id', 'name', 'target', 'hearts', 'spawn', 'speed', 'ramp', 'safeTime', 'weights']
+    miss = [k for k in req if k not in L]
+    if miss: bad(f'{f}: missing {miss}')
+    elif L['id'] != prev + 1: bad(f'{f}: id {L["id"]} not consecutive (expected {prev + 1})')
+    else: ok(f'{f}: L{L["id"]} {L["name"]} target {L["target"]}'); prev = L['id']
+extra = sorted(p.name for p in (ROOT / 'data/levels').glob('L*.json') if p.name not in idx['levels'])
+for e in extra: print('  ! not in index.json:', e)
+
 # 3. script tags + version --------------------------------------------------------------------
 print('3. index.html scripts + version')
 html = (ROOT / 'index.html').read_text()
@@ -62,8 +82,9 @@ except ImportError:
     sync_playwright = None
 
 if sync_playwright:
-    Handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(ROOT))
-    Handler.log_message = lambda *a, **k: None
+    class Quiet(http.server.SimpleHTTPRequestHandler):
+        def log_message(self, *a, **k): pass
+    Handler = functools.partial(Quiet, directory=str(ROOT))
     srv = socketserver.TCPServer(('127.0.0.1', 0), Handler); port = srv.server_address[1]
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     url = f'http://127.0.0.1:{port}/index.html?a={int(time.time())}'
@@ -93,6 +114,41 @@ if sync_playwright:
             (ok if lvl == 1 and paused and not errs else bad)(msg)
             for e in errs[:5]: print('     ', e[:200])
             pg.close()
+        # 6. data layer ---------------------------------------------------------------
+        print('6. data layer (save v2 / levels / wallet / analytics)')
+        errs = []
+        pg = br.new_page(viewport={'width': 390, 'height': 844})
+        pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        ready = lambda: (pg.wait_for_function('document.querySelector("#loader.done")', timeout=20000), pg.wait_for_timeout(300))
+        pg.goto(url); ready()
+        pg.evaluate("""() => { localStorage.clear(); localStorage.setItem('bonk_best','777'); localStorage.setItem('bonk_coins','123');
+            localStorage.setItem('bonk_levels', JSON.stringify({1:{best:500,cleared:true,stars:[true,true,false]}})); localStorage.setItem('bonk_set_sound','false'); }""")
+        pg.reload(); ready()
+        m = pg.evaluate('() => ({ v: Save.doc.v, best: Store.best(), coins: Store.coins(), stars: Store.totalStars(), unlocked: Store.highestUnlocked(), sound: Store.setting("sound"), legacyGone: localStorage.getItem("bonk_levels") === null })')
+        (ok if m == {'v': 2, 'best': 777, 'coins': 123, 'stars': 2, 'unlocked': 2, 'sound': False, 'legacyGone': True} else bad)(f'v1 → v2 migration {m}')
+        pg.evaluate('() => { Save.flush(); localStorage.setItem("bonk_save", "{broken"); }'); pg.reload(); ready()
+        r = pg.evaluate('() => ({ coins: Store.coins(), best: Store.best() })')
+        (ok if r == {'coins': 123, 'best': 777} else bad)(f'corrupt main → backup recovery {r}')
+        lv = pg.evaluate('() => ({ n: LEVELS.length, bad: Levels.validate({id:0}).length > 3, good: Levels.validate(JSON.parse(JSON.stringify(LEVELS[0]))).length })')
+        (ok if lv['n'] >= 3 and lv['bad'] and lv['good'] == 0 else bad)(f'levels from JSON {lv}')
+        w = pg.evaluate('() => { const a = Wallet.add(99999, "t"); const s1 = Wallet.spend(5, "t"), s2 = Wallet.spend(1e9, "t"); return { a, s1, s2, c: Wallet.coins() }; }')
+        (ok if w['a'] == 5123 and w['s1'] and not w['s2'] and w['c'] == 5118 else bad)(f'wallet bounds {w}')
+        pg.click('#btnLevels', force=True); pg.wait_for_timeout(400); pg.click('#lsPlay', force=True); pg.wait_for_timeout(4300)
+        pg.evaluate('Game.puppy.inv = 1e9; Game.state.score = Game.state.level.target'); pg.wait_for_timeout(2000)
+        pg.click('#btnWinRetry', force=True); pg.wait_for_timeout(500)
+        pg.evaluate('document.querySelector("#btnPause").click()'); pg.wait_for_timeout(300); pg.click('#btnQuit', force=True); pg.wait_for_timeout(300)
+        a = pg.evaluate('() => ({ ends: Analytics.events("level_end").map(e => e.result), retry: Analytics.events("retry").length, starts: Analytics.events("level_start").length, plays: (Store.levelProgress()[1]||{}).plays, exp: Analytics.export().length > 100 })')
+        (ok if a['ends'] == ['win', 'quit'] and a['retry'] == 1 and a['starts'] == 2 and a['plays'] == 1 and a['exp'] else bad)(f'analytics run events {a}')
+        pg.evaluate('window.confirm = () => true'); pg.click('#btnSettings', force=True); pg.wait_for_timeout(300); pg.click('#btnResetProgress', force=True); pg.wait_for_timeout(400)
+        rs = pg.evaluate('() => ({ u: Store.highestUnlocked(), c: Store.coins(), b: Store.best() })')
+        (ok if rs == {'u': 1, 'c': 0, 'b': 0} else bad)(f'reset progress {rs}')
+        pg.goto(url + '&flag_shop_enabled=1'); ready()
+        fl = pg.evaluate('() => Flags.get("shop_enabled") === true && Flags.get("paws_enabled") === false')
+        (ok if fl else bad)('URL flag overrides')
+        (ok if not errs else bad)(f'data-layer console errors: {len(errs)}')
+        for e in errs[:5]: print('     ', e[:200])
+        pg.close()
         br.close()
     srv.shutdown()
 

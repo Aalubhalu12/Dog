@@ -1,5 +1,5 @@
 # BONK! — Status & Next Steps
-_Updated 2026-09-05 · current build **v0.8.2** · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
+_Updated 2026-09-05 · current build **v0.9.0** (Phase 1 done) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
 
 ---
 
@@ -23,6 +23,9 @@ _Updated 2026-09-05 · current build **v0.8.2** · roadmap reference: `PHASE2_PL
 - Menu: PLAY continues from furthest level, LEVELS button with total stars
 - "Premium casual" look: wood-framed cards, glossy buttons, icon rows on pause / game over / win
 - Cache-busting (`?v=`), README / CHANGELOG / ADDING_CONTENT / ANIMATION_BRIEF kept current
+
+### Phase 1 — Foundation (v0.9.0) ✅
+- Save v2 (versioned doc + migration + backup/corrupt recovery), Wallet, Levels as JSON with validator, Analytics buffer + export, Flags, Events, Reset progress, extended `tools/check.py`
 
 ### Infra
 - Modular vanilla JS (no build step), server on :8080, public tunnel link for phone testing, Playwright screenshot checks

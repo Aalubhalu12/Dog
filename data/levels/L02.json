@@ -1,0 +1,35 @@
+{
+  "id": 2,
+  "name": "Rocky Road",
+  "target": 900,
+  "hearts": 3,
+  "spawn": [
+    0.7,
+    0.45
+  ],
+  "speed": [
+    0.38,
+    0.55
+  ],
+  "ramp": 60,
+  "safeTime": 2,
+  "weights": {
+    "bone": 32,
+    "coin": 28,
+    "rock": 22,
+    "bomb": 9,
+    "magnet": 5,
+    "star": 4
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 0.8,
+    "walkers": 0.6,
+    "cars": 0
+  },
+  "goal": {
+    "type": "coins",
+    "count": 12
+  },
+  "notes": "Villagers come out. More rocks."
+}

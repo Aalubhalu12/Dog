@@ -5,7 +5,7 @@ const PlayScene = (() => {
   const $ = s => document.querySelector(s);
   let app;
 
-  const pause = () => { if (!Game.inProgress || Game.paused) return; Game.pause(); Modals.open('#modalPause'); };
+  const pause = () => { if (!Game.inProgress || Game.paused) return; Game.pause(); Modals.open('#modalPause'); Analytics.track('pause', { id: Game.state.level.id, at: Math.round(Game.state.time) }); };
   const togglePause = (onlyPause) => { if (Modals.isOpen('#modalPause')) { if (!onlyPause) { Modals.close('#modalPause'); Game.resume(); } } else pause(); };
 
   function bind(a) {
@@ -22,14 +22,14 @@ const PlayScene = (() => {
     Input.setPauseHandler(togglePause);
     $('#btnPause').onclick = () => { SFX.click(); pause(); };
     $('#btnResume').onclick = () => { SFX.click(); Modals.close('#modalPause'); Game.resume(); };
-    $('#btnRestart').onclick = () => { SFX.click(); Modals.close('#modalPause'); Game.start(Game.state.levelIdx); };
+    $('#btnRestart').onclick = () => { SFX.click(); Modals.close('#modalPause'); Analytics.track('retry', { id: Game.state.level.id, from: 'pause' }); Game.start(Game.state.levelIdx); };
     $('#btnQuit').onclick = () => { SFX.click(); app.goMenu(); };
-    $('#btnAgain').onclick = () => { SFX.click(); Modals.close('#modalOver'); Game.start(Game.state.levelIdx); };
+    $('#btnAgain').onclick = () => { SFX.click(); Modals.close('#modalOver'); Analytics.track('retry', { id: Game.state.level.id, from: 'gameover' }); Game.start(Game.state.levelIdx); };
     $('#btnHome').onclick = () => { SFX.click(); app.goMenu(); };
-    $('#btnContinue').onclick = () => { SFX.click(); Modals.close('#modalWin'); Game.continueNext(); };
+    $('#btnContinue').onclick = () => { SFX.click(); Modals.close('#modalWin'); Analytics.track('continue', { from: Game.state.level.id }); Game.continueNext(); };
     $('#btnWinHome').onclick = () => { SFX.click(); app.goMenu(); };
     $('#btnWinMap').onclick = () => { SFX.click(); app.goMap(); };
-    $('#btnWinRetry').onclick = () => { SFX.click(); Modals.close('#modalWin'); Game.start(Game.state.levelIdx); };
+    $('#btnWinRetry').onclick = () => { SFX.click(); Modals.close('#modalWin'); Analytics.track('retry', { id: Game.state.level.id, from: 'win' }); Game.start(Game.state.levelIdx); };
     $('#btnOverMap').onclick = () => { SFX.click(); app.goMap(); };
     $('#btnPauseMap').onclick = () => { SFX.click(); app.goMap(); };
   }

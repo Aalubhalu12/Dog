@@ -12,7 +12,7 @@ P1 Foundation ─► P2 Core Fun ─► P3 Content ─► P4 Meta & Screens ─�
 
 ---
 
-## Phase 1 — Foundation  (`v0.9.0`)
+## Phase 1 — Foundation  (`v0.9.0`) ✅ DONE
 **Goal:** data & save layer solid before anything is built on it.
 
 Build
@@ -24,10 +24,10 @@ Build
 - Playwright regression script: menu / levels / game / pause / win / lose screenshots on 3 sizes
 
 Done when
-- [ ] Old saves migrate with no loss (tested with seeded localStorage)
-- [ ] All 3 existing levels load from JSON and play identically
-- [ ] `analytics.export()` returns the events of a full run
-- [ ] Regression script runs green in one command
+- [x] Old saves migrate with no loss (tested with seeded localStorage)
+- [x] All 3 existing levels load from JSON and play identically
+- [x] `Analytics.export()` returns the events of a full run
+- [x] Regression script runs green in one command (`python3 tools/check.py`)
 
 From you: nothing.
 

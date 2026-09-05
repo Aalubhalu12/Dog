@@ -1,54 +1,81 @@
 /**
- * BONK! — Level definitions
+ * BONK! — Levels: loaded from data/levels/*.json
  * ---------------------------------------------------------------
- * Add a level by appending an object to LEVELS. Nothing else needs
- * to change — the level select, HUD, progress bar and level-clear
- * flow all read from this array.
+ * Add a level:  create data/levels/L04.json (copy L03.json), add its file
+ * name to data/levels/index.json — nothing else changes. The level board,
+ * HUD, star goals and clear flow all read from the LEVELS array.
  *
- * Fields:
- *   id        – display number
- *   name      – short title shown on the clear card
- *   target    – score needed to clear the level
+ * Fields (validated by Levels.validate — a bad file is reported in the console
+ * and the level is skipped instead of breaking the game):
+ *   id        – display number (1-based, unique, in order)
+ *   name      – short title
+ *   target    – score needed to clear the level                         ★1
  *   hearts    – lives at start (also the max)
- *   duration  – (optional) if set, level also ends when the timer runs out
  *   spawn     – [startInterval, endInterval] seconds between spawns
  *   speed     – [startSpeed, endSpeed] fall speed (stage heights / second)
  *   ramp      – seconds over which spawn/speed go from start → end
- *   weights   – relative spawn chance per item key (see items.js)
+ *   weights   – relative spawn chance per item key (must exist in ITEMS)
  *   safeTime  – seconds at the start with no hazards
- *   theme     – background theme key, default 'meadow'
- *   ambient   – background life density: { birds, walkers, cars } each 0..1 (0 = none). Grows level by level.
- *   goal      – the level-specific 3rd star. Types (see GOALS in goals.js):
- *                 { type:'bonesIn', count, seconds }  – catch N bones within the first T seconds
- *                 { type:'coins', count }             – collect N coins this level
- *                 { type:'noBomb' }                   – never get dizzy
- *                 { type:'power', count }             – grab N power-ups
- *               Star 1 = reach target · Star 2 = don't lose a heart · Star 3 = goal. Timed goals are never game-over.
- *   unlock    – (future) requirement, e.g. { stars: 3 }
+ *   theme     – background theme key (BG.THEMES), default 'meadow'
+ *   ambient   – background life density { birds, walkers, cars } each 0..1
+ *   goal      – the level-specific 3rd star, { type, ... } — type must exist in GOALS   ★3
+ *   notes     – (optional) designer notes, ignored by the game
+ *   modifiers – (optional, Phase 3+) e.g. { wind: 0.4 }
+ * ★2 is always "don't lose a heart".
  */
-const LEVELS = [
-  {
-    id: 1, name: 'Sunny Meadow', target: 400, hearts: 3,
-    spawn: [1.00, 0.62], speed: [0.28, 0.40], ramp: 60, safeTime: 3,
-    weights: { bone: 36, coin: 30, rock: 16, bomb: 6, magnet: 6, star: 6 },
-    theme: 'meadow', ambient: { birds: .6, walkers: 0, cars: 0 },        // quiet morning: just birds
-    goal: { type: 'bonesIn', count: 8, seconds: 30 },
-  },
-  {
-    id: 2, name: 'Rocky Road', target: 900, hearts: 3,
-    spawn: [0.70, 0.45], speed: [0.38, 0.55], ramp: 60, safeTime: 2,
-    weights: { bone: 32, coin: 28, rock: 22, bomb: 9, magnet: 5, star: 4 },
-    theme: 'meadow', ambient: { birds: .8, walkers: .6, cars: 0 },       // villagers come out
-    goal: { type: 'coins', count: 12 },
-  },
-  {
-    id: 3, name: 'Bomb Squad', target: 1500, hearts: 3,
-    spawn: [0.60, 0.38], speed: [0.45, 0.65], ramp: 60, safeTime: 2,
-    weights: { bone: 30, coin: 26, rock: 20, bomb: 14, magnet: 5, star: 5 },
-    theme: 'meadow', ambient: { birds: 1, walkers: .8, cars: .7 },       // the lane gets busy
-    goal: { type: 'noBomb' },
-  },
-];
+const LEVELS = [];                                   // filled by Levels.load() before the app starts
+
+const Levels = (() => {
+  const ROOT = 'data/levels/';
+  const NUM = (v, lo, hi) => typeof v === 'number' && v >= lo && v <= hi;
+  const PAIR = v => Array.isArray(v) && v.length === 2 && v.every(n => typeof n === 'number' && n > 0);
+
+  /** Returns [] if valid, else a list of problems. */
+  function validate(L) {
+    const p = [];
+    if (!Number.isInteger(L.id) || L.id < 1) p.push('id must be a positive integer');
+    if (typeof L.name !== 'string' || !L.name) p.push('name missing');
+    if (!NUM(L.target, 1, 1e7)) p.push('target must be a number ≥ 1');
+    if (!Number.isInteger(L.hearts) || L.hearts < 1 || L.hearts > 9) p.push('hearts must be 1..9');
+    if (!PAIR(L.spawn)) p.push('spawn must be [start, end] seconds');
+    if (!PAIR(L.speed)) p.push('speed must be [start, end]');
+    if (!NUM(L.ramp, 1, 600)) p.push('ramp must be 1..600 s');
+    if (!NUM(L.safeTime, 0, 30)) p.push('safeTime must be 0..30 s');
+    if (!L.weights || typeof L.weights !== 'object' || !Object.keys(L.weights).length) p.push('weights missing');
+    else for (const k in L.weights) { if (!(k in ITEMS)) p.push(`weights: unknown item '${k}'`); if (!NUM(L.weights[k], 0, 1000)) p.push(`weights.${k} must be 0..1000`); }
+    if (L.weights && !Object.keys(L.weights).some(k => ITEMS[k] && ITEMS[k].kind === 'score')) p.push('weights must include at least one score item (bone)');
+    if (L.theme != null && typeof L.theme !== 'string') p.push('theme must be a string');
+    if (L.ambient) for (const k of ['birds', 'walkers', 'cars']) if (L.ambient[k] != null && !NUM(L.ambient[k], 0, 1)) p.push(`ambient.${k} must be 0..1`);
+    if (L.goal) { if (!L.goal.type || !(L.goal.type in GOALS)) p.push(`goal.type '${L.goal && L.goal.type}' unknown (GOALS: ${Object.keys(GOALS).join(', ')})`); }
+    return p;
+  }
+
+  function normalise(L) {
+    return Object.freeze({ theme: 'meadow', ambient: { birds: 0, walkers: 0, cars: 0 }, safeTime: 0, modifiers: {}, ...L, ambient: { birds: 0, walkers: 0, cars: 0, ...(L.ambient || {}) } });
+  }
+
+  const fetchJSON = async url => { const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + CONFIG.VERSION, { cache: 'no-cache' }); if (!r.ok) throw new Error(`${url} → HTTP ${r.status}`); return r.json(); };
+
+  /** Load index + all level files. Resolves with LEVELS (also filled in place). */
+  async function load() {
+    const index = await fetchJSON(ROOT + 'index.json');
+    const files = index.levels || [];
+    const docs = await Promise.all(files.map(f => fetchJSON(ROOT + f).catch(e => ({ __error: String(e), __file: f }))));
+    LEVELS.length = 0; let expect = 1;
+    for (const d of docs) {
+      if (d.__error) { console.error(`[Levels] ${d.__file}: ${d.__error}`); Analytics.track('error', { msg: 'level load ' + d.__file }); continue; }
+      const problems = validate(d);
+      if (problems.length) { console.error(`[Levels] ${d.name || '?'} (id ${d.id}) skipped:\n  - ${problems.join('\n  - ')}`); continue; }
+      if (d.id !== expect) console.warn(`[Levels] expected id ${expect}, got ${d.id} — ids should be consecutive`);
+      expect = d.id + 1; LEVELS.push(normalise(d));
+    }
+    if (!LEVELS.length) throw new Error('No valid levels — check data/levels/');
+    Object.freeze(LEVELS.slice());  // (array itself stays mutable for hot-reload in dev tools)
+    return LEVELS;
+  }
+
+  return { load, validate, ROOT, byId: id => LEVELS.find(L => L.id === id) || null, count: () => LEVELS.length };
+})();
 
 /** Returns a level by index, clamped to the last level (endless replay of the hardest). */
 function getLevel(index) { return LEVELS[Math.max(0, Math.min(index, LEVELS.length - 1))]; }

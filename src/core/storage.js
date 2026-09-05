@@ -1,20 +1,22 @@
 /**
- * BONK! — Persistent storage (localStorage wrapper)
- * Keys are namespaced with CONFIG.STORAGE_PREFIX.
+ * BONK! — Store: progress / settings facade over Save (v2 document)
+ * ---------------------------------------------------------------
+ * Callers keep using Store.* — the data lives in one versioned document
+ * (see save.js). Coins go through Wallet (wallet.js) so every change is
+ * bounded, logged and emits events for the UI.
  */
 const Store = {
-  get(k, d) { try { const v = localStorage.getItem(CONFIG.STORAGE_PREFIX + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
-  set(k, v) { try { localStorage.setItem(CONFIG.STORAGE_PREFIX + k, JSON.stringify(v)); } catch (e) {} },
+  // --- best score ------------------------------------------------------------
+  best()        { return Save.get('best', 0); },
+  setBest(v)    { if (v > Store.best()) { Save.set('best', v); Events.emit('best', { best: v }); return true; } return false; },
 
-  // --- convenience accessors -------------------------------------------
-  best()        { return Store.get('best', 0); },
-  setBest(v)    { if (v > Store.best()) { Store.set('best', v); return true; } return false; },
-  coins()       { return Store.get('coins', 0); },
-  addCoins(n=1) { Store.set('coins', Store.coins() + n); },
-  spendCoins(n) { if (Store.coins() < n) return false; Store.set('coins', Store.coins() - n); return true; },
+  // --- coins (delegates to Wallet) ----------------------------------------------
+  coins()       { return Wallet.coins(); },
+  addCoins(n = 1, reason = 'run') { return Wallet.add(n, reason); },
+  spendCoins(n, reason = 'shop')  { return Wallet.spend(n, reason); },
 
-  /** Per-level progress: { [levelId]: { best, cleared, stars:[b,b,b] } } */
-  levelProgress()            { return Store.get('levels', {}); },
+  // --- per-level progress: { [levelId]: { best, cleared, stars:[b,b,b], plays } } -----------
+  levelProgress()            { return Save.get('levels', {}); },
   levelBest(id)              { return (Store.levelProgress()[id] || {}).best || 0; },
   isCleared(id)              { return !!(Store.levelProgress()[id] || {}).cleared; },
   levelStars(id)             { return (Store.levelProgress()[id] || {}).stars || [false, false, false]; },
@@ -22,16 +24,30 @@ const Store = {
   totalStars()               { const p = Store.levelProgress(); let n = 0; for (const k in p) n += (p[k].stars || []).filter(Boolean).length; return n; },
   /** Merge a run into progress; stars are sticky (once earned, kept). Returns the newly earned star indices. */
   recordLevel(id, score, cleared, stars = [false, false, false]) {
-    const p = Store.levelProgress(); const cur = p[id] || { best: 0, cleared: false, stars: [false, false, false] };
-    const prev = cur.stars || [false, false, false], merged = prev.map((v, i) => v || !!stars[i]);
-    p[id] = { best: Math.max(cur.best, score), cleared: cur.cleared || cleared, stars: merged }; Store.set('levels', p);
-    return merged.map((v, i) => v && !prev[i] ? i : -1).filter(i => i >= 0);
+    let gained = [];
+    Save.update(d => {
+      const cur = d.levels[id] || { best: 0, cleared: false, stars: [false, false, false], plays: 0 };
+      const prev = cur.stars || [false, false, false], merged = prev.map((v, i) => v || !!stars[i]);
+      d.levels[id] = { best: Math.max(cur.best, score), cleared: cur.cleared || cleared, stars: merged, plays: (cur.plays || 0) + 1 };
+      gained = merged.map((v, i) => v && !prev[i] ? i : -1).filter(i => i >= 0);
+    });
+    Events.emit('progress', { id, score, cleared, stars, gained });
+    return gained;
   },
   highestUnlocked() { const p = Store.levelProgress(); let n = 1; while (p[n] && p[n].cleared) n++; return n; },
   /** Level the PLAY button should open: furthest unlocked (capped to the last level). */
   continueLevelIdx() { return Math.min(Store.highestUnlocked(), LEVELS.length) - 1; },
 
-  /** Settings */
-  setting(k, d = true) { return Store.get('set_' + k, d); },
-  setSetting(k, v)     { Store.set('set_' + k, v); },
+  // --- settings ------------------------------------------------------------------
+  setting(k, d = true) { const v = Save.get('settings.' + k); return v == null ? d : v; },
+  setSetting(k, v)     { Save.set('settings.' + k, v); Events.emit('setting', { key: k, value: v }); },
+
+  // --- misc flags ----------------------------------------------------------------
+  ftueDone()    { return !!Save.get('ftue.done', false); },
+  setFtueDone(v = true) { Save.set('ftue.done', v); },
+  stat(k)       { return Save.get('stats.' + k, 0); },
+  bumpStat(k, n = 1) { Save.update(d => { d.stats[k] = (d.stats[k] || 0) + n; }); },
+
+  /** Wipe everything (Settings → Reset progress). */
+  resetAll()    { Save.reset(); Events.emit('coins', { coins: 0, delta: 0, reason: 'reset' }); },
 };

@@ -2,19 +2,26 @@
 
 ## 1. Add a level
 
-`src/game/levels.js` → append to `LEVELS`:
+Levels are **JSON files** in `data/levels/`. Copy the last one, edit, register:
 
-```js
+1. `cp data/levels/L03.json data/levels/L04.json` and edit:
+```json
 {
-  id: 4, name: 'Windy Peaks', target: 2200, hearts: 3,
-  spawn: [0.55, 0.35],     // seconds between spawns, start → after `ramp`
-  speed: [0.50, 0.72],     // fall speed in stage-heights/second
-  ramp: 60, safeTime: 2,
-  weights: { bone: 28, coin: 24, rock: 22, bomb: 16, magnet: 5, star: 5 },
-  theme: 'meadow',
-},
+  "id": 4, "name": "Windy Peaks", "target": 2200, "hearts": 3,
+  "spawn": [0.55, 0.35],     "speed": [0.50, 0.72],     "ramp": 60, "safeTime": 2,
+  "weights": { "bone": 28, "coin": 24, "rock": 22, "bomb": 16, "magnet": 5, "star": 5 },
+  "theme": "meadow",
+  "ambient": { "birds": 1, "walkers": 0.8, "cars": 0.7 },
+  "goal": { "type": "power", "count": 4 },
+  "notes": "designer notes — ignored by the game"
+}
 ```
-That's it. HUD, progress bar, level-clear card and `Store.recordLevel` all read from the array.
+2. Add `"L04.json"` to the `levels` list in `data/levels/index.json`.
+3. (optional) `assets/images/levels/thumb_4.webp` — level-select thumbnail (falls back to thumb_1).
+4. `python3 tools/check.py` — validates the file (ids consecutive, item keys exist, goal type exists, ranges sane).
+
+That's it. The level board, HUD, star goals, clear card and `Store.recordLevel` all read from the loaded `LEVELS` array.
+A level file with problems is **skipped with a console error** instead of breaking the game; `Levels.validate(obj)` returns the list of problems.
 `getLevel(i)` clamps to the last entry, so "Keep playing" after the final level replays it (endless).
 
 ## 2. Add a falling item
@@ -151,3 +158,22 @@ To add a type, add an entry with `label / init / on / done` (optionally `failed`
 map card and win card all read from `GOALS`. Star 1 (target) and star 2 (no heart lost) are automatic.
 
 The level-select board pages itself from `LEVELS.length` (10 tiles per page) — nothing to lay out. Optional: add `assets/images/levels/thumb_<id>.webp` (4:3, ~520 px) for the details card; otherwise level 1's thumbnail is used.
+
+## 8. Persist something new (save v2)
+
+All player data lives in one document (`src/core/save.js`, key `bonk_save`, `v: 2`).
+- Read: `Save.get('shop.equipped', 'classic')` · write: `Save.set('shop.equipped', id)` or `Save.update(d => { … })` (one write).
+- New field → add its default to `fresh()`; existing saves get it filled automatically on load (`fill`).
+- Changing the **shape** of an existing field → bump `SCHEMA` and add `MIGRATIONS[oldVersion]`.
+- Coins **only** via `Wallet.add / Wallet.spend` (bounded, emits `coins` events, logged).
+- Listen for changes with `Events.on('coins' | 'progress' | 'best' | 'setting' | 'save:loaded', fn)`.
+
+## 9. Log an analytics event
+
+`Analytics.track('shop_open', { from: 'menu' })`. Keep names snake_case and in the catalogue at the top of `src/core/analytics.js`.
+Settings → *Export log* downloads the buffer; `Analytics.summary()` in the console prints per-level starts / win rate / retries.
+
+## 10. Gate a feature behind a flag
+
+`if (Flags.get('shop_enabled')) …` — add the default in `src/core/flags.js`. QA can flip any flag from the URL: `?flag_shop_enabled=1`.
+Phase 5 feeds Remote Config values into `Flags.apply({...})`; nothing else changes.

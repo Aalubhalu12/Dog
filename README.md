@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.8.3 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.9.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -40,13 +40,18 @@ bonk/
 │   ├── app.js                 # bootstrap: load assets → register scenes → fixed-step main loop → settings
 │   ├── core/                  # engine-level, game-agnostic
 │   │   ├── config.js          #   VERSION + all tunables (puppy physics, parallax, FX flags)
-│   │   ├── storage.js         #   localStorage wrapper (best, coins, per-level {best,cleared,stars}, settings)
+│   │   ├── events.js          #   tiny pub/sub (Events.on / emit)
+│   │   ├── flags.js           #   feature flags (defaults · ?flag_x=1 · Remote Config later)
+│   │   ├── analytics.js       #   event log: ring buffer + sinks, export, summary
+│   │   ├── save.js            #   ★ save v2: one versioned document, migrations, backup, corrupt recovery
+│   │   ├── wallet.js          #   coins: bounded add/spend, events
+│   │   ├── storage.js         #   Store facade: best, per-level {best,cleared,stars,plays}, settings, stats
 │   │   ├── assets.js          #   image manifest + loader  → Assets.img('key') / Assets.url('key')
 │   │   ├── audio.js           #   procedural SFX + puppy voice (Web Audio) → SFX.play('key')
 │   │   └── input.js           #   touch buttons + drag + keyboard → Input.left/right/drag
 │   ├── game/                  # gameplay (never touches the DOM except FX overlay)
 │   │   ├── items.js           #   ★ ITEM catalogue + POWERS (data only)
-│   │   ├── levels.js          #   ★ LEVELS array (data only)
+│   │   ├── levels.js          #   loads + validates data/levels/*.json into LEVELS
 │   │   ├── goals.js           #   ★ GOALS registry — 3rd-star objectives per level
 │   │   ├── game.js            #   Game controller: score, lives, powers, catch rules, star evaluation, flow
 │   │   ├── puppy.js           #   Puppy: physics, sheet animation (idle/run/yay/bonk/dizzy), draw
@@ -59,6 +64,8 @@ bonk/
 │   │   └── modals.js          #   modal open/close + fill (pause, game over, level clear w/ stars, settings)
 │   └── scenes/                # glue: user actions ⇄ Game events ⇄ UI
 │       ├── menu.js  map.js  play.js     # MenuScene · MapScene (level board) · PlayScene
+├── data/
+│   └── levels/                # ★ L01.json … + index.json — one file per level
 ├── assets/                    # everything the game SHIPS (all WebP, ≈4 MB)
 │   ├── images/
 │   │   ├── bg/                # parallax layers: sky, clouds, mountains, village (+water_mask), meadow, road, foreground_wide, trees
@@ -101,7 +108,7 @@ bonk/
 
 | I want to… | Edit | Details |
 |---|---|---|
-| Add a level | `src/game/levels.js` | append an object to `LEVELS` (incl. a `goal`) — the map lays itself out |
+| Add a level | `data/levels/L0N.json` + `index.json` | copy the last file, edit, register — the board lays itself out; `tools/check.py` validates |
 | Add a goal type (3rd star) | `src/game/goals.js` | add an entry to `GOALS` — see `docs/ADDING_CONTENT.md` |
 | Add a falling item | `src/game/items.js` + sprite in `assets/images/items/` + line in `src/core/assets.js` | see `docs/ADDING_CONTENT.md` |
 | Add a power-up | `items.js` (`POWERS`) + handle in `game.js` / `spawner.js` | |
@@ -143,7 +150,7 @@ Full recipes with code: **[docs/ADDING_CONTENT.md](docs/ADDING_CONTENT.md)**
 ```bash
 python3 tools/check.py
 ```
-Checks JS syntax, every asset reference, `?v=` cache tags vs `CONFIG.VERSION`, then plays the game headless on 3 viewports asserting zero console errors, and refreshes `docs/screenshots/`. Needs `pip install playwright && python3 -m playwright install chromium` for the browser part (skipped gracefully otherwise).
+Checks JS syntax, every asset reference, level JSON files, `?v=` cache tags vs `CONFIG.VERSION`, then plays the game headless on 3 viewports asserting zero console errors, refreshes `docs/screenshots/`, and exercises the data layer (save migration, corrupt-save recovery, wallet bounds, analytics events, reset, flags). Needs `pip install playwright && python3 -m playwright install chromium` for the browser part (skipped gracefully otherwise).
 
 **Release checklist:** bump `VERSION` in `src/core/config.js` → same value in every `?v=` in `index.html` and in this README → add a `docs/CHANGELOG.md` entry → `python3 tools/check.py` green.
 

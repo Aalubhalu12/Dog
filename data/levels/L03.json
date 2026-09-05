@@ -1,0 +1,34 @@
+{
+  "id": 3,
+  "name": "Bomb Squad",
+  "target": 1500,
+  "hearts": 3,
+  "spawn": [
+    0.6,
+    0.38
+  ],
+  "speed": [
+    0.45,
+    0.65
+  ],
+  "ramp": 60,
+  "safeTime": 2,
+  "weights": {
+    "bone": 30,
+    "coin": 26,
+    "rock": 20,
+    "bomb": 14,
+    "magnet": 5,
+    "star": 5
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 1,
+    "walkers": 0.8,
+    "cars": 0.7
+  },
+  "goal": {
+    "type": "noBomb"
+  },
+  "notes": "The lane gets busy. Bombs are the threat."
+}

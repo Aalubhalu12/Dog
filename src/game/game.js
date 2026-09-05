@@ -22,6 +22,9 @@ const Game = (() => {
   // --- flow ----------------------------------------------------------------
   function start(levelIdx = 0, carry = null) {
     S = newState(levelIdx, carry); Goals.init(S); puppy.reset(); running = false; paused = false;
+    S.startedAt = performance.now(); S.ended = false;
+    Analytics.track('level_start', { id: S.level.id, idx: levelIdx, carry: !!carry, plays: (Store.levelProgress()[S.level.id] || {}).plays || 0 });
+    Store.bumpStat('runs');
     Input.reset(); FX.clear(); BG.setTheme(S.level.theme);
     Ambient.setDensity(S.level.ambient); Ambient.reset();   // background life grows level by level
     hooks.onStart && hooks.onStart(S);
@@ -80,13 +83,21 @@ const Game = (() => {
   function onLevelClear() {
     SFX.win(); FX.vibrate([30, 30, 30, 30, 80]); FX.banner('LEVEL CLEAR!');
     S.stars = Goals.stars(S); S.newStars = Store.recordLevel(S.level.id, S.score, true, S.stars);
-    Store.setBest(S.score);
+    Store.setBest(S.score); endRun('win');
     setTimeout(() => { paused = true; hooks.onLevelClear && hooks.onLevelClear(S); }, 1300);
   }
   function onGameOver() {
     running = false; SFX.over();
-    S.isNewBest = S.score > 0 && Store.setBest(S.score); S.stars = Goals.stars(S); Store.recordLevel(S.level.id, S.score, false, S.stars);
+    S.isNewBest = S.score > 0 && Store.setBest(S.score); S.stars = Goals.stars(S); Store.recordLevel(S.level.id, S.score, false, S.stars); endRun('lose');
     hooks.onGameOver && hooks.onGameOver(S);
+  }
+
+  /** One level_end per run (win / lose / quit) + lifetime stats. */
+  function endRun(result) {
+    if (!S || S.ended) return; S.ended = true;
+    const duration = Math.round((performance.now() - S.startedAt) / 1000);
+    Analytics.track('level_end', { id: S.level.id, result, score: S.score, stars: S.stars || Goals.stars(S), starsN: (S.stars || []).filter(Boolean).length, coins: S.coins, bones: S.bones, duration, heartsLost: S.heartsLost || 0 });
+    Store.bumpStat(result === 'win' ? 'wins' : result === 'lose' ? 'losses' : 'quits'); Store.bumpStat('bones', S.bones); Store.bumpStat('playSec', duration);
   }
 
   // --- draw ----------------------------------------------------------------
@@ -96,7 +107,7 @@ const Game = (() => {
     init(h) { hooks = h; }, start, update, draw, continueNext,
     pause() { if (S && !S.over) paused = true; },
     resume() { paused = false; if (cdResume) { const r = cdResume; cdResume = null; r(); } },
-    stop() { running = false; paused = false; S = null; clearTimeout(cdTimer); cdTimer = null; cdResume = null; FX.clear(); hooks.onCountdown && hooks.onCountdown(null); },
+    stop() { if (S && !S.ended && !S.over) { Analytics.track('quit', { id: S.level.id, at: Math.round(S.time), score: S.score }); endRun('quit'); } running = false; paused = false; S = null; clearTimeout(cdTimer); cdTimer = null; cdResume = null; FX.clear(); hooks.onCountdown && hooks.onCountdown(null); },
     get active() { return running; }, get inProgress() { return !!S && !S.over; }, get paused() { return paused; }, get state() { return S; }, get puppy() { return puppy; },
   };
 })();
