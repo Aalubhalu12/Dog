@@ -25,14 +25,14 @@
  *   glow    – (optional) halo colour drawn behind the item while falling
  */
 const ITEMS = Object.freeze({
-  bone:   { kind: 'score',  size: 0.082, rot: 1.6, fall: 'tumble', score: 10, pose: 'yay',  poseTime: 0.9, popText: '+{v}', popClass: 'good', sfx: 'bone',  particles: ['#fff', '#ffd23a', '#ffe9a8'] },
+  bone:   { kind: 'score',  size: 0.082, rot: 1.6, fall: 'tumble', score: 10, pose: 'yay',  poseTime: 1.15, popText: '+{v}', popClass: 'good', sfx: 'bone',  particles: ['#fff', '#ffd23a', '#ffe9a8'] },
   coin:   { kind: 'coin',   size: 0.082, rot: 0,   fall: 'flutter', coins: 1,  popText: '+1', popClass: 'coin', sfx: 'coin', particles: ['#ffd23a'] },
   magnet: { kind: 'power',  size: 0.088, rot: 0.6, fall: 'float', power: 'magnet', dur: 6, banner: 'MAGNET!',   sfx: 'magnet', particles: ['#7fe3ff', '#fff'] },
   star:   { kind: 'power',  size: 0.105, rot: 0.9, fall: 'float', power: 'star',   dur: 8, banner: '2× SCORE!', sfx: 'star',   particles: ['#ffd23a', '#fff', '#ff9a1f'] },
   // Phase 2 additions
-  goldbone: { kind: 'score', size: 0.090, rot: 1.4, fall: 'tumble', score: 50, rare: true, pose: 'yay', poseTime: 0.9, popText: '+{v} GOLD!', popClass: 'gold', sfx: 'goldbone', particles: ['#ffd23a', '#fff4b0', '#ff9a1f'], glow: '#ffd23a' },
+  goldbone: { kind: 'score', size: 0.090, rot: 1.4, fall: 'tumble', score: 50, rare: true, pose: 'yay', poseTime: 1.15, popText: '+{v} GOLD!', popClass: 'gold', sfx: 'goldbone', particles: ['#ffd23a', '#fff4b0', '#ff9a1f'], glow: '#ffd23a' },
   shield:   { kind: 'power', size: 0.092, rot: 0,   fall: 'float',  power: 'shield', dur: 0, banner: 'SHIELD!', sfx: 'shield', particles: ['#7fe3ff', '#fff', '#ffd23a'], glow: '#7fe3ff' },
-  rock:   { kind: 'hazard', size: 0.100, rot: 2.2, fall: 'heavy', hit: 'bonk',  stun: 0.5, pose: 'bonk',  poseTime: 1.1, banner: 'BONK!',  sfx: 'bonk', particles: ['#ffd23a', '#ff9a1f', '#fff'] },
+  rock:   { kind: 'hazard', size: 0.100, rot: 2.2, fall: 'heavy', hit: 'bonk',  stun: 0.5, pose: 'bonk',  poseTime: 1.2, banner: 'BONK!',  sfx: 'bonk', particles: ['#ffd23a', '#ff9a1f', '#fff'] },
   bomb:   { kind: 'hazard', size: 0.088, rot: 0.4, fall: 'heavy', hit: 'dizzy', stun: 1.1, pose: 'dizzy', poseTime: 1.4, banner: 'DIZZY!', sfx: 'bomb', particles: ['#333', '#ff9a1f', '#ffd23a', '#fff'] },
 });
 

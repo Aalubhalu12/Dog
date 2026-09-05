@@ -4,11 +4,14 @@
  * Visual states (all go through ONE crossfade system, so nothing pops).
  * Every visual is a horizontal sprite sheet cut from the AI video clips
  * (uploads/clips/*.mp4, 24 fps) — see docs/ANIMATION_BRIEF.md:
- *   idle   – 24 f, side view, breathing ping-pong loop      (12 fps)
- *   run    – 16 f = one real stride of the treadmill clip   (24 fps at full speed, eases to 70 %)
- *   yay    – 24 f, hop with a smile, plays once             (24 fps ≈ 1 s... trimmed to poseTime)
- *   bonk   – 24 f, flinch, plays once                       (24 fps)
- *   dizzy  – 24 f, front view wobble + stars, loops         (24 fps)
+ * ALL sheets are consecutive real clip frames and play at a true 24 fps (v0.12):
+ *   idle   – 20 f, breathing, ping-ponged in code            (1.6 s per breath)
+ *   run    – 16 f = one real stride of the treadmill clip   (24 fps at full speed, eases to 75 %)
+ *   yay    – 28 f, take-off → smile → landing, plays once   (1.17 s)
+ *   bonk   – 28 f, flinch → shake off, plays once           (1.17 s)
+ *   dizzy  – 26 f, front view wobble + stars, loops         (1.08 s)
+ * Sheets are colour-graded + pseudo-3D relit (tools/light_puppy.py): key light top-left, AO under the belly,
+ * sky rim on the back, warm ground bounce, glossy sheen.
  *
  * Smoothness rules
  *   • Any visual → any visual dissolves (alpha sums to 1 → no ghosting).
@@ -24,11 +27,11 @@ class Puppy {
   constructor() {
     this.SHEETS = {
       // body = measured body-height / cell-height, so every sheet draws the dog the same size
-      idle:  { key: 'idle_sheet',  frames: 24, fps: 12, loop: true,  body: .839 },
-      run:   { key: 'run_sheet',   frames: 16, fps: 24, loop: true,  body: .907 },
-      yay:   { key: 'yay_sheet',   frames: 24, fps: 24, loop: false, body: .839 },
-      bonk:  { key: 'bonk_sheet',  frames: 24, fps: 22, loop: false, body: .854 },
-      dizzy: { key: 'dizzy_sheet', frames: 24, fps: 24, loop: true,  body: .942, scale: 1.18 },   // front view incl. stars: a bit taller
+      idle:  { key: 'idle_sheet',  frames: 20, fps: 24, loop: true,  body: .978, pingpong: true },   // 20 real frames played 0→19→0 (1.6 s breath)
+      run:   { key: 'run_sheet',   frames: 16, fps: 24, loop: true,  body: .919 },
+      yay:   { key: 'yay_sheet',   frames: 28, fps: 24, loop: false, body: .841 },
+      bonk:  { key: 'bonk_sheet',  frames: 28, fps: 24, loop: false, body: .850 },
+      dizzy: { key: 'dizzy_sheet', frames: 26, fps: 24, loop: true,  body: .943, scale: 1.18 },   // front view incl. stars: a bit taller
     };
     this.reset();
   }
@@ -59,9 +62,9 @@ class Puppy {
   setPose(p, t) {
     const MAX = this.W * CONFIG.PUPPY.MAX_SPEED, sp = Math.abs(this.vx) / MAX;
     if (p === 'yay') {
-      // running: keep the gallop, add a little hop; nearly still: show the happy pose
-      this.hopV = this.width * (sp > .25 ? 1.6 : 1.1);
-      if (sp > .25) return;
+      // running: keep the gallop + a little hop (a 1.2 s hop pose would slide); slow/still: the real happy hop clip
+      this.hopV = this.width * (sp > .3 ? 1.6 : 0.5);
+      if (sp > .3) return;
     }
     this.pose = p; this.poseT = t;
   }
@@ -124,7 +127,7 @@ class Puppy {
     if (this.anim === 'run' || (this.prevAnim === 'run' && this.blend > 0)) {
       // 16 real frames = one stride of the treadmill clip @ 24 fps (0.67 s). Play at the clip's own cadence
       // at full speed, ease down to ~70 % when slower — never faster than the source.
-      const N = this.SHEETS.run.frames, fps = this.SHEETS.run.fps * (0.75 + 0.55 * Math.min(1, sp / .8));   // 18 → 31 sprite-fps with speed
+      const N = this.SHEETS.run.frames, fps = this.SHEETS.run.fps * (0.75 + 0.25 * Math.min(1, sp / .7));   // 18 → 24 sprite-fps with speed (never faster than the 24 fps source)
       if (this.anim === 'run') this.frame = (this.frame + fps * dt) % N; else this.prevFrame = (this.prevFrame + fps * dt) % N;
       const f = this.anim === 'run' ? this.frame : this.prevFrame;
       // one bob per stride: lowest at the gather (frame 0), highest at full suspension (frame ~2.5)
@@ -138,7 +141,8 @@ class Puppy {
       this.bob += (0 - this.bob) * Math.min(1, dt * 10);
     }
     if (this.anim === 'idle') {
-      const S = this.SHEETS.idle; this.frame = (this.frame + S.fps * dt) % S.frames;   // sheet is pre-ping-ponged → seamless
+      const S = this.SHEETS.idle, P = 2 * (S.frames - 1); this.idleT = ((this.idleT || 0) + S.fps * dt) % P;
+      this.frame = this.idleT < S.frames - 1 ? this.idleT : P - this.idleT;   // 0→19→0 ping-pong: a seamless breath
     } else if (this.anim === 'yay' || this.anim === 'bonk' || this.anim === 'dizzy') {
       const S = this.SHEETS[this.anim]; this.frame += S.fps * dt;
       if (S.loop) this.frame %= S.frames; else this.frame = Math.min(S.frames - 1, this.frame);

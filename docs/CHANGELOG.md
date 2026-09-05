@@ -2,6 +2,18 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.0] — 2026-09-05 — Puppy: true 24 fps, right expression per state, pseudo-3D relight
+### Changed
+- **24 fps everywhere.** All five puppy sheets are consecutive real clip frames (no sub-sampling): idle 20 f
+  (ping-ponged in code), run 16 f (one stride, never played faster than the 24 fps source), yay 28 f, bonk 28 f,
+  dizzy 26 f. Reaction durations in `items.js` now match the clips (yay 1.15 s, bonk 1.2 s).
+- **Expressions.** Frame windows re-picked so each state shows its face: happy neutral (idle/run), full smile
+  mid-hop (yay), squint + ear flap (bonk; game-over still = strongest flinch frame), crossed eyes + stars (dizzy).
+  The real hop pose now also plays when the puppy is moving slowly (previously only when still).
+- **Pseudo-3D look.** New one-shot `tools/light_puppy.py` (grade + relight): silhouette-derived normals, key light
+  top-left, ambient occlusion under the belly, sky rim on the back, warm ground bounce, faint fur sheen — kept subtle.
+- Asset budget: puppy sheets 1.8 MB total (`assets/images` 4.0 MB).
+
 ## [0.6.1] — 2026-09-05 — Smoothness + puppy voice
 ### Fixed (animation glitches)
 - **Catch pop.** Catching a bone while running used to snap to the front-view "yay" image and back — the most visible

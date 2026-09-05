@@ -27,6 +27,7 @@ def grade(im):
     al=im[...,3]; er=cv2.erode(al,np.ones((5,5),np.uint8)); rim=((al.astype(int)-er.astype(int))/255.).clip(0,1)[...,None]
     out=out+rim*np.array([40,26,0],np.float32)*.5
     return np.dstack([np.clip(out,0,255).astype(np.uint8),im[...,3]])
-for n in ['run_sheet','idle_sheet','yay_sheet','bonk_sheet','dizzy_sheet','puppy','puppy_yay','puppy_bonk','puppy_dizzy']:
+if __name__=='__main__':
+  for n in ['run_sheet','idle_sheet','yay_sheet','bonk_sheet','dizzy_sheet','puppy','puppy_yay','puppy_bonk','puppy_dizzy']:
     im=np.array(Image.open(D+n+'.webp').convert('RGBA'))
     Image.fromarray(grade(im),'RGBA').save(D+n+'.webp',quality=92,method=6); print('graded',n)
