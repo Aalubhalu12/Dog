@@ -33,10 +33,11 @@ const HUD = (() => {
     if (Input.any || (S && S.time > 4)) el.hint.style.opacity = 0;   // hide on first input or after 4 s
     // arrow buttons go translucent while the puppy runs underneath them (canvas is below the DOM)
     if (!zones || zoneW !== el.stage.clientWidth) { zoneW = el.stage.clientWidth; const sr = el.stage.getBoundingClientRect();
-      zones = [el.ctlL, el.ctlR].map(b => { const r = b.getBoundingClientRect(); return [(r.left - sr.left) / sr.width, (r.right - sr.left) / sr.width]; }); }
+      zones = [el.ctlL, el.ctlR].map(b => { const r = b.getBoundingClientRect(); return [(r.left - sr.left) / sr.width, (r.right - sr.left) / sr.width]; }); zones.top = el.ctlL.getBoundingClientRect().top - sr.top; }
     const bx = Game.puppy.box, x0 = (bx.cx - bx.pw * .5) / BG.W, x1 = (bx.cx + bx.pw * .5) / BG.W;
-    el.ctlL.classList.toggle('ghost', x0 < zones[0][1] && x1 > zones[0][0]);
-    el.ctlR.classList.toggle('ghost', x0 < zones[1][1] && x1 > zones[1][0]);
+    const under = Game.puppy.groundY > zones.top;   // only when the layout actually puts the puppy under the buttons (v0.12.2: it doesn't)
+    el.ctlL.classList.toggle('ghost', under && x0 < zones[0][1] && x1 > zones[0][0]);
+    el.ctlR.classList.toggle('ghost', under && x0 < zones[1][1] && x1 > zones[1][0]);
     // goal chip: live progress, then done/failed state; fades out 3 s after resolving
     if (S.goal) {
       const done = !S.goal.def.survive && S.goal.def.done(S, S.goal.st, S.goal.cfg), failed = !done && Goals.failed(S);

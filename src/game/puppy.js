@@ -187,7 +187,8 @@ class Puppy {
     const box = this.box, gy = this.groundY, lift = this.bob + this.hop;
     for (const d of this.dust) { c.save(); c.globalAlpha = (1 - d.t / d.life) * .35; c.fillStyle = '#e8d9b5'; c.beginPath(); c.arc(d.x, d.y, d.r * (1 + d.t * 2), 0, 6.28); c.fill(); c.restore(); }
 
-    const baseAlpha = (this.inv > 0 && Math.floor(this.inv * 12) % 2 === 0) ? .55 : 1;
+    // i-frames: NO transparency flicker (that read as "the dog disappears"). Instead a soft pulsing white glow around him.
+    const baseAlpha = 1, glow = this.inv > 0 ? (0.5 + 0.5 * Math.sin(this.inv * 18)) : 0;
     // shadow — shrinks and fades a little as the puppy lifts off
     const k = Math.min(1, lift / (box.pw * .3));
     c.save(); c.globalAlpha = .28 - k * .10; c.fillStyle = '#143c0a'; c.beginPath(); c.ellipse(box.cx, gy + 2, box.pw * (.36 - k * .08), box.pw * (.08 - k * .02), 0, 0, 6.28); c.fill(); c.restore();
@@ -202,6 +203,7 @@ class Puppy {
     const passes = (tt < 1 && !frontView) ? [[tt < .5 ? this.prevFace : this.face, 1, wOf(tt)]] : [[frontView ? 1 : this.face, 1, 1]];
     for (const [fx, a, wx] of passes) {
       c.save(); c.translate(box.cx, gy - lift);
+      if (glow > 0) { c.shadowColor = `rgba(255,255,255,${(0.35 + 0.5 * glow).toFixed(2)})`; c.shadowBlur = box.pw * (0.06 + 0.10 * glow); }
       c.rotate(sideView ? this.lean * .6 : 0);
       c.scale(fx * wx * this.squash, (2 - this.squash) * (1 + (1 - wx) * .10));
       // cross-dissolve between animations: alphas sum to 1 → no double exposure

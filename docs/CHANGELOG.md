@@ -2,6 +2,14 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.2] — 2026-09-05 — Phone layout: puppy above the buttons, no more "disappearing"
+### Fixed
+- **Puppy hidden under the arrow buttons on phones.** Ground line raised 0.905 → 0.845 and the grass apron made
+  taller, so the puppy runs on a clear lane above the ◀ ▶ buttons (buttons a touch smaller: 22 → 20 cqmin).
+  Fence and road moved up with him; items still land at his feet; the arrow-ghosting hack is now dormant.
+- **Puppy "invisible" after a hit.** The i-frame effect was a 45 % alpha strobe at 6 Hz, which on a phone reads as
+  the dog vanishing. Replaced with a soft pulsing white glow — always fully visible.
+
 ## [0.12.1] — 2026-09-05 — Turn "blink" fixed
 ### Fixed
 - Turning used to ease scaleX through 0, so for a frame or two the puppy shrank to a line and looked like it blinked

@@ -6,14 +6,14 @@
  * Item definitions live in src/game/items.js
  */
 const CONFIG = Object.freeze({
-  VERSION: '0.12.1',
+  VERSION: '0.12.2',
   STORAGE_PREFIX: 'bonk_',
 
   /** Player (puppy) */
   PUPPY: {
     HEIGHT_FRAC: 0.135,    // puppy body height as fraction of stage height (medium: clearly readable on phones)
     MAX_WIDTH_FRAC: 0.30,  // cap so it never gets too wide on narrow screens
-    GROUND_Y: 0.905,      // ground line as fraction of stage height
+    GROUND_Y: 0.845,      // ground line (fraction of stage height) — above the arrow buttons, so the puppy is never hidden under them
     MIN_X: 0.06,          // movement bounds (fraction of width)
     MAX_X: 0.94,
     MAX_SPEED: 1.05,      // stage widths / second (~0.85 s edge-to-edge) — snappy

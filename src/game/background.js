@@ -16,7 +16,7 @@ const BG = (() => {
         { key: 'mountains', depth: 0.15, bottom: 0.60 },
         { key: 'village',   depth: 0.30, bottom: 0.80, water: 'water_mask' },
         { key: 'meadow',    depth: 0.42, bottom: 0.95, width: 1.30, mid: true },
-        { key: 'foreground',depth: 0.55, bottom: 1.01, front: true, width: 1.30 },   // wide: camera pulled back
+        { key: 'foreground',depth: 0.55, bottom: 1.01, front: true, width: 1.55 },   // taller grass apron: fence sits behind the puppy, buttons on the grass below him
       ],
       frameWidth: 1.55,  // tree frame pushed outward → more open play area
       frameY: -0.02,

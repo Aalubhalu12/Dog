@@ -32,7 +32,7 @@
 
 /* control buttons */
 .controls{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 3%);display:flex;justify-content:space-between;padding:0 5%;pointer-events:none}
-.ctl{width:clamp(70px,22cqmin,120px);height:clamp(70px,22cqmin,120px);pointer-events:auto;cursor:pointer;background:none;border:none;filter:drop-shadow(0 6px 10px #0007);transition:transform .08s,opacity .25s}
+.ctl{width:clamp(66px,20cqmin,110px);height:clamp(66px,20cqmin,110px);pointer-events:auto;cursor:pointer;background:none;border:none;filter:drop-shadow(0 6px 10px #0007);transition:transform .08s,opacity .25s}
 .ctl.ghost{opacity:.35}
 .ctl img{width:100%;height:100%;object-fit:contain}
 .ctl.down{transform:scale(.92) translateY(3px)}
