@@ -9,8 +9,7 @@
 const Events = (() => {
   const map = new Map();
   function on(name, fn) { if (!map.has(name)) map.set(name, new Set()); map.get(name).add(fn); return () => off(name, fn); }
-  function once(name, fn) { const un = on(name, p => { un(); fn(p); }); return un; }
   function off(name, fn) { const s = map.get(name); if (s) s.delete(fn); }
   function emit(name, payload) { const s = map.get(name); if (!s) return; for (const fn of [...s]) { try { fn(payload); } catch (e) { console.error(`[Events:${name}]`, e); } } }
-  return { on, once, off, emit };
+  return { on, off, emit };
 })();

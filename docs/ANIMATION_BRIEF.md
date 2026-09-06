@@ -53,4 +53,4 @@ Idle → `idle_sheet.webp`, catch/bonk/dizzy → `puppy_yay.webp`, `puppy_bonk.w
 - All five sheets are now **consecutive real clip frames at a true 24 fps** (no sub-sampling): idle 20 f (ping-ponged in code, 1.6 s breath), run 16 f (one stride), yay 28 f (1.17 s take-off→smile→landing), bonk 28 f (1.17 s flinch→shake-off), dizzy 26 f (1.08 s loop).
 - Expression per state comes from the clips themselves: idle/run = happy neutral (tongue), yay = big smile mid-hop, bonk = squint + ear flap (still = strongest flinch frame), dizzy = crossed eyes + star ring.
 - Pipeline: `tools/build_puppy_sheets.py` (key + pack) → `tools/light_puppy.py` **once** (colour grade + pseudo-3D relight: distance-transform "inflated" normal, key light top-left, belly AO, sky rim, warm ground bounce, faint sheen — deliberately subtle).
-- Reaction durations in `src/game/items.js` match the clip lengths (yay 1.15 s, bonk 1.2 s, dizzy 1.4 s).
+- Reaction durations in `src/data/items.js` match the clip lengths (yay 1.15 s, bonk 1.2 s, dizzy 1.4 s).

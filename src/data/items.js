@@ -4,8 +4,8 @@
  * To add a new falling item:
  *   1. Drop its sprite in  assets/images/items/<key>.webp
  *   2. Add an entry below with the same <key>
- *   3. Reference <key> in a level's `weights` (src/game/levels.js)
- *   4. (optional) Add a sound in src/core/audio.js and an effect in
+ *   3. Reference <key> in a level's `weights` (data/levels/*.json)
+ *   4. (optional) Add a sound in src/audio/sfx.js and an effect in
  *      src/game/effects.js — see `onCatch` handlers there.
  *
  * Fields:

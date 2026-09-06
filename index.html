@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2f8fe0">
 <title>BONK! — Catch. Dodge. Don't get bonked.</title>
-<link rel="stylesheet" href="styles/main.css?v=0.12.2">
+<link rel="stylesheet" href="styles/main.css?v=0.13.0">
 </head>
 <body>
 <div id="backdrop"></div>
@@ -13,9 +13,10 @@
  <div id="shaker">
   <canvas id="bg"></canvas>
 
-  <!-- ================= HOME — exact replica of art/reference/home_mockup.png ================= -->
-  <div class="scene" id="sceneMap">
+  <!-- ================= HOME — level board, exact replica of art/reference/home_mockup.png ================= -->
+  <div class="scene" id="sceneHome">
     <img class="hm-plate" src="assets/images/home/plate.webp" alt="" draggable="false">
+    <div class="hm-dog" id="hmDog" aria-hidden="true"><div class="hm-dog-shadow"></div><div class="hm-dog-body"><div class="hm-dog-breath"><img class="a" src="assets/images/home/dog_sit.webp" alt="" draggable="false"><img class="b" src="assets/images/home/dog_sit_b.webp" alt="" draggable="false"></div></div></div>
     <button class="hm-gear" id="btnSettings" aria-label="Settings">⚙</button>
     <img class="hm-logo" src="assets/images/home/logo.webp" alt="BONK! Catch · Jump · Play" draggable="false">
     <div class="hm-bones"><img src="assets/images/items/bone.webp" alt=""><span id="mapCoins">0</span><button class="plus" id="btnShop" aria-label="Shop">+</button></div>
@@ -24,7 +25,7 @@
     <button class="hm-arrow l" id="lsPrev" aria-label="Previous page">◀</button>
     <div class="hm-dots" id="lsDots"></div>
     <button class="hm-arrow r" id="lsNext" aria-label="Next page">▶</button>
-    <div class="hm-card" id="lsCard">
+    <div class="hm-card">
       <div class="hm-thumb"><img id="lsThumb" src="assets/images/levels/thumb_1.webp" alt=""><span class="hm-lvl" id="lsTitle">Level 1</span></div>
       <ul class="hm-info" id="lsInfo"></ul>
     </div>
@@ -32,8 +33,7 @@
     <button class="hm-play" id="lsPlay"><span class="paw">🐾</span><span class="tri">▶</span><span class="txt">Play</span><span class="paw">🐾</span></button>
     <button class="hm-post r" id="btnBoard"><span>You<br>Can<br>Do It!<br>♥</span></button>
     <button class="hm-sound" id="btnSound" aria-label="Sound">🔊</button>
-    <span class="hm-hidden" id="mapStars">0 / 9</span><span class="hm-hidden" id="best">0</span>
-  </div>
+      </div>
 
   <div class="scene" id="hud">
     <!-- Compact HUD (≤15% of the stage): one row — pause+hearts | big score | coins+level — then a thin progress line and small chips -->
@@ -57,7 +57,7 @@
       <div class="powerbar" id="powerbar"></div>
       <div class="combo" id="combo"><div class="paws" id="comboPaws"></div><div class="mult" id="comboMult">×1</div></div>
     </div>
-    <div class="ftue" id="ftue"><div class="bubble" id="ftueText"></div><div class="hand" id="ftueHand">👆</div></div>
+    <div class="ftue" id="ftue"><div class="bubble" id="ftueText"></div><div class="hand">👆</div></div>
     <div class="controls">
       <button class="ctl" id="ctlL" aria-label="Left"><img src="assets/images/ui/btn_left.webp" alt="" draggable="false"></button>
       <button class="ctl" id="ctlR" aria-label="Right"><img src="assets/images/ui/btn_right.webp" alt="" draggable="false"></button>
@@ -118,7 +118,7 @@
 
   <div class="modal" id="modalOver">
     <div class="card">
-      <h2 id="overTitle">Game Over</h2>
+      <h2>Game Over</h2>
       <img class="pose" id="overPose" src="assets/images/puppy/puppy_dizzy.webp" alt="">
       <div id="overBadge"></div>
       <div class="stats">
@@ -159,36 +159,40 @@
   <div id="loader"><div><div class="paw">🐾</div><div class="bar"><i id="loadbar"></i></div></div></div>
 </div>
 
-<!-- core -->
-<script src="src/core/config.js?v=0.12.2"></script>
-<script src="src/core/events.js?v=0.12.2"></script>
-<script src="src/core/flags.js?v=0.12.2"></script>
-<script src="src/core/analytics.js?v=0.12.2"></script>
-<script src="src/core/save.js?v=0.12.2"></script>
-<script src="src/core/wallet.js?v=0.12.2"></script>
-<script src="src/core/storage.js?v=0.12.2"></script>
-<script src="src/core/assets.js?v=0.12.2"></script>
-<script src="src/core/audio.js?v=0.12.2"></script>
-<script src="src/core/input.js?v=0.12.2"></script>
-<script src="src/net/leaderboard.js?v=0.12.2"></script>
-<!-- game data -->
-<script src="src/game/items.js?v=0.12.2"></script>
-<script src="src/game/goals.js?v=0.12.2"></script>
-<script src="src/game/levels.js?v=0.12.2"></script>
-<!-- game systems -->
-<script src="src/game/ambient.js?v=0.12.2"></script>
-<script src="src/game/background.js?v=0.12.2"></script>
-<script src="src/game/effects.js?v=0.12.2"></script>
-<script src="src/game/puppy.js?v=0.12.2"></script>
-<script src="src/game/spawner.js?v=0.12.2"></script>
-<script src="src/game/game.js?v=0.12.2"></script>
-<script src="src/game/ftue.js?v=0.12.2"></script>
+<!-- Load order = dependency order (plain <script>, no bundler). Layers: core → services → data → game → ui → scenes → app -->
+<!-- core: engine-agnostic plumbing -->
+<script src="src/core/config.js?v=0.13.0"></script>
+<script src="src/core/events.js?v=0.13.0"></script>
+<script src="src/core/dom.js?v=0.13.0"></script>
+<script src="src/core/assets.js?v=0.13.0"></script>
+<script src="src/core/input.js?v=0.13.0"></script>
+<!-- services: persistence, economy, telemetry, backend -->
+<script src="src/services/flags.js?v=0.13.0"></script>
+<script src="src/services/analytics.js?v=0.13.0"></script>
+<script src="src/services/save.js?v=0.13.0"></script>
+<script src="src/services/wallet.js?v=0.13.0"></script>
+<script src="src/services/store.js?v=0.13.0"></script>
+<script src="src/services/leaderboard.js?v=0.13.0"></script>
+<!-- audio -->
+<script src="src/audio/sfx.js?v=0.13.0"></script>
+<!-- data: catalogues + level loader -->
+<script src="src/data/items.js?v=0.13.0"></script>
+<script src="src/data/goals.js?v=0.13.0"></script>
+<script src="src/data/levels.js?v=0.13.0"></script>
+<!-- game: simulation + rendering -->
+<script src="src/game/background.js?v=0.13.0"></script>
+<script src="src/game/ambient.js?v=0.13.0"></script>
+<script src="src/game/effects.js?v=0.13.0"></script>
+<script src="src/game/puppy.js?v=0.13.0"></script>
+<script src="src/game/spawner.js?v=0.13.0"></script>
+<script src="src/game/game.js?v=0.13.0"></script>
+<script src="src/game/ftue.js?v=0.13.0"></script>
 <!-- ui + scenes -->
-<script src="src/ui/hud.js?v=0.12.2"></script>
-<script src="src/ui/modals.js?v=0.12.2"></script>
-<script src="src/scenes/map.js?v=0.12.2"></script>
-<script src="src/scenes/play.js?v=0.12.2"></script>
+<script src="src/ui/hud.js?v=0.13.0"></script>
+<script src="src/ui/modals.js?v=0.13.0"></script>
+<script src="src/scenes/home.js?v=0.13.0"></script>
+<script src="src/scenes/play.js?v=0.13.0"></script>
 <!-- bootstrap -->
-<script src="src/app.js?v=0.12.2"></script>
+<script src="src/app.js?v=0.13.0"></script>
 </body>
 </html>

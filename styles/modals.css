@@ -61,3 +61,18 @@
 .lb-row.me em{font-style:normal;font-size:.75em;background:#e2680a;color:#fff;border-radius:6px;padding:0 5px;vertical-align:middle}
 .lb-gap{text-align:center;opacity:.35;letter-spacing:4px;font-weight:900;line-height:1;margin:2px 0;filter:blur(.4px)}
 .lb-dim{opacity:.55;font-weight:700;font-size:clamp(12px,3.4cqmin,14px);padding:10px;text-align:center}
+
+/* ---- goal list (level-clear card) ---- */
+.goals{list-style:none;text-align:left;margin:4px auto 8px;width:fit-content;max-width:100%}
+.goals li{display:flex;align-items:center;gap:8px;font-weight:800;font-size:clamp(13px,3.9cqmin,17px);padding:4px 0}
+.goals li img{width:1.5em;filter:drop-shadow(0 1px 1px #0005)}
+.card .goals li{color:#5a2c0b}.card .goals li.ok{color:#c9720a}
+
+/* ---- result stars (level-clear card) ---- */
+.result-stars{display:flex;justify-content:center;gap:8px;margin:2px 0 -6px}
+.result-stars img{width:clamp(44px,13cqmin,66px);filter:drop-shadow(0 4px 4px #0005);opacity:.95}
+.result-stars img:nth-child(2){transform:translateY(-10px) scale(1.2)}
+.result-stars img.on{animation:starPop .55s cubic-bezier(.2,1.6,.4,1) both}
+.result-stars img.on:nth-child(1){animation-delay:.25s}.result-stars img.on:nth-child(2){animation-delay:.55s;animation-name:starPopMid}.result-stars img.on:nth-child(3){animation-delay:.85s}
+@keyframes starPop{0%{opacity:0;transform:scale(.2) rotate(-40deg)}60%{opacity:1;transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes starPopMid{0%{opacity:0;transform:translateY(-10px) scale(.2) rotate(-40deg)}60%{opacity:1;transform:translateY(-10px) scale(1.45) rotate(8deg)}100%{transform:translateY(-10px) scale(1.2) rotate(0)}}

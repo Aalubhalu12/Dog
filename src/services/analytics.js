@@ -32,7 +32,6 @@ const Analytics = (() => {
   }
   function addSink(fn) { sinks.push(fn); return () => { const i = sinks.indexOf(fn); if (i >= 0) sinks.splice(i, 1); }; }
   function events(filter) { return filter ? buf.filter(e => e.ev === filter) : buf.slice(); }
-  function clear() { buf = []; persist(); }
   function exportJSON() { return JSON.stringify({ exportedAt: new Date().toISOString(), version: CONFIG.VERSION, session, events: buf }, null, 0); }
 
   /** Numbers you want after a playtest: starts/ends per level, win rate, retries, avg duration. */
@@ -53,5 +52,5 @@ const Analytics = (() => {
     window.addEventListener('unhandledrejection', e => track('error', { msg: String(e.reason && e.reason.message || e.reason).slice(0, 160) }));
   }
 
-  return { track, addSink, events, clear, export: exportJSON, summary, get session() { return session; }, set debug(v) { debug = !!v; } };
+  return { track, addSink, events, export: exportJSON, summary, set debug(v) { debug = !!v; } };
 })();

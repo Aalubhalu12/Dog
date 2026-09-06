@@ -74,7 +74,7 @@ const Levels = (() => {
     return LEVELS;
   }
 
-  return { load, validate, ROOT, byId: id => LEVELS.find(L => L.id === id) || null, count: () => LEVELS.length };
+  return { load, validate };
 })();
 
 /** Returns a level by index, clamped to the last level (endless replay of the hardest). */

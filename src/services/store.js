@@ -3,7 +3,7 @@
  * ---------------------------------------------------------------
  * Callers keep using Store.* — the data lives in one versioned document
  * (see save.js). Coins go through Wallet (wallet.js) so every change is
- * bounded, logged and emits events for the UI.
+ * bounded, logged and emits events for the UI. Spending arrives with the shop (Phase 4) via Wallet.spend.
  */
 const Store = {
   // --- best score ------------------------------------------------------------
@@ -13,14 +13,12 @@ const Store = {
   // --- coins (delegates to Wallet) ----------------------------------------------
   coins()       { return Wallet.coins(); },
   addCoins(n = 1, reason = 'run') { return Wallet.add(n, reason); },
-  spendCoins(n, reason = 'shop')  { return Wallet.spend(n, reason); },
 
   // --- per-level progress: { [levelId]: { best, cleared, stars:[b,b,b], plays } } -----------
   levelProgress()            { return Save.get('levels', {}); },
   levelBest(id)              { return (Store.levelProgress()[id] || {}).best || 0; },
   isCleared(id)              { return !!(Store.levelProgress()[id] || {}).cleared; },
   levelStars(id)             { return (Store.levelProgress()[id] || {}).stars || [false, false, false]; },
-  starCount(id)              { return Store.levelStars(id).filter(Boolean).length; },
   totalStars()               { const p = Store.levelProgress(); let n = 0; for (const k in p) n += (p[k].stars || []).filter(Boolean).length; return n; },
   /** Merge a run into progress; stars are sticky (once earned, kept). Returns the newly earned star indices. */
   recordLevel(id, score, cleared, stars = [false, false, false]) {
@@ -35,8 +33,6 @@ const Store = {
     return gained;
   },
   highestUnlocked() { const p = Store.levelProgress(); let n = 1; while (p[n] && p[n].cleared) n++; return n; },
-  /** Level the PLAY button should open: furthest unlocked (capped to the last level). */
-  continueLevelIdx() { return Math.min(Store.highestUnlocked(), LEVELS.length) - 1; },
 
   // --- settings ------------------------------------------------------------------
   setting(k, d = true) { const v = Save.get('settings.' + k); return v == null ? d : v; },
@@ -45,7 +41,6 @@ const Store = {
   // --- misc flags ----------------------------------------------------------------
   ftueDone()    { return !!Save.get('ftue.done', false); },
   setFtueDone(v = true) { Save.set('ftue.done', v); },
-  stat(k)       { return Save.get('stats.' + k, 0); },
   bumpStat(k, n = 1) { Save.update(d => { d.stats[k] = (d.stats[k] || 0) + n; }); },
 
   /** Wipe everything (Settings → Reset progress). */

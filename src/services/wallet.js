@@ -25,5 +25,5 @@ const Wallet = (() => {
     Events.emit('coins', { coins: c, delta: -n, reason }); Analytics.track('coins_spent', { amount: n, reason, balance: c });
     return true;
   }
-  return { coins, add, spend, canAfford: n => coins() >= n, MAX_DELTA };
+  return { coins, add, spend, canAfford: n => coins() >= n };
 })();

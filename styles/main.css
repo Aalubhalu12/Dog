@@ -1,6 +1,5 @@
-/* BONK! — stylesheet entry point (import order matters) */
-@import url("base.css?v=0.12.2");
-@import url("menu.css?v=0.12.2");
-@import url("hud.css?v=0.12.2");
-@import url("modals.css?v=0.12.2");
-@import url("map.css?v=0.12.2");
+/* BONK! — stylesheet entry point (import order matters; ?v= tags are kept in sync by tools/bump.py) */
+@import url("base.css?v=0.13.0");
+@import url("home.css?v=0.13.0");
+@import url("hud.css?v=0.13.0");
+@import url("modals.css?v=0.13.0");

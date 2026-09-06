@@ -47,6 +47,6 @@ if __name__=='__main__':
         im=np.array(Image.open(D+n+'.webp').convert('RGBA'))
         g=grade(im); L=relight(g,K)
         Image.fromarray(L,'RGBA').save(D+n+'.webp',quality={'dizzy_sheet':82,'run_sheet':88}.get(n,84),method=6); print('graded+lit',n,L.shape)
-    for n in ['puppy','puppy_yay','puppy_bonk','puppy_dizzy']:
+    for n in ['puppy_yay','puppy_bonk','puppy_dizzy']:
         im=np.array(Image.open(D+n+'.webp').convert('RGBA')); L=relight(grade(im),1)
         Image.fromarray(L,'RGBA').save(D+n+'.webp',quality=92,method=6); print('graded+lit',n)

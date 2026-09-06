@@ -197,7 +197,7 @@ const BG = (() => {
     init() { resize(); initClouds(); window.addEventListener('resize', resize); enableTilt(); document.addEventListener('pointerdown', enableTilt, { once: true }); },
     draw, ctx,
     get W() { return W; }, get H() { return H; },
-    setAmp(v) { amp = v; }, setTilt(v) { tiltEnabled = v; }, setAmbient(v) { ambient = v; },
+    setAmp(v) { amp = v; }, setTilt(v) { tiltEnabled = v; },
     setTheme(name) { theme = THEMES[name] || THEMES.meadow; initClouds(); },
   };
 })();

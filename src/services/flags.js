@@ -29,6 +29,5 @@ const Flags = (() => {
   const get = k => (k in overrides ? overrides[k] : DEFAULTS[k]);
   const set = (k, v) => { overrides[k] = v; Events.emit('flag', { key: k, value: v }); };
   const apply = obj => { for (const k in obj) set(k, obj[k]); };
-  const all = () => ({ ...DEFAULTS, ...overrides });
-  return { get, set, apply, all, DEFAULTS };
+  return { get, set, apply };
 })();

@@ -2,6 +2,38 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.13.0] — 2026-09-06 — Codebase audit & restructure (no gameplay changes)
+### Changed
+- **Source layout by responsibility** (script order in `index.html` documents the dependency order):
+  `core/` (config, events, dom, assets, input) · `services/` (flags, analytics, save, wallet, store, leaderboard) ·
+  `audio/sfx.js` · `data/` (items, goals, levels loader) · `game/` · `ui/` · `scenes/`.
+  Renames: `storage.js → store.js`, `audio.js → audio/sfx.js`, `net/leaderboard.js → services/`,
+  `scenes/map.js → scenes/home.js` (`MapScene → HomeScene`, `sceneMap → sceneHome`, `goMenu/goMap → goHome`).
+- **CSS**: `menu.css → home.css`; `map.css` dissolved into `hud.css` (goal chip), `modals.css` (goal list, result
+  stars) and `home.css` (tile keyframes). Removed pre-mockup widgets never rendered (`.topbar .pill .iconbtn
+  .btn-blue .btn-wood`, `float`/`menuIn` leftovers, dead `@container` block).
+- One shared `$` / `$$` / `restartAnimation()` in `core/dom.js` replaces six private copies and six reflow hacks.
+### Removed (verified zero runtime/tool references)
+- Assets: `brand/logo.webp` (superseded by `home/logo.webp`), `ui/board.webp`, `ui/badge_paw.webp`, `puppy/puppy.webp`,
+  the old `home/plate.webp` with the baked-in dog (`plate_nodog` renamed to `plate`), empty `assets/audio/`.
+- Dead API: `Store.spendCoins/starCount/stat/continueLevelIdx`, `Save.toJSON/SCHEMA`, `Analytics.clear/session`,
+  `Flags.all/DEFAULTS`, `Wallet.MAX_DELTA`, `Events.once`, `SFX.pant`, `BG.setAmbient`, `Levels.byId/count`,
+  `Assets.all`, `CONFIG.PARALLAX.MENU_AMP`, `CONFIG.COMBO.DECAY`; hidden DOM (`#mapStars #best #lsCard #ftueHand #overTitle`).
+- Duplicate / superseded art sources (`mockup_level_select.png` = `home_mockup.png`, raw logo, board sheet) and
+  24 historical screenshots no doc references (docs/ 11 MB → 4 MB).
+### Fixed
+- `tools/sim_play.py` used absolute `/home/user/...` screenshot paths — now repo-relative.
+
+## [0.12.3] — 2026-09-05 — Home: complete logo bone, living puppy
+### Fixed
+- **Logo bone was cut off.** The source logo art had the bottom-left bone clipped by its own canvas edge. Regenerated
+  the logo with the bone complete (`assets/images/home/logo.webp`, same lettering/ribbon/proportions).
+### Added
+- **Home puppy moves.** The painted puppy was baked into the background plate. He is now a separate layer
+  (`plate.webp (puppy painted out)` + `dog_sit.webp` / `dog_sit_b.webp`) with: a hello hop on entry, a slow breathing sway
+  with soft shadow, a happy-squint blink every ~6.5 s, and a hop + yip when tapped. Subtle by design; honours
+  `prefers-reduced-motion`.
+
 ## [0.12.2] — 2026-09-05 — Phone layout: puppy above the buttons, no more "disappearing"
 ### Fixed
 - **Puppy hidden under the arrow buttons on phones.** Ground line raised 0.905 → 0.845 and the grass apron made

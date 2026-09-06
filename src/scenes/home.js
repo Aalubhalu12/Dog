@@ -1,5 +1,5 @@
 /**
- * BONK! — HOME scene: logo + "Select Level" board (single screen, per mockup). Also used as the level map.
+ * BONK! — HOME scene: logo + "Select Level" board (single screen, per mockup). Also the level map.
  * ---------------------------------------------------------------
  * Layout (matches the level-select mockup):
  *   hero      – puppy + hanging wooden "Select Level" sign
@@ -13,8 +13,7 @@
  * Tiles beyond LEVELS.length on the last page are shown as
  * "coming soon" locks so the grid always looks full.
  */
-const MapScene = (() => {
-  const $ = s => document.querySelector(s);
+const HomeScene = (() => {
   const PER_PAGE = 10, COLS = 5;
   let app, page = 0, selected = 0, picked = false;   // picked = player tapped a tile this session (else default to current level)
 
@@ -36,7 +35,7 @@ const MapScene = (() => {
     grid.innerHTML = Array.from({ length: PER_PAGE }, (_, k) => tileHTML(start + k)).join('');
     grid.querySelectorAll('.tile[data-i]').forEach(el => el.onclick = () => {
       const i = +el.dataset.i; SFX.click();
-      if (LEVELS[i].id > unlocked()) { Modals.toast('🔒 Clear the previous level first'); el.classList.remove('nudge'); void el.offsetWidth; el.classList.add('nudge'); return; }
+      if (LEVELS[i].id > unlocked()) { Modals.toast('🔒 Clear the previous level first'); restartAnimation(el, 'nudge'); return; }
       picked = true; select(i);
     });
     $('#lsDots').innerHTML = Array.from({ length: Math.max(4, pageCount()) }, (_, p) => `<i class="${p === page ? 'on' : ''}">${p === page ? '🐾' : ''}</i>`).join('');   // 4 dots like the mockup
@@ -47,13 +46,11 @@ const MapScene = (() => {
   /** Compact goal text for the card's middle row (mockup: "Time: 60 seconds"). */
   const goalRow = L => { const g = L.goal || {}; return ({ bonesIn: `${g.count} bones in ${g.seconds}s`, coins: `Coins: ${g.count}`, noBomb: 'No bombs hit', combo: `Combo ×${g.mult}`, nearMiss: `Near misses: ${g.count}`, goldBones: `Gold bones: ${g.count}`, power: `Power-ups: ${g.count}` })[g.type] || Goals.label(L); };
   function select(i) {
-    selected = i; const L = LEVELS[i], st = Store.levelStars(L.id), locked = L.id > unlocked(), best = Store.levelBest(L.id);
+    selected = i; const L = LEVELS[i], st = Store.levelStars(L.id), locked = L.id > unlocked();
     $('#lsGrid').querySelectorAll('.tile').forEach(t => t.classList.toggle('selected', +t.dataset.i === i));
     $('#lsTitle').textContent = `Level ${L.id}`;
     const th = $('#lsThumb'); th.src = `assets/images/levels/thumb_${L.id}.webp`; th.onerror = () => { th.onerror = null; th.src = 'assets/images/levels/thumb_1.webp'; };
     th.parentElement.classList.toggle('locked', locked);
-    const star = k => `<span class="mini"><img src="${Assets.url(st[k] ? 'star_gold' : 'star_grey')}" alt=""></span>`;
-    void star; void best;
     // three rows exactly like the mockup card: bones goal · time/goal · lives
     $('#lsInfo').innerHTML = [
       `<li class="${st[0] ? 'ok' : ''}"><img src="${Assets.url('bone')}" alt=""><span class="t">Score <b>${L.target.toLocaleString()}</b></span></li>`,
@@ -68,8 +65,7 @@ const MapScene = (() => {
     if (!picked || selected < 0 || selected >= LEVELS.length || LEVELS[selected].id > unlocked()) selected = cur;   // home opens on the level to continue
     page = Math.floor(selected / PER_PAGE);
     renderGrid(); select(selected);
-    $('#mapStars').textContent = `${Store.totalStars()} / ${LEVELS.length * 3}`;   // (hidden on the home replica; kept for tools/tests)
-    $('#mapCoins').textContent = Store.coins().toLocaleString(); $('#best').textContent = Store.best().toLocaleString();
+    $('#mapCoins').textContent = Store.coins().toLocaleString();
   }
 
   function bind(a) {
@@ -81,6 +77,8 @@ const MapScene = (() => {
     $('#btnBoard').onclick = () => { SFX.click(); Modals.leaderboard(); };
     $('#lsPrev').onclick  = () => { SFX.click(); page = Math.max(0, page - 1); renderGrid(); };
     $('#lsNext').onclick  = () => { SFX.click(); page = Math.min(pageCount() - 1, page + 1); renderGrid(); };
+    // tap the puppy: a little happy hop + yip (pure delight, no function)
+    $('#hmDog').onpointerdown = () => { restartAnimation($('#hmDog .hm-dog-body')); SFX.unlock(); SFX.yip(); };
     // swipe between pages
     let sx = null; const wrap = $('#lsGrid');
     wrap.addEventListener('pointerdown', e => sx = e.clientX);
@@ -91,6 +89,6 @@ const MapScene = (() => {
     bind,
     enter() { render(); },
     exit() {},
-    frame() {},   // home is a painted plate (assets/images/home/plate.webp) — nothing to draw on the canvas
+    frame() {},   // home is a painted plate (assets/images/home/plate.webp) + DOM — nothing to draw on the canvas
   };
 })();

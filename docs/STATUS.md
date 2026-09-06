@@ -1,5 +1,5 @@
 # BONK! — Status & Next Steps
-_Updated 2026-09-05 · current build **v0.12.2** (Phases 1–2 done) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
+_Updated 2026-09-05 · current build **v0.13.0** (Phases 1–2 done) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
 
 ---
 

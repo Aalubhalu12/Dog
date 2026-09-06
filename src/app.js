@@ -4,10 +4,10 @@
  * Scenes implement { bind(app), enter(...args), exit(), frame(now, dt) }.
  * Add a scene: create src/scenes/<name>.js, register it in SCENES,
  * add its DOM in index.html with class="scene" id="scene<Name>".
+ * Script load order (dependency order) is documented in index.html.
  */
 (() => {
-  const $ = s => document.querySelector(s);
-  const SCENES = { menu: { obj: MapScene, dom: 'sceneMap' }, map: { obj: MapScene, dom: 'sceneMap' }, play: { obj: PlayScene, dom: 'hud' } };   // home = level board (mockup)
+  const SCENES = { home: { obj: HomeScene, dom: 'sceneHome' }, play: { obj: PlayScene, dom: 'hud' } };   // home doubles as the level board
   let current = null;
 
   const app = {
@@ -17,9 +17,8 @@
       document.querySelectorAll('.scene').forEach(s => s.classList.toggle('active', s.id === SCENES[name].dom));
       SCENES[name].obj.enter(...args);
     },
-    goMenu() { app.go('menu'); },
+    goHome() { app.go('home'); },
     goPlay(levelIdx = 0) { app.go('play', levelIdx); },
-    goMap() { app.go('map'); },
   };
 
   // --- settings toggles ---------------------------------------------------
@@ -41,7 +40,7 @@
     };
     $('#btnResetProgress').onclick = () => {
       SFX.click(); if (!confirm('Reset ALL progress, coins and stars? This cannot be undone.')) return;
-      Store.resetAll(); Analytics.track('reset_progress'); Modals.closeAll(); app.goMenu(); Modals.toast('Progress reset');
+      Store.resetAll(); Analytics.track('reset_progress'); Modals.closeAll(); app.goHome(); Modals.toast('Progress reset');
     };
     $('#btnSound').onclick = () => { const tg = $('[data-setting="sound"]'); tg.classList.toggle('on'); const on = tg.classList.contains('on'); Store.setSetting('sound', on); syncSound(on); SFX.click(); };
   }
@@ -75,10 +74,10 @@
   loadAll.then(() => {
     BG.init();
     Input.bind({ leftBtn: $('#ctlL'), rightBtn: $('#ctlR'), dragSurface: $('#bg'), canvas: $('#bg') });
-    MapScene.bind(app); PlayScene.bind(app); bindSettings();
+    HomeScene.bind(app); PlayScene.bind(app); bindSettings();
     Leaderboard.init();                                              // local-first; syncs only inside daily windows
     $('#appVersion').textContent = 'v' + CONFIG.VERSION;
-    app.go('menu');
+    app.go('home');
     $('#loader').classList.add('done');
     requestAnimationFrame(frame);
   });

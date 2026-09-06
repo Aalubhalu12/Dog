@@ -1,9 +1,8 @@
 /**
  * BONK! — Sound effects (procedural Web Audio, no files needed)
  * ---------------------------------------------------------------
- * To use recorded audio later: put files in assets/audio/ and add a
- * `sample(name)` player here; keep the same public keys so game code
- * doesn't change.
+ * To use recorded audio later: create assets/audio/, add a `sample(name)`
+ * player here and keep the same public keys so game code doesn't change.
  */
 const SFX = (() => {
   let ctx = null, master = null, enabled = true;
@@ -52,7 +51,6 @@ const SFX = (() => {
     wuff:    () => { voice({ f0: vary(300, .08), f1: 200, dur: .16, formants: [600, 1400], vol: .6, breath: .5 }); },                 // content "wuff" (power-up / level start)
     whine:   () => voice({ f0: 700, f1: 520, dur: .42, formants: [1100, 2300], vol: .42, breath: .6 }),                                // bonk: soft whimper
     whimper: () => { voice({ f0: 620, f1: 700, dur: .22, formants: [1000, 2200], vol: .4, breath: .6 }); voice({ f0: 720, f1: 480, dur: .38, formants: [1000, 2200], vol: .4, breath: .6, delay: .26 }); }, // dizzy
-    pant:    () => { for (let i = 0; i < 3; i++) noise(.07, .10, 1800); },                                                             // (reserved) idle pant
     step:    (sp = 1) => { const now = performance.now(); if (now - lastStep < 80) return; lastStep = now; noise(.04, .09 + .07 * sp, 700); }, // paw pat on grass
     // — items —
     bone:  () => { tone(660, 990, .12, 'triangle', .8); tone(990, 1320, .16, 'triangle', .6, .09); },

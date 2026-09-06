@@ -17,7 +17,7 @@
  *   daily: { streak: 0, last: null },          // reserved: daily bonus (Phase 4)
  *   stats: { runs, wins, losses, bones, playSec },
  *   profile: { uid, name, country },          // leaderboard identity (anonymous; Firebase Auth uid later)
- *   lb: { latest, best, serverBest, lastWindow, lastSyncAt, rank:{world,country} }   // see src/net/leaderboard.js
+ *   lb: { latest, best, serverBest, lastWindow, lastSyncAt, rank:{world,country} }   // see src/services/leaderboard.js
  * }
  *
  * Guarantees
@@ -124,7 +124,6 @@ const Save = (() => {
   function reset() { doc = fresh(); generation++; persisted = false; clearLegacy(); localStorage.removeItem(BAK()); write(true); Events.emit('save:reset', { doc }); }
   /** Replace the whole document (cloud restore). Runs migrations on the incoming doc. */
   function replace(d) { doc = migrate(fill(d, {})); generation++; write(true); Events.emit('save:loaded', { source: 'replace', doc }); }
-  function toJSON() { if (!doc) load(); return JSON.stringify(doc); }
 
-  return { SCHEMA, load, get, set, update, reset, replace, flush, toJSON, get doc() { return doc || load(); }, get generation() { return generation; } };
+  return { load, get, set, update, reset, replace, flush, get doc() { return doc || load(); }, get generation() { return generation; } };
 })();

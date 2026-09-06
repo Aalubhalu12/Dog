@@ -3,6 +3,8 @@
     python3 tools/sim_play.py     (server must be running on :8080; needs playwright)
 Simulated player: reads game state each frame, steers toward the best good item / away from hazards.
 Plays L1 → L2 → L3 through the real UI (countdown, win cards, NEXT LEVEL). Records a checklist."""
+import pathlib
+SHOTS = pathlib.Path(__file__).resolve().parent.parent / 'docs' / 'screenshots'
 import json,time
 from playwright.sync_api import sync_playwright
 URL=f'http://localhost:8080/index.html?a={int(time.time())}'
@@ -63,14 +65,14 @@ with sync_playwright() as p:
             pg.wait_for_timeout(500)
             st=pg.evaluate('() => ({ win: Modals.isOpen("#modalWin"), over: Modals.isOpen("#modalOver"), score: Game.state?Game.state.score:0, time: Game.state?Game.state.time:0, lives: Game.state?Game.state.lives:0, combo: Game.state?Game.state.combo.bestMult:0, shield: Game.state?Game.state.shieldSaves:0, near: Game.state?Game.state.nearMisses:0, gold: Game.state?(Game.state._goldSeen||false):false, sh: Game.state?Game.state.powers.shield:0 })')
             combo_seen=max(combo_seen,st['combo']); near_seen=max(near_seen,st['near']); shield_seen=shield_seen or st['shield']>0
-            if st['sh']>0 and not shot: pg.screenshot(path=f'/home/user/bonk/docs/screenshots/sim_shield_L{lvl}.jpg',quality=75,type='jpeg'); shot=True
+            if st['sh']>0 and not shot: pg.screenshot(path=str(SHOTS / f'sim_shield_L{lvl}.jpg'),quality=75,type='jpeg'); shot=True
             if st['win']: outcome='win'; break
             if st['over']: outcome='over'; break
         dur=round(time.time()-t0,1)
         info=pg.evaluate('() => ({ score: Game.state.score, lives: Game.state.lives, stars: Game.state.stars, comboBest: Game.state.combo.best, comboMult: Game.state.combo.bestMult, near: Game.state.nearMisses, shields: Game.state.shieldSaves, bones: Game.state.bones, t: Math.round(Game.state.time) })')
         levels_done.append((lvl,outcome,info))
         check(f'L{lvl}: bot outcome', outcome=='win', f"{outcome} score={info['score']}/{LEVEL_T[lvl-1] if (LEVEL_T:=[400,900,1500]) else 0} in {info['t']}s lives={info['lives']} stars={info['stars']} combo×{info['comboMult']}({info['comboBest']}) near={info['near']} shields={info['shields']}")
-        pg.screenshot(path=f'/home/user/bonk/docs/screenshots/sim_result_L{lvl}.jpg',quality=75,type='jpeg')
+        pg.screenshot(path=str(SHOTS / f'sim_result_L{lvl}.jpg'),quality=75,type='jpeg')
         if outcome!='win':
             # retry once with the R key
             pg.evaluate('window.dispatchEvent(new KeyboardEvent("keydown",{key:"r"}))'); pg.wait_for_timeout(300)
@@ -98,12 +100,12 @@ with sync_playwright() as p:
     coins=pg.evaluate('Store.coins()'); check('Coins persisted to wallet', coins>0, f'{coins} coins')
     # ---- persistence across reload + level board
     pg.reload(); ready()
-    per=pg.evaluate('() => ({ stars: Store.totalStars(), unlocked: Store.highestUnlocked(), coins: Store.coins(), play: document.querySelector("#lsTitle").textContent.trim(), menuStars: document.querySelector("#mapStars").textContent })')
+    per=pg.evaluate('() => ({ stars: Store.totalStars(), unlocked: Store.highestUnlocked(), coins: Store.coins(), play: document.querySelector("#lsTitle").textContent.trim(), homeCoins: document.querySelector("#mapCoins").textContent })')
     check('Reload: progress persisted', per['unlocked']>=2 and per['coins']==coins, json.dumps(per))
     pg.wait_for_timeout(300)
     board=pg.evaluate('() => ({ done: document.querySelectorAll(".tile.done").length, cur: document.querySelectorAll(".tile.current").length, locked: document.querySelectorAll(".tile.locked").length })')
     check('Level board reflects progress', board['done']>=1, json.dumps(board))
-    pg.screenshot(path='/home/user/bonk/docs/screenshots/sim_board.jpg',quality=75,type='jpeg')
+    pg.screenshot(path=str(SHOTS / 'sim_board.jpg'),quality=75,type='jpeg')
     # ---- pause / resume / hardware-ish flows
     pg.click('#lsPlay',force=True); pg.wait_for_function('Game.active',timeout=15000)
     pg.evaluate('window.dispatchEvent(new KeyboardEvent("keydown",{key:"Escape"}))'); pg.wait_for_timeout(300)
@@ -112,7 +114,7 @@ with sync_playwright() as p:
     resumed=pg.evaluate('!Game.paused && Game.active')
     check('Pause (Esc) → Resume', paused and resumed)
     pg.evaluate('window.dispatchEvent(new KeyboardEvent("keydown",{key:"Escape"}))'); pg.wait_for_timeout(200); pg.click('#btnPauseMap',force=True); pg.wait_for_timeout(400)
-    check('Pause → Level board (quit logged)', pg.evaluate('document.querySelector("#sceneMap").classList.contains("active") && Analytics.events("quit").length>0'))
+    check('Pause → Level board (quit logged)', pg.evaluate('document.querySelector("#sceneHome").classList.contains("active") && Analytics.events("quit").length>0'))
     # ---- settings
     pg.click('#btnBackMenu, #mapBack, .ls-back',force=True) if pg.query_selector('#mapBack, .ls-back') else None
     pg.evaluate('document.querySelector("#btnSettings") && document.querySelector("#btnSettings").click()'); pg.wait_for_timeout(300)

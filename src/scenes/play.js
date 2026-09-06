@@ -2,7 +2,6 @@
  * BONK! — Play scene: wires Game events to HUD/Modals and handles buttons
  */
 const PlayScene = (() => {
-  const $ = s => document.querySelector(s);
   let app;
 
   let retryArmed = 0;
@@ -28,15 +27,15 @@ const PlayScene = (() => {
     $('#btnPause').onclick = () => { SFX.click(); pause(); };
     $('#btnResume').onclick = () => { SFX.click(); Modals.close('#modalPause'); Game.resume(); };
     $('#btnRestart').onclick = () => { SFX.click(); Modals.close('#modalPause'); Analytics.track('retry', { id: Game.state.level.id, from: 'pause' }); Game.start(Game.state.levelIdx); };
-    $('#btnQuit').onclick = () => { SFX.click(); app.goMenu(); };
+    $('#btnQuit').onclick = () => { SFX.click(); app.goHome(); };
     $('#btnAgain').onclick = () => { SFX.click(); Modals.close('#modalOver'); Analytics.track('retry', { id: Game.state.level.id, from: 'gameover' }); Game.start(Game.state.levelIdx); };
-    $('#btnHome').onclick = () => { SFX.click(); app.goMenu(); };
+    $('#btnHome').onclick = () => { SFX.click(); app.goHome(); };
     $('#btnContinue').onclick = () => { SFX.click(); Modals.close('#modalWin'); Analytics.track('continue', { from: Game.state.level.id }); Game.continueNext(); };
-    $('#btnWinHome').onclick = () => { SFX.click(); app.goMenu(); };
-    $('#btnWinMap').onclick = () => { SFX.click(); app.goMap(); };
+    $('#btnWinHome').onclick = () => { SFX.click(); app.goHome(); };
+    $('#btnWinMap').onclick = () => { SFX.click(); app.goHome(); };
     $('#btnWinRetry').onclick = () => { SFX.click(); Modals.close('#modalWin'); Analytics.track('retry', { id: Game.state.level.id, from: 'win' }); Game.start(Game.state.levelIdx); };
-    $('#btnOverMap').onclick = () => { SFX.click(); app.goMap(); };
-    $('#btnPauseMap').onclick = () => { SFX.click(); app.goMap(); };
+    $('#btnOverMap').onclick = () => { SFX.click(); app.goHome(); };
+    $('#btnPauseMap').onclick = () => { SFX.click(); app.goHome(); };
   }
   return { bind,
     enter(levelIdx) { BG.setAmp(CONFIG.PARALLAX.GAME_AMP); Game.start(levelIdx); FTUE.start(levelIdx); },

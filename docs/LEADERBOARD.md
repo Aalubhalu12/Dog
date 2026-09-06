@@ -1,6 +1,6 @@
 # Leaderboard — local-first, cached, daily-window sync
 
-**Code:** `src/net/leaderboard.js` (client) · `src/ui/modals.js → leaderboard()` (UI) · `firebase/functions/leaderboard.js` (server)
+**Code:** `src/services/leaderboard.js` (client) · `src/ui/modals.js → leaderboard()` (UI) · `firebase/functions/leaderboard.js` (server)
 **Tests:** `python3 tools/test_leaderboard.py` (26 browser checks) · `node --test firebase/functions/test/` (function contract, 4 tests)
 
 ## Rules

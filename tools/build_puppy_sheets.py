@@ -58,7 +58,6 @@ fw=list(range(0,still_end)); seq=fw; print('idle: still until',still_end,'frames
 box_idle=ubox(boxes,fw,6,1280,720)
 cells=grab('hop',seq,box_idle); sh=packq(cells,OUT+'idle_sheet.webp',280); preview(sh,'/tmp/prev_idle.jpg',len(seq))
 report['idle']=dict(frames=len(seq),size=sh.size,body=round(body_ratio(boxes,0,box_idle),3))
-c0=cells[0]; c0=c0.crop(c0.getbbox()); c0.thumbnail((500,500)); c0.save(OUT+'puppy.webp',quality=92,method=6)
 
 # ---------------- YAY: hop clip, real frames 24..51 (take-off → landing) ----------------
 a,b=24,52; idx=list(range(a,b)); box_hop=ubox(boxes,range(0,N),6,1280,720)

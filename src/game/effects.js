@@ -12,7 +12,7 @@ const FX = (() => {
   };
   const banner = text => { const d = document.createElement('div'); d.className = 'banner'; d.textContent = text; layer.appendChild(d); setTimeout(() => d.remove(), 1400); };
   const flash  = () => { if (!CONFIG.FX.FLASH) return; const d = document.createElement('div'); d.className = 'flash'; layer.appendChild(d); setTimeout(() => d.remove(), 500); };
-  const shake  = () => { if (!CONFIG.FX.SHAKE) return; shaker.classList.remove('shake'); void shaker.offsetWidth; shaker.classList.add('shake'); };
+  const shake  = () => { if (CONFIG.FX.SHAKE) restartAnimation(shaker, 'shake'); };
   const vibrate= p => { if (Store.setting('vib', CONFIG.FX.VIBRATE_DEFAULT) && navigator.vibrate) navigator.vibrate(p); };
 
   const burst = (x, y, cols, n = 10, spd = 1) => {

@@ -1,13 +1,26 @@
-/* BONK! — HOME scene: exact replica of art/reference/home_mockup.png
+/* BONK! — HOME scene (level board): exact replica of art/reference/home_mockup.png
    Everything is absolutely positioned in % of the stage (portrait 9:16 reference 882×1568).
-   The background is a painted plate (assets/images/home/plate.webp) that already contains the puppy,
-   doghouse, "Small Paws Big Happiness" sign and bowl, so no canvas parallax is drawn here. */
-#sceneMap{display:none;padding:0;justify-content:flex-start;align-items:stretch}
-#sceneMap.active{display:block}
-#sceneMap>*{position:absolute;pointer-events:auto;box-sizing:border-box}
+   The background is a painted plate (assets/images/home/plate.webp: doghouse, sign, bowl — no puppy);
+   the puppy is a separate live layer (.hm-dog: dog_sit.webp + dog_sit_b.webp blink pose) so he can move. */
+#sceneHome{display:none;padding:0;justify-content:flex-start;align-items:stretch}
+#sceneHome.active{display:block}
+#sceneHome>*{position:absolute;pointer-events:auto;box-sizing:border-box}
 .hm-plate{left:50%;top:50%;transform:translate(-50%,-50%);min-width:100%;min-height:100%;width:auto;height:100%;object-fit:cover;pointer-events:none;z-index:0}
 @media (max-aspect-ratio: 9/16){ .hm-plate{width:100%;height:auto;min-height:100%} }
 .hm-hidden{display:none}
+
+/* --- the puppy: same spot as the painted plate, but a live layer (breath + tail-wag ear sway + blink + hello hop) --- */
+.hm-dog{left:5.2%;top:16.7%;width:36.5%;aspect-ratio:657/798;z-index:1;cursor:pointer}   /* tappable: hop + yip (scenes/home.js) */
+.hm-dog-shadow{position:absolute;left:14%;right:10%;bottom:-1.5%;height:7%;border-radius:50%;background:radial-gradient(ellipse at center,#2a4a1288 0%,#2a4a1200 70%);animation:dogShadow 3.2s ease-in-out infinite}
+.hm-dog-body{position:absolute;inset:0;transform-origin:50% 100%;animation:dogHello 1.1s .35s cubic-bezier(.3,1.4,.5,1) both}   /* hop once on entry / tap */
+.hm-dog-breath{position:absolute;inset:0;transform-origin:50% 92%;animation:dogBreath 3.4s ease-in-out infinite}                 /* gentle breathing sway, forever */
+.hm-dog-breath img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 6px #0004)}
+.hm-dog-breath img.b{opacity:0;animation:dogBlink 6.5s 2.2s infinite}                                                             /* happy-squint pose flashes in as a blink */
+@keyframes dogBreath{0%,100%{transform:scale(1,1) rotate(0deg)}28%{transform:scale(1.02,.985) rotate(-1.3deg)}62%{transform:scale(.988,1.018) rotate(1deg)}}
+@keyframes dogShadow{0%,100%{transform:scaleX(1);opacity:.9}50%{transform:scaleX(1.05);opacity:1}}
+@keyframes dogHello{0%{transform:translateY(0) scale(1,1)}25%{transform:translateY(-1%) scale(.96,1.05)}55%{transform:translateY(-6%) scale(1.02,.98)}80%{transform:translateY(0) scale(1.04,.95)}100%{transform:translateY(0) scale(1,1)}}
+@keyframes dogBlink{0%,86%{opacity:0}88%,96%{opacity:1}98%,100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){.hm-dog-body,.hm-dog-breath,.hm-dog-breath img.b,.hm-dog-shadow{animation:none}}
 
 /* --- header --- */
 .hm-gear{left:3.8%;top:1.6%;width:9.4%;aspect-ratio:1;border-radius:50%;border:none;cursor:pointer;color:#fff;font-size:clamp(18px,5.4cqw,32px);display:grid;place-items:center;
@@ -90,3 +103,9 @@
 .hm-post.l span{transform:rotate(-1.5deg)}.hm-post.r span{transform:rotate(1.5deg)}
 .hm-post:active{transform:translateY(3px)}
 .hm-sound{left:4.5%;top:12%;width:8%;aspect-ratio:1;border-radius:50%;border:2px solid #d9a466;background:#7a4a1ccc;color:#fff;font-size:clamp(12px,3.6cqw,20px);display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 6px #0005;padding:0}
+
+/* keyframes */
+@keyframes menuIn{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
+@keyframes nodeIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+@keyframes ringBlue{0%,100%{box-shadow:0 5px 0 #124e8e,0 8px 14px #0005,0 0 0 3px #bfe6ff88,inset 0 2px 0 #fff8}50%{box-shadow:0 5px 0 #124e8e,0 8px 14px #0005,0 0 0 9px #bfe6ff22,inset 0 2px 0 #fff8}}
+@keyframes nudgeX{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}

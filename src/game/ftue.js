@@ -14,7 +14,6 @@
  * Flag: ftue_enabled.
  */
 const FTUE = (() => {
-  const $ = s => document.querySelector(s);
   const el = { box: $('#ftue'), text: $('#ftueText') };
   const STEPS = {
     move:  { text: 'Drag or hold ◀ ▶ to run!', hand: true,  done: () => Math.abs(Game.puppy.x - .5) > .12 || Input.any, timeout: 8 },

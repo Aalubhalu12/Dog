@@ -39,6 +39,17 @@
 .hint{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 30%);transform:translateX(-50%);text-align:center;color:#fff;font-weight:900;font-size:clamp(13px,3.8cqmin,18px);
       text-shadow:0 2px 0 #1a5fa8,0 0 10px #0008;pointer-events:none;transition:opacity .5s}
 
+/* goal chip (3rd-star objective) */
+.goalchip{position:relative;display:flex;align-items:center;gap:4px;background:#0f2c52b3;border:2px solid #fff;border-radius:999px;padding:1px 9px 1px 4px;color:#fff;font-weight:800;
+  font-size:clamp(10px,2.9cqmin,13px);overflow:hidden;transition:opacity .4s,transform .3s;max-width:50%;white-space:nowrap;text-overflow:ellipsis}
+.goalchip span{overflow:hidden;text-overflow:ellipsis}
+.goalchip img{width:1.35em;position:relative;z-index:1}
+.goalchip span{position:relative;z-index:1}
+.goalchip i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#ffd23a88,#ff9a1f88);transition:width .3s}
+.goalchip.done{border-color:#ffd23a;background:#3fae37cc}
+.goalchip.failed{opacity:.55}
+.goalchip.hide{opacity:0;transform:translateY(-6px)}
+
 /* floating text & reactions */
 #fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .pop{position:absolute;font-weight:900;font-size:clamp(20px,6cqmin,34px);color:#fff;transform:translate(-50%,-50%);animation:popUp 1s ease-out forwards;

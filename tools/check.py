@@ -32,8 +32,9 @@ for js in sorted(list(ROOT.glob('src/**/*.js')) + list(ROOT.glob('firebase/funct
 # 2. asset references ------------------------------------------------------------------------
 print('2. asset references')
 text = ''.join(p.read_text() for p in list(ROOT.glob('src/**/*.js')) + [ROOT / 'index.html'] + list(ROOT.glob('styles/*.css')))
-refs = set(re.findall(r"['\"(]((?:assets/)?(?:images|audio)/[\w/.\-]+\.(?:webp|png|jpg|mp3|ogg|wav))", text))
-refs |= {'assets/images/' + m for m in re.findall(r"'((?:bg|ambient|puppy|items|ui|brand|levels)/[\w.\-]+\.webp)'", text)}
+refs = set(re.findall(r"['\"(]((?:\.\./)?(?:assets/)?(?:images|audio)/[\w/.\-]+\.(?:webp|png|jpg|mp3|ogg|wav))", text))
+refs = {r.replace('../', '') for r in refs}
+refs |= {'assets/images/' + m for m in re.findall(r"'((?:bg|ambient|puppy|items|ui|home|levels)/[\w.\-]+\.webp)'", text)}
 for r in sorted(refs):
     p = ROOT / (r if r.startswith('assets/') else 'assets/' + r)
     (ok if p.exists() else bad)(str(p.relative_to(ROOT)))

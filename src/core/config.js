@@ -2,11 +2,11 @@
  * BONK! — Global configuration
  * ---------------------------------------------------------------
  * Central place for tunables that are NOT level-specific.
- * Level design lives in  src/game/levels.js
- * Item definitions live in src/game/items.js
+ * Level design lives in  data/levels/*.json (loaded by src/data/levels.js)
+ * Item definitions live in src/data/items.js
  */
 const CONFIG = Object.freeze({
-  VERSION: '0.12.2',
+  VERSION: '0.13.0',
   STORAGE_PREFIX: 'bonk_',
 
   /** Player (puppy) */
@@ -23,11 +23,8 @@ const CONFIG = Object.freeze({
     INVINCIBLE_TIME: 1.6, // seconds of i-frames after taking a hit
   },
 
-  /** Parallax background */
-  PARALLAX: {
-    MENU_AMP: 1.0,
-    GAME_AMP: 0.45,
-  },
+  /** Parallax background (gameplay; the home screen is a painted plate) */
+  PARALLAX: { GAME_AMP: 0.45 },
 
   /** Effects */
   FX: {
@@ -41,12 +38,11 @@ const CONFIG = Object.freeze({
     STEP: 4,              // catches per multiplier step  (×2 after 4, ×3 after 8 … ×5 after 16)
     MAX: 5,
     MISS_RESETS: true,    // letting a bone hit the ground breaks the chain (hazards always do)
-    DECAY: 0,             // (reserved) seconds of inactivity before the chain drops — 0 = never
   },
   /** Near-miss: a hazard passes within this many puppy-widths of the puppy without hitting */
   NEAR_MISS: { MARGIN: 0.18, COINS: 1, COOLDOWN: 0.8 },
 
-  /** Leaderboard (src/net/leaderboard.js): local-first, server only in limited daily windows */
+  /** Leaderboard (src/services/leaderboard.js): local-first, server only in limited daily windows */
   LEADERBOARD: {
     SYNC_WINDOWS_PER_DAY: 2,   // 2 → one sync allowed in 00:00–11:59 and one in 12:00–23:59 (local time)
     ENDPOINT: '',              // '' = mock population; Phase 5: 'https://<region>-<project>.cloudfunctions.net/leaderboard'

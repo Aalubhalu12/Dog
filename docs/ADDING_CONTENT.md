@@ -40,7 +40,7 @@ A level file with problems is **skipped with a console error** instead of breaki
 1. Sprite → `assets/images/items/<key>.webp` (transparent, ~260 px wide).
    Drop a PNG and run `python3 tools/optimize_assets.py` to convert.
 2. `src/core/assets.js` → add `<key>: 'items/<key>.webp'` to `MANIFEST`.
-3. `src/game/items.js` → add an entry:
+3. `src/data/items.js` → add an entry:
 
 ```js
 // a good item worth 25 points
@@ -60,16 +60,16 @@ cactus: { kind: 'hazard', size: .11, rot: 0, hit: 'bonk', stun: .5, pose: 'bonk'
 ## 3. Add a power-up
 
 1. Create the item with `kind: 'power'`, `power: 'shield'`, `dur: 5`, `banner: 'SHIELD!'`.
-2. `src/game/items.js` → `POWERS.shield = { icon: 'shield', label: '' }`.
+2. `src/data/items.js` → `POWERS.shield = { icon: 'shield', label: '' }`.
 3. `src/game/game.js` → in `newState` add `shield: 0` to `powers`; implement its effect
    where relevant (e.g. in `onCatch` hazard branch: `if (S.powers.shield > 0) { S.powers.shield = 0; return; }`).
 4. The HUD badge with countdown appears automatically (`HUD.update` iterates `S.powers`).
 
 ## 4. Add a sound
 
-`src/core/audio.js` → add a key to `lib` using `tone()` / `noise()`, then reference it
+`src/audio/sfx.js` → add a key to `lib` using `tone()` / `noise()`, then reference it
 with `sfx: '<key>'` on an item, or call `SFX.play('<key>')` anywhere.
-For recorded audio later: put files under `assets/audio/` and add a small sample player
+For recorded audio later: create `assets/audio/`, put files there and add a small sample player
 in the same file — keep the same keys so nothing else changes.
 
 ## 5. Add a background theme
@@ -111,7 +111,7 @@ frame scale by alpha-area before packing (see the 0.6.0 build notes).
 
 ```js
 const ShopScene = (() => {
-  function bind(app) { document.querySelector('#btnShopBack').onclick = () => app.goMenu(); }
+  function bind(app) { document.querySelector('#btnShopBack').onclick = () => app.goHome(); }
   return { bind, enter() { BG.setAmp(1); /* fill list */ }, exit() {}, frame(now, dt) { BG.draw(now, dt); } };
 })();
 ```
@@ -154,8 +154,8 @@ painting: threshold the blue hue band (H 170–225°, S > .25) below the horizon
 
 ## Adding a level goal (3rd star)
 
-Each level in `src/game/levels.js` has a `goal`, e.g. `{ type: 'coins', count: 12 }`.
-Available types live in `src/game/goals.js` → `GOALS`:
+Each level in `src/data/levels.js` has a `goal`, e.g. `{ type: 'coins', count: 12 }`.
+Available types live in `src/data/goals.js` → `GOALS`:
 
 | type | config | done when |
 |---|---|---|
@@ -172,7 +172,7 @@ The level-select board pages itself from `LEVELS.length` (10 tiles per page) —
 
 ## 8. Persist something new (save v2)
 
-All player data lives in one document (`src/core/save.js`, key `bonk_save`, `v: 2`).
+All player data lives in one document (`src/services/save.js`, key `bonk_save`, `v: 2`).
 - Read: `Save.get('shop.equipped', 'classic')` · write: `Save.set('shop.equipped', id)` or `Save.update(d => { … })` (one write).
 - New field → add its default to `fresh()`; existing saves get it filled automatically on load (`fill`).
 - Changing the **shape** of an existing field → bump `SCHEMA` and add `MIGRATIONS[oldVersion]`.
@@ -181,10 +181,10 @@ All player data lives in one document (`src/core/save.js`, key `bonk_save`, `v: 
 
 ## 9. Log an analytics event
 
-`Analytics.track('shop_open', { from: 'menu' })`. Keep names snake_case and in the catalogue at the top of `src/core/analytics.js`.
+`Analytics.track('shop_open', { from: 'menu' })`. Keep names snake_case and in the catalogue at the top of `src/services/analytics.js`.
 Settings → *Export log* downloads the buffer; `Analytics.summary()` in the console prints per-level starts / win rate / retries.
 
 ## 10. Gate a feature behind a flag
 
-`if (Flags.get('shop_enabled')) …` — add the default in `src/core/flags.js`. QA can flip any flag from the URL: `?flag_shop_enabled=1`.
+`if (Flags.get('shop_enabled')) …` — add the default in `src/services/flags.js`. QA can flip any flag from the URL: `?flag_shop_enabled=1`.
 Phase 5 feeds Remote Config values into `Flags.apply({...})`; nothing else changes.

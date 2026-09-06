@@ -2,7 +2,6 @@
  * BONK! — In-game HUD binding (score, hearts, powers, progress, countdown)
  */
 const HUD = (() => {
-  const $ = s => document.querySelector(s);
   const el = { score: $('#hScore'), best: $('#hBest'), coins: $('#hCoins'), hearts: $('#hearts'), level: $('#hLevel'),
                power: $('#powerbar'), progress: $('#levelProgress'), hint: $('#hint'), cd: $('#countdown'), cdNum: $('#countNum'),
                chip: $('#goalChip'), goalText: $('#goalText'), goalBar: $('#goalBar'), ctlL: $('#ctlL'), ctlR: $('#ctlR'), stage: $('#stage'),
@@ -23,7 +22,7 @@ const HUD = (() => {
     el.score.textContent = S.score.toLocaleString(); el.coins.textContent = S.coins.toLocaleString();
     el.best.textContent = Math.max(S.score, Store.best()).toLocaleString();
     el.level.textContent = `LV ${S.level.id}`;
-    if (S.score !== lastScore) { lastScore = S.score; el.score.classList.remove('bump'); void el.score.offsetWidth; el.score.classList.add('bump'); }
+    if (S.score !== lastScore) { lastScore = S.score; restartAnimation(el.score, 'bump'); }
     el.progress.style.width = (S.cleared ? 100 : Math.min(100, S.score / S.level.target * 100)) + '%';
     let html = '';
     for (const k in S.powers) if (S.powers[k] > 0) { const P = POWERS[k];
@@ -58,7 +57,7 @@ const HUD = (() => {
     if (key !== comboKey) { comboKey = key;
       let h = ''; for (let i = 0; i < K.STEP; i++) h += `<i class="${i < filled ? 'on' : ''}"></i>`; el.comboPaws.innerHTML = h;
       el.comboMult.textContent = '×' + C.mult; }
-    if (ev === 'add' && (C.n % K.STEP === 0 || C.mult >= K.MAX)) { el.combo.classList.remove('pulse'); void el.combo.offsetWidth; el.combo.classList.add('pulse'); }
+    if (ev === 'add' && (C.n % K.STEP === 0 || C.mult >= K.MAX)) restartAnimation(el.combo, 'pulse');
   }
   function reset(S) {
     comboKey = ''; el.combo.classList.remove('on', 'max', 'pulse'); combo(S);
@@ -69,7 +68,7 @@ const HUD = (() => {
   }
   function countdown(txt) {
     if (txt == null) { el.cd.classList.remove('on'); return; }
-    el.cd.classList.add('on'); el.cdNum.textContent = txt; el.cdNum.style.animation = 'none'; void el.cdNum.offsetWidth; el.cdNum.style.animation = '';
+    el.cd.classList.add('on'); el.cdNum.textContent = txt; restartAnimation(el.cdNum);
   }
   return { update, hearts, reset, countdown, combo };
 })();

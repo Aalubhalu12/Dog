@@ -3,7 +3,6 @@
  * Add a modal: create a `.modal` element in index.html, then open('#id').
  */
 const Modals = (() => {
-  const $ = s => document.querySelector(s);
   const STICKY = ['modalPause', 'modalOver', 'modalWin'];         // can't be dismissed by tapping outside
   const open = id => $(id).classList.add('open');
   const close = id => $(id).classList.remove('open');

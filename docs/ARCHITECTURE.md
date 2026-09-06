@@ -11,20 +11,22 @@ adding `export`/`import` lines — the boundaries are already clean.
 ┌──────────────────────────────────────────────────────────────┐
 │ app.js            scene registry · main rAF loop · settings  │
 ├──────────────────────────────────────────────────────────────┤
-│ scenes/           MenuScene · MapScene · PlayScene           │
+│ scenes/           HomeScene (level board) · PlayScene        │
 │                   (glue: user actions ⇄ Game events ⇄ UI)    │
 ├──────────────────────────────────────────────────────────────┤
 │ ui/               HUD (compact, ≤15 % of stage) · Modals     │
 ├──────────────────────────────────────────────────────────────┤
-│ game/             Game ─┬─ Puppy          FTUE (first-run hints)│
-│                         ├─ Spawner ── ITEMS / POWERS (data)  │
-│                         ├─ FX                                │
-│                         ├─ GOALS (3rd-star rules, data)      │
-│                         └─ LEVELS (data)                     │
+│ game/             Game ─┬─ Puppy · Spawner · FX    FTUE      │
 │                   BG (parallax, THEMES) · Ambient (bg life)  │
 ├──────────────────────────────────────────────────────────────┤
-│ core/             CONFIG · Events · Flags · Analytics        │
-│                   Save → Wallet → Store · Assets · SFX · Input│
+│ data/             ITEMS / POWERS · GOALS · LEVELS (json)     │
+├──────────────────────────────────────────────────────────────┤
+│ audio/            SFX (procedural Web Audio + puppy voice)   │
+├──────────────────────────────────────────────────────────────┤
+│ services/         Flags · Analytics · Save → Wallet → Store  │
+│                   Leaderboard (Mock / Http adapter)          │
+├──────────────────────────────────────────────────────────────┤
+│ core/             CONFIG · Events · DOM helpers · Assets · Input│
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -135,5 +137,5 @@ const S = Game.state, W = BG.W, H = BG.H, def = ITEMS.rock;
 S.spawner.items.push({ type:'rock', def, x: Game.puppy.x*W, y: H*.5, size: W*def.size, vy: H*.5, rot:0, vr:1, wob:0, dead:false });
 ```
 
-- `src/net/leaderboard.js` — local-first leaderboard, cached server view, daily-window sync (see docs/LEADERBOARD.md)
+- `src/services/leaderboard.js` — local-first leaderboard, cached server view, daily-window sync (see docs/LEADERBOARD.md)
 - `firebase/` — Cloud Function + Firestore indexes/rules for the leaderboard
