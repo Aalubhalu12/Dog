@@ -7,6 +7,8 @@ Move the puppy left/right, catch bones and coins, grab power-ups, and dodge fall
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
+**Live build:** https://aalubhalu12.github.io/Dog/ (GitHub Pages, deploys on every push to `main`) · **Repo:** https://github.com/Aalubhalu12/Dog
+
 ---
 
 ## 🚀 Quick start

@@ -73,4 +73,4 @@ Ordered by impact; each item is a self-contained ship.
 ## Known gaps / small polish backlog
 - Level board side decorations (signposts, dog house) from the mockup — skipped so far to keep the parallax clean
 - Settings: no separate music/SFX sliders yet (one sound toggle)
-- Tunnel link is temporary (dies with the sandbox) — ask for a new one when needed; permanent hosting = M4 PWA item
+- Permanent hosting: GitHub Pages at https://aalubhalu12.github.io/Dog/ (repo Aalubhalu12/Dog); tunnels are only needed for testing uncommitted work
