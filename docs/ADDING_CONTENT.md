@@ -4,21 +4,30 @@
 
 Levels are **JSON files** in `data/levels/`. Copy the last one, edit, register:
 
-1. `cp data/levels/L03.json data/levels/L04.json` and edit:
+1. `cp data/levels/L10.json data/levels/L11.json` and edit:
 ```json
 {
-  "id": 4, "name": "Windy Peaks", "target": 2200, "hearts": 3,
+  "id": 11, "name": "Windy Peaks", "target": 3300, "hearts": 3,
   "spawn": [0.55, 0.35],     "speed": [0.50, 0.72],     "ramp": 60, "safeTime": 2,
   "weights": { "bone": 28, "coin": 24, "rock": 22, "bomb": 16, "magnet": 5, "star": 5 },
   "theme": "meadow",
   "ambient": { "birds": 1, "walkers": 0.8, "cars": 0.7 },
+  "modifiers": { "wind": 0.6, "squirrel": true, "waves": { "every": 15, "count": 4, "gap": 0.35, "mix": true } },
   "goal": { "type": "power", "count": 4 },
   "notes": "designer notes — ignored by the game"
 }
 ```
-2. Add `"L04.json"` to the `levels` list in `data/levels/index.json`.
-3. (optional) `assets/images/levels/thumb_4.webp` — level-select thumbnail (falls back to thumb_1).
+2. Add `"L11.json"` to the `levels` list in `data/levels/index.json`.
+3. (optional) `assets/images/levels/thumb_11.webp` — level-select thumbnail (falls back to thumb_1).
 4. `python3 tools/check.py` — validates the file (ids consecutive, item keys exist, goal type exists, ranges sane).
+5. `python3 tools/sim_levels.py 2 11-11` — a scripted player must be able to clear it and reach the 3rd star.
+
+### `modifiers` (all optional, all off by default — see `src/game/mechanics.js`)
+| key | value | effect |
+|---|---|---|
+| `wind` | 0..1 | gusts every 7–13 s push light items sideways (never rocks/bombs); telegraphed by chevrons + leaves + puppy lean |
+| `squirrel` | `true` | squirrel steals bones that hit the ground (visual only) |
+| `waves` | `{ every, count, gap, mix }` | every `every` s: warning, then `count` rocks across `count+1` lanes, one lane always open; `mix` alternates bombs |
 
 That's it. The level board, HUD, star goals, clear card and `Store.recordLevel` all read from the loaded `LEVELS` array.
 A level file with problems is **skipped with a console error** instead of breaking the game; `Levels.validate(obj)` returns the list of problems.
@@ -34,6 +43,7 @@ A level file with problems is **skipped with a console error** instead of breaki
 | `combo` | `mult` | reach combo ×3 |
 | `nearMiss` | `count` | 3 near misses |
 | `goldBones` | `count` | catch 2 gold bones |
+| `dodge` | `count` | let 30 hazards hit the ground without touching you |
 
 ## 2. Add a falling item
 

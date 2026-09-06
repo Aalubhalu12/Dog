@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.13.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.14.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -65,7 +65,8 @@ bonk/
 │   ├── game/                  # simulation + canvas rendering (never touches the DOM except FX)
 │   │   ├── game.js            #   Game controller: score, lives, powers, combo, near-miss, shield, flow
 │   │   ├── puppy.js           #   Puppy: physics, 24 fps sheet animation, turn pivot, draw
-│   │   ├── spawner.js         #   Spawner: spawning, fall profiles, magnet, collisions
+│   │   ├── mechanics.js       #   per-level mechanics from `modifiers`: wind · squirrel · hazard waves
+│   │   ├── spawner.js         #   Spawner: spawning, fall profiles, wind drift, magnet, collisions
 │   │   ├── background.js      #   BG: parallax renderer + THEMES + camera framing
 │   │   ├── ambient.js         #   background life per level (birds, walkers, cars) — behind the fence
 │   │   ├── effects.js         #   FX: pop text, banners, flash, shake, particles
@@ -77,7 +78,7 @@ bonk/
 │       ├── home.js            #   HomeScene — level board + PLAY (also the level map)
 │       └── play.js            #   PlayScene — wires Game hooks to HUD / Modals
 ├── data/
-│   └── levels/                # ★ L01.json … + index.json — one file per level
+│   └── levels/                # ★ L01.json … L10.json + index.json — one file per level
 ├── assets/images/             # everything the game SHIPS (all WebP, ≈3.9 MB)
 │   ├── bg/                    # parallax layers: sky, clouds, mountains, village (+water_mask), meadow, road, foreground_wide, trees
 │   ├── ambient/               # bird sheet, walker sheets, cars
@@ -92,6 +93,7 @@ bonk/
 └── tools/
     ├── check.py               # ★ smoke test: syntax, asset refs, version tags, headless play, data layer, leaderboard tests
     ├── sim_play.py            # scripted bot plays L1–L3 through the real UI (25-point checklist)
+    ├── sim_levels.py          # balance sweep: the bot plays every level (good + perfect runs), fails on unwinnable levels
     ├── test_leaderboard.py    # leaderboard unit/integration checks (run by check.py)
     ├── bump.py                # bump VERSION everywhere it must match
     ├── serve.sh               # local dev server
@@ -118,6 +120,7 @@ bonk/
 | Add a sound | `src/audio/sfx.js` | reference by key from an item |
 | Add a background theme | `src/game/background.js` → `THEMES` | set `theme:` on a level |
 | Tune background life (cars/people/birds) | `src/game/ambient.js` → `CFG` | spawn intervals, caps, road position |
+| Wind / squirrel / hazard waves on a level | `data/levels/L*.json` → `modifiers` | logic in `src/game/mechanics.js` |
 | Add a screen (shop, level select) | new `src/scenes/*.js` + `.scene` div in `index.html` + register in `src/app.js` | |
 
 Full recipes with code: **[docs/ADDING_CONTENT.md](docs/ADDING_CONTENT.md)**

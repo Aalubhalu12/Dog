@@ -27,6 +27,7 @@ const Assets = (() => {
     // ambient life (decorative)
     car0: 'ambient/car0.webp', car1: 'ambient/car1.webp', car2: 'ambient/car2.webp',
     walker0: 'ambient/walker0_sheet.webp', walker1: 'ambient/walker1_sheet.webp', bird_sheet: 'ambient/bird_sheet.webp',
+    squirrel: 'ambient/squirrel.webp',                       // L8+ bone thief (src/game/mechanics.js)
     // (home-screen art — plate, puppy, logo — is referenced directly from index.html and never drawn on the canvas)
   };
   const images = {};

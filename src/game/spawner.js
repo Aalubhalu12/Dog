@@ -29,26 +29,37 @@ class Spawner {
   static lerp(a, b, t) { return a + (b - a) * t; }
 
   spawn(time) {
-    const L = this.level, W = BG.W, H = BG.H, p = Math.max(0, Math.min(1, time / L.ramp));
+    const L = this.level;
     let type = Spawner.pick(L.weights);
     if (time < (L.safeTime || 0) && ITEMS[type].kind === 'hazard') type = 'bone';
+    this.spawnAt(type, null, time, 1);
+    const p = Math.max(0, Math.min(1, time / L.ramp));
+    this.timer = Spawner.lerp(L.spawn[0], L.spawn[1], p) * (.8 + Math.random() * .4);
+  }
+
+  /** Spawn a specific item. xFrac null = random lane position; speedMul scales the level fall speed (hazard waves use ~1.08). */
+  spawnAt(type, xFrac, time, speedMul = 1) {
+    const L = this.level, W = BG.W, H = BG.H, p = Math.max(0, Math.min(1, time / L.ramp));
     const def = ITEMS[type], size = W * def.size, margin = W * .05 + size / 2, F = Spawner.FALL[def.fall] || Spawner.FALL.tumble;
-    const v = H * Spawner.lerp(L.speed[0], L.speed[1], p) * (.9 + Math.random() * .25) * F.term;
-    this.items.push({ type, def, F, x: margin + Math.random() * (W - margin * 2), y: -size, size,
+    const v = H * Spawner.lerp(L.speed[0], L.speed[1], p) * (.9 + Math.random() * .25) * F.term * speedMul;
+    const x = xFrac == null ? margin + Math.random() * (W - margin * 2) : margin + xFrac * (W - margin * 2);
+    this.items.push({ type, def, F, x, y: -size, size,
       vy: v * F.start, vt: v, age: 0,
       rot: Math.random() * 6.28, vr: (Math.random() - .5) * def.rot * F.spin,
       wob: Math.random() * 6.28, swayF: F.sway[1] * (.85 + Math.random() * .3), swayA: W * F.sway[0] * (.7 + Math.random() * .6), tilt: 0, dead: false });
-    this.timer = Spawner.lerp(L.spawn[0], L.spawn[1], p) * (.8 + Math.random() * .4);
   }
 
   /**
    * @param onCatch(item)   – item touched the puppy
    * @param onMiss(item)    – a good item hit the ground (combo-breaker for bones)
    * @param onNear(item)    – a hazard passed close by without touching (near-miss)
+   * @param onDodge(item)   – a hazard reached the ground without touching the puppy
    */
-  update(dt, time, puppy, powers, onCatch, onMiss, onNear) {
-    this.timer -= dt; if (this.timer <= 0) this.spawn(time);
+  update(dt, time, puppy, powers, onCatch, onMiss, onNear, onDodge) {
+    this.timer -= dt; if (this.timer <= 0) { if (Mechanics.spawnPaused) this.timer = .3; else this.spawn(time); }
     const box = puppy.box, W = BG.W, H = BG.H, clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+    // wind: light things (coins, power-ups) drift most, bones a bit, rocks/bombs NOT at all — hazards stay predictable
+    const wind = Mechanics.windX, windK = wind ? W * .30 * wind : 0;
     for (const it of this.items) {
       if (it.dead) continue;
       // ease toward terminal speed (gravity feel), drift sideways on a per-item sine, rotate/wobble by profile
@@ -56,8 +67,9 @@ class Spawner {
       it.vy += (it.vt - it.vy) * Math.min(1, F.accel * dt);
       it.wob += dt * it.swayF * 6.283;
       it.y += it.vy * dt; it.x += Math.cos(it.wob) * it.swayA * it.swayF * 6.283 * dt;
+      if (windK && F !== Spawner.FALL.heavy) { const m = F === Spawner.FALL.tumble ? .7 : 1; it.x = clamp(it.x + windK * m * dt, it.size * .4, W - it.size * .4); }
       it.rot += it.vr * dt;
-      it.tilt = F.wobble ? Math.sin(it.wob) * F.wobble : 0;
+      it.tilt = (F.wobble ? Math.sin(it.wob) * F.wobble : 0) + (windK && F !== Spawner.FALL.heavy ? wind * .22 : 0);
       // slow the tumble slightly as things speed up? no — keep spin constant; it reads more solid.
       if (powers.magnet > 0 && POWERS.magnet.attracts.includes(it.type)) {
         const dx = box.cx - it.x, dy = box.cy - it.y, d = Math.hypot(dx, dy) || 1, R = W * POWERS.magnet.radius;
@@ -68,7 +80,7 @@ class Spawner {
       // near-miss: a hazard's centre passes the puppy's mid-height within MARGIN puppy-widths of its body, never touching
       if (it.def.kind === 'hazard' && !it.near && it.y > box.cy) { it.near = true;
         const gap = Math.abs(it.x - box.cx) - box.w * .5 - r; if (gap > 0 && gap < box.pw * CONFIG.NEAR_MISS.MARGIN && puppy.inv <= 0 && onNear) onNear(it); }
-      if (it.y > H * CONFIG.PUPPY.GROUND_Y + it.size * .5) { it.dead = true; if (it.def.kind !== 'hazard' && onMiss) onMiss(it); }
+      if (it.y > H * CONFIG.PUPPY.GROUND_Y + it.size * .5) { it.dead = true; if (it.def.kind !== 'hazard') { onMiss && onMiss(it); Mechanics.onGround(it); } else if (onDodge) onDodge(it); }
     }
     this.items = this.items.filter(i => !i.dead);
   }

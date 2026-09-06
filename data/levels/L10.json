@@ -1,0 +1,47 @@
+{
+  "id": 10,
+  "name": "Meadow Master",
+  "target": 3000,
+  "hearts": 3,
+  "spawn": [
+    0.46,
+    0.31
+  ],
+  "speed": [
+    0.58,
+    0.8
+  ],
+  "ramp": 75,
+  "safeTime": 3,
+  "weights": {
+    "bone": 34,
+    "coin": 22,
+    "rock": 22,
+    "bomb": 13,
+    "magnet": 4,
+    "star": 4,
+    "shield": 4,
+    "goldbone": 4
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 1,
+    "walkers": 1,
+    "cars": 1
+  },
+  "modifiers": {
+    "wind": 0.7,
+    "squirrel": true,
+    "waves": {
+      "every": 16,
+      "count": 4,
+      "gap": 0.36,
+      "mix": true
+    }
+  },
+  "goal": {
+    "type": "combo",
+    "mult": 5
+  },
+  "notes": "Everything at once: wind, squirrel, mixed waves with a single open lane. Reach \u00d75 to prove mastery."
+}

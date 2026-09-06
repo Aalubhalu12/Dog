@@ -1,0 +1,40 @@
+{
+  "id": 6,
+  "name": "Breezy Hill",
+  "target": 2200,
+  "hearts": 3,
+  "spawn": [
+    0.5,
+    0.33
+  ],
+  "speed": [
+    0.52,
+    0.74
+  ],
+  "ramp": 65,
+  "safeTime": 2,
+  "weights": {
+    "bone": 32,
+    "coin": 22,
+    "rock": 20,
+    "bomb": 12,
+    "magnet": 5,
+    "star": 4,
+    "shield": 3,
+    "goldbone": 3
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 1,
+    "walkers": 0.5,
+    "cars": 0.5
+  },
+  "modifiers": {
+    "wind": 0.55
+  },
+  "goal": {
+    "type": "goldBones",
+    "count": 1
+  },
+  "notes": "First wind level: gusts push falling items sideways. Read the leaves."
+}

@@ -2,6 +2,48 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.14.0] — 2026-09-07 — Phase 3: levels 4–10, wind, squirrel, hazard waves
+### Added
+- **Levels 4–10** (`data/levels/L04–L10.json`, thumbnails `thumb_4..10.webp`) — the board is now 10 real tiles.
+
+| # | Name | Target | 3rd star | Mechanics |
+|---|------|--------|----------|-----------|
+| 1 | Sunny Meadow | 400 | bonesIn 8 | — |
+| 2 | Rocky Road | 900 | coins 12 | — |
+| 3 | Bomb Squad | 1500 | noBomb  | — |
+| 4 | Combo Creek | 1700 | combo 3 | — |
+| 5 | Close Call | 2000 | nearMiss 4 | — |
+| 6 | Breezy Hill | 2200 | goldBones 1 | wind 0.55 |
+| 7 | Gusty Gap | 2400 | power 4 | wind 0.8 |
+| 8 | Squirrel Trouble | 2600 | coins 25 | wind 0.4, squirrel |
+| 9 | Rock Slide | 2800 | dodge 30 | wind 0.5, squirrel, waves 3/18s |
+| 10 | Meadow Master | 3000 | combo 5 | wind 0.7, squirrel, waves 4/16s mix |
+
+- **`src/game/mechanics.js`** — per-level mechanics, all driven by the level's `modifiers` (off unless asked):
+  - **Wind** (`wind: 0..1`): gusts every 7–13 s for 2.5–4 s; telegraphed 0.8 s early by a chevron sweep, streaming
+    leaves, the tree frame leaning, a whoosh — and the puppy bracing into the wind. Light items (coins, power-ups)
+    drift most, bones a bit, **rocks/bombs never** (hazards stay predictable; the wind is a reading skill, not RNG).
+  - **Squirrel** (`squirrel: true`): darts out from behind the fence, grabs any bone that hits the ground, bounces
+    with a "MINE!" and scampers off. The puppy does a startled "HEY!" hop if it's close. Visual only.
+  - **Hazard waves** (`waves: {every, count, gap, mix}`): "⚠ INCOMING!" banner + alarm, then a rock sweep across
+    `count+1` lanes with **one lane always open**. Regular spawning pauses during the wave. `mix` alternates bombs.
+- **`dodge` goal** (`src/data/goals.js`): count hazards that reach the ground without touching you (L9).
+- **Puppy**: `celebrate()` on level clear (plants paws, happy-hop clip, two bounces, confetti burst), `surprised()`
+  (squirrel), wind lean. All understated — no new sheets, nothing added to L1–L5 gameplay.
+- **`tools/sim_levels.py`** — balance sweep: a look-ahead bot plays every level from a clean save through the real
+  board UI ("good" runs + a "perfect" no-hazard run per level), reports win rate / stars / mechanic event counts and
+  fails if a level is unwinnable, a goal unreachable, or a configured mechanic never fires.
+  `tools/sim_play.py` now imports the same bot (one bot to maintain) and expects 10 levels.
+- SFX: `whoosh`, `squeak`, `alarm`. CSS: `.banner.warn`, `.gust`.
+### Changed
+- `Spawner.spawn()` split into `spawn()` + `spawnAt(type, xFrac, time, speedMul)`; `update()` takes `onDodge`.
+- `Levels.validate` checks `modifiers` (wind range, squirrel boolean, waves shape).
+### Balance (scripted, 390×844, fresh save)
+- Good bot clears every level (L4 3★, L5–L9 ★☆★, L10 cleared on 1 of 2 runs at ~3 min); perfect run reaches the
+  3rd star on every level whose goal doesn't need hazards; nearMiss (L5) and dodge (L9) stars reached in good runs.
+  Targets were lowered twice from the first draft (L10 6000 → 3000) — the sweep showed the curve was ~2× too steep.
+- `tools/check.py` PASS · `tools/sim_play.py` 25/25 · zero console errors in every run.
+
 ## [0.13.0] — 2026-09-06 — Codebase audit & restructure (no gameplay changes)
 ### Changed
 - **Source layout by responsibility** (script order in `index.html` documents the dependency order):

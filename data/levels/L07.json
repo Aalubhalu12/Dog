@@ -1,0 +1,40 @@
+{
+  "id": 7,
+  "name": "Gusty Gap",
+  "target": 2400,
+  "hearts": 3,
+  "spawn": [
+    0.48,
+    0.32
+  ],
+  "speed": [
+    0.55,
+    0.76
+  ],
+  "ramp": 65,
+  "safeTime": 2,
+  "weights": {
+    "bone": 30,
+    "coin": 22,
+    "rock": 22,
+    "bomb": 13,
+    "magnet": 5,
+    "star": 4,
+    "shield": 3,
+    "goldbone": 3
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 1,
+    "walkers": 0.7,
+    "cars": 0.7
+  },
+  "modifiers": {
+    "wind": 0.8
+  },
+  "goal": {
+    "type": "power",
+    "count": 4
+  },
+  "notes": "Stronger, longer gusts. Power-ups drift the most \u2014 chase them."
+}

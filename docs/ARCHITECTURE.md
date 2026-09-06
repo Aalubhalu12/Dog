@@ -17,6 +17,7 @@ adding `export`/`import` lines — the boundaries are already clean.
 │ ui/               HUD (compact, ≤15 % of stage) · Modals     │
 ├──────────────────────────────────────────────────────────────┤
 │ game/             Game ─┬─ Puppy · Spawner · FX    FTUE      │
+│                         └─ Mechanics (wind · squirrel · waves)│
 │                   BG (parallax, THEMES) · Ambient (bg life)  │
 ├──────────────────────────────────────────────────────────────┤
 │ data/             ITEMS / POWERS · GOALS · LEVELS (json)     │
@@ -43,7 +44,8 @@ requestAnimationFrame
             ├─ Game.update(dt)              (play scene only)
             │    ├─ puppy.update(dt)        physics from Input
             │    ├─ powers tick
-            │    ├─ spawner.update(...)     spawn · fall · magnet · collide → Game.onCatch(item)
+            │    ├─ Mechanics.update(dt,S)   gusts · squirrel · wave spawns (via spawner.spawnAt)
+            │    ├─ spawner.update(...)     spawn · fall · wind drift · magnet · collide → Game.onCatch(item)
             │    ├─ FX.update(dt)           particles
             │    └─ hooks.onHUD(state)      → HUD.update
             └─ BG.draw(now, dt, hooks)

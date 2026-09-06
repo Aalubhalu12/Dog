@@ -1,0 +1,37 @@
+{
+  "id": 5,
+  "name": "Close Call",
+  "target": 2000,
+  "hearts": 3,
+  "spawn": [
+    0.52,
+    0.34
+  ],
+  "speed": [
+    0.52,
+    0.72
+  ],
+  "ramp": 60,
+  "safeTime": 2,
+  "weights": {
+    "bone": 30,
+    "coin": 22,
+    "rock": 24,
+    "bomb": 12,
+    "magnet": 4,
+    "star": 4,
+    "shield": 3,
+    "goldbone": 3
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 1,
+    "walkers": 0.8,
+    "cars": 0.7
+  },
+  "goal": {
+    "type": "nearMiss",
+    "count": 4
+  },
+  "notes": "Rocks everywhere. Rewards brave dodging (near misses)."
+}

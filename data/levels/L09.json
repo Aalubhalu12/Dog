@@ -1,0 +1,46 @@
+{
+  "id": 9,
+  "name": "Rock Slide",
+  "target": 2800,
+  "hearts": 3,
+  "spawn": [
+    0.46,
+    0.31
+  ],
+  "speed": [
+    0.57,
+    0.79
+  ],
+  "ramp": 70,
+  "safeTime": 3,
+  "weights": {
+    "bone": 32,
+    "coin": 22,
+    "rock": 22,
+    "bomb": 14,
+    "magnet": 4,
+    "star": 4,
+    "shield": 4,
+    "goldbone": 3
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 1,
+    "walkers": 0.8,
+    "cars": 0.8
+  },
+  "modifiers": {
+    "wind": 0.5,
+    "squirrel": true,
+    "waves": {
+      "every": 18,
+      "count": 3,
+      "gap": 0.36
+    }
+  },
+  "goal": {
+    "type": "dodge",
+    "count": 30
+  },
+  "notes": "Hazard waves: a warning, then a burst of rocks across the lane \u2014 one lane is always open. Find the gap."
+}

@@ -69,6 +69,11 @@ class Puppy {
     this.pose = p; this.poseT = t;
   }
 
+  /** Level clear: plant the paws, play the happy-hop clip and bounce twice — a real little curtain call. */
+  celebrate() { this.vx = 0; this.stun = 1.3; this.inv = 2; this.pose = 'yay'; this.poseT = 1.3; this.hopV = this.width * 1.9; this.squash = 1.15; this.puffDust(4); this._cheer = .55; }
+  /** Squirrel stole a bone: a tiny startled bounce + squash ("HEY!") without stopping the run. */
+  surprised() { if (this.stun > 0) return; this.hopV = Math.max(this.hopV, this.width * .9); this.squash = .88; }
+
   // --- update -------------------------------------------------------------
   update(dt) {
     const C = CONFIG.PUPPY, W = this.W;
@@ -161,6 +166,9 @@ class Puppy {
     }
 
     this.lean += (Math.max(-1, Math.min(1, this.vx / MAX)) * .10 - this.lean) * Math.min(1, dt * 10);
+    // wind: bracing against a gust (leans INTO the wind, ~3°) — reads the mechanic on the character itself
+    const gust = typeof Mechanics !== 'undefined' ? Mechanics.windX : 0; this.windLean = (this.windLean || 0) + (-gust * .055 - (this.windLean || 0)) * Math.min(1, dt * 4);
+    if (this._cheer > 0) { this._cheer -= dt; if (this._cheer <= 0 && this.hop <= 0) this.hopV = this.width * 1.4; }   // second celebration bounce
     this.squash += (1 - this.squash) * Math.min(1, dt * 8);
     if (this.inv > 0) this.inv -= dt;
     this.voiceCd -= dt;
@@ -204,7 +212,7 @@ class Puppy {
     for (const [fx, a, wx] of passes) {
       c.save(); c.translate(box.cx, gy - lift);
       if (glow > 0) { c.shadowColor = `rgba(255,255,255,${(0.35 + 0.5 * glow).toFixed(2)})`; c.shadowBlur = box.pw * (0.06 + 0.10 * glow); }
-      c.rotate(sideView ? this.lean * .6 : 0);
+      c.rotate((sideView ? this.lean * .6 : 0) + (this.windLean || 0));
       c.scale(fx * wx * this.squash, (2 - this.squash) * (1 + (1 - wx) * .10));
       // cross-dissolve between animations: alphas sum to 1 → no double exposure
       const e = this.blend * this.blend * (3 - 2 * this.blend);           // smoothstep

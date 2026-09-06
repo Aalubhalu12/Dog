@@ -28,6 +28,7 @@ const Game = (() => {
     Store.bumpStat('runs');
     Input.reset(); FX.clear(); BG.setTheme(S.level.theme);
     Ambient.setDensity(S.level.ambient); Ambient.reset();   // background life grows level by level
+    Mechanics.start(S.level);                                // wind / squirrel / waves — only if the level asks
     hooks.onStart && hooks.onStart(S);
     countdown(() => { running = true; });
   }
@@ -53,7 +54,8 @@ const Game = (() => {
     puppy.update(dt);
     for (const k in S.powers) if (S.powers[k] > 0 && k !== 'shield') { S.powers[k] -= dt; if (S.powers[k] <= 0) { S.powers[k] = 0; if (k === 'star') S.mult = 1; } }
     if (S.nearCd > 0) S.nearCd -= dt;
-    S.spawner.update(dt, S.time, puppy, S.powers, onCatch, onMiss, onNear);
+    Mechanics.update(dt, S);
+    S.spawner.update(dt, S.time, puppy, S.powers, onCatch, onMiss, onNear, onDodge);
     FX.update(dt);
     hooks.onHUD && hooks.onHUD(S);
     if (!S.cleared && S.score >= S.level.target) { S.cleared = true; onLevelClear(); }
@@ -76,6 +78,7 @@ const Game = (() => {
     C.n = 0; C.mult = 1; hooks.onCombo && hooks.onCombo(S, 'break');
   }
   function onMiss(it) { if (it.def.kind === 'score' && CONFIG.COMBO.MISS_RESETS) comboBreak('miss'); }
+  function onDodge(it) { if (!S.over) { S.dodged = (S.dodged || 0) + 1; Goals.event(S, 'dodge', it); } }
   function onNear(it) {
     if (S.nearCd > 0 || S.over) return; S.nearCd = CONFIG.NEAR_MISS.COOLDOWN; S.nearMisses++;
     const box = puppy.box; FX.pop(box.cx, box.y - box.h * .9, 'PHEW!', 'phew'); SFX.phew(); FX.vibrate(10);
@@ -114,7 +117,8 @@ const Game = (() => {
     }
   }
   function onLevelClear() {
-    SFX.win(); FX.vibrate([30, 30, 30, 30, 80]); FX.banner('LEVEL CLEAR!');
+    SFX.win(); FX.vibrate([30, 30, 30, 30, 80]); FX.banner('LEVEL CLEAR!'); puppy.celebrate();
+    FX.burst(puppy.box.cx, puppy.box.y, ['#ffd23a', '#ff7ab6', '#7fe3ff', '#8ef08a', '#fff'], 30, 1.8);
     S.stars = Goals.stars(S); S.newStars = Store.recordLevel(S.level.id, S.score, true, S.stars);
     Store.setBest(S.score); endRun('win');
     setTimeout(() => { paused = true; hooks.onLevelClear && hooks.onLevelClear(S); }, 1300);
@@ -134,7 +138,7 @@ const Game = (() => {
   }
 
   // --- draw ----------------------------------------------------------------
-  function draw(c, t) { if (!S) return; puppy.draw(c, t, S.powers.magnet > 0, S.powers.shield > 0); S.spawner.draw(c, t); FX.draw(c); }
+  function draw(c, t) { if (!S) return; puppy.draw(c, t, S.powers.magnet > 0, S.powers.shield > 0); Mechanics.drawFront(c, t); S.spawner.draw(c, t); FX.draw(c); }
 
   return {
     init(h) { hooks = h; }, start, update, draw, continueNext,

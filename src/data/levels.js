@@ -20,7 +20,10 @@
  *   ambient   – background life density { birds, walkers, cars } each 0..1
  *   goal      – the level-specific 3rd star, { type, ... } — type must exist in GOALS   ★3
  *   notes     – (optional) designer notes, ignored by the game
- *   modifiers – (optional, Phase 3+) e.g. { wind: 0.4 }
+ *   modifiers – (optional) level mechanics, all off by default:
+ *               wind: 0..1     gusts push falling items sideways (Wind system)
+ *               squirrel: bool a squirrel steals bones that hit the ground (visual only)
+ *               waves: { every, count, gap, mix? }  hazard bursts: every N s, `count` hazards `gap` s apart (mix = rocks+bombs)
  * ★2 is always "don't lose a heart".
  */
 const LEVELS = [];                                   // filled by Levels.load() before the app starts
@@ -47,6 +50,10 @@ const Levels = (() => {
     if (L.theme != null && typeof L.theme !== 'string') p.push('theme must be a string');
     if (L.ambient) for (const k of ['birds', 'walkers', 'cars']) if (L.ambient[k] != null && !NUM(L.ambient[k], 0, 1)) p.push(`ambient.${k} must be 0..1`);
     if (L.goal) { if (!L.goal.type || !(L.goal.type in GOALS)) p.push(`goal.type '${L.goal && L.goal.type}' unknown (GOALS: ${Object.keys(GOALS).join(', ')})`); }
+    const M = L.modifiers || {};
+    if (M.wind != null && !NUM(M.wind, 0, 1)) p.push('modifiers.wind must be 0..1');
+    if (M.squirrel != null && typeof M.squirrel !== 'boolean') p.push('modifiers.squirrel must be true/false');
+    if (M.waves) { const w = M.waves; if (!NUM(w.every, 5, 120) || !Number.isInteger(w.count) || w.count < 2 || w.count > 8 || !NUM(w.gap, .15, 1.5)) p.push('modifiers.waves needs every 5..120, count 2..8, gap .15..1.5'); }
     return p;
   }
 

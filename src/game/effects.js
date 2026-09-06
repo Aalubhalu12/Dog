@@ -10,7 +10,9 @@ const FX = (() => {
     const d = document.createElement('div'); d.className = 'pop ' + cls; d.textContent = text;
     d.style.left = (x / BG.W * 100) + '%'; d.style.top = (y / BG.H * 100) + '%'; layer.appendChild(d); setTimeout(() => d.remove(), 1000);
   };
-  const banner = text => { const d = document.createElement('div'); d.className = 'banner'; d.textContent = text; layer.appendChild(d); setTimeout(() => d.remove(), 1400); };
+  const banner = (text, cls = '') => { const d = document.createElement('div'); d.className = 'banner ' + cls; d.textContent = text; layer.appendChild(d); setTimeout(() => d.remove(), 1400); };
+  /** Wind telegraph: a row of soft chevrons sweeps across the lane in the gust direction. */
+  const gustHint = dir => { const d = document.createElement('div'); d.className = 'gust ' + (dir > 0 ? 'r' : 'l'); d.textContent = dir > 0 ? '〉〉〉' : '〈〈〈'; layer.appendChild(d); setTimeout(() => d.remove(), 1500); };
   const flash  = () => { if (!CONFIG.FX.FLASH) return; const d = document.createElement('div'); d.className = 'flash'; layer.appendChild(d); setTimeout(() => d.remove(), 500); };
   const shake  = () => { if (CONFIG.FX.SHAKE) restartAnimation(shaker, 'shake'); };
   const vibrate= p => { if (Store.setting('vib', CONFIG.FX.VIBRATE_DEFAULT) && navigator.vibrate) navigator.vibrate(p); };
@@ -31,5 +33,5 @@ const FX = (() => {
     }
   };
   const clear = () => { layer.innerHTML = ''; parts = []; };
-  return { pop, banner, flash, shake, vibrate, burst, update, draw, clear };
+  return { pop, banner, gustHint, flash, shake, vibrate, burst, update, draw, clear };
 })();

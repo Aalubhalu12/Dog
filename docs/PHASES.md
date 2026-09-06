@@ -54,7 +54,7 @@ From you: 30 min playtest + feedback (which level, what felt unfair, was combo u
 
 ---
 
-## Phase 3 — Content (levels 4–10)  (`v0.10`)
+## Phase 3 — Content (levels 4–10)  (`v0.14` — content + mechanics shipped 2026-09-07; music + playtest balance open)
 **Goal:** the level board is full and the curve feels right.
 
 Build
@@ -65,9 +65,9 @@ Build
 - Balance pass from Playtest #1 data
 
 Done when
-- [ ] All 10 levels have 3 achievable stars (I verify by scripted "perfect" runs + your play)
+- [x] All 10 levels have 3 achievable stars (verified by `tools/sim_levels.py`; your play next)
 - [ ] No level with > 25 % quit rate in playtest
-- [ ] Board shows 10 real tiles, page 2 empty/"more soon"
+- [x] Board shows 10 real tiles, page 2 empty/"more soon"
 
 From you: optional music track (or I use a generated/royalty-free loop); Playtest #2 later in P4.
 

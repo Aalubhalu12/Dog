@@ -1,0 +1,41 @@
+{
+  "id": 8,
+  "name": "Squirrel Trouble",
+  "target": 2600,
+  "hearts": 3,
+  "spawn": [
+    0.46,
+    0.31
+  ],
+  "speed": [
+    0.56,
+    0.78
+  ],
+  "ramp": 70,
+  "safeTime": 2,
+  "weights": {
+    "bone": 32,
+    "coin": 24,
+    "rock": 22,
+    "bomb": 13,
+    "magnet": 4,
+    "star": 4,
+    "shield": 3,
+    "goldbone": 3
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 1,
+    "walkers": 0.8,
+    "cars": 0.8
+  },
+  "modifiers": {
+    "wind": 0.4,
+    "squirrel": true
+  },
+  "goal": {
+    "type": "coins",
+    "count": 25
+  },
+  "notes": "A cheeky squirrel steals any bone you drop (visual only) \u2014 but it hurts to watch."
+}

@@ -1,0 +1,37 @@
+{
+  "id": 4,
+  "name": "Combo Creek",
+  "target": 1700,
+  "hearts": 3,
+  "spawn": [
+    0.56,
+    0.36
+  ],
+  "speed": [
+    0.48,
+    0.68
+  ],
+  "ramp": 60,
+  "safeTime": 2,
+  "weights": {
+    "bone": 32,
+    "coin": 24,
+    "rock": 20,
+    "bomb": 12,
+    "magnet": 4,
+    "star": 4,
+    "shield": 3,
+    "goldbone": 3
+  },
+  "theme": "meadow",
+  "ambient": {
+    "birds": 0.8,
+    "walkers": 0.6,
+    "cars": 0.5
+  },
+  "goal": {
+    "type": "combo",
+    "mult": 3
+  },
+  "notes": "Faster lane. Teaches chaining: keep the combo alive to reach \u00d73."
+}

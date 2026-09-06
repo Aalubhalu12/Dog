@@ -177,14 +177,16 @@ const BG = (() => {
     hooks.behindFront && hooks.behindFront(ctx, t, px * AMP, py * AMP);
     for (const L of theme.layers) if (L.front) drawCover(img(L.key), -px * AMP * L.depth, -py * AMP * L.depth * .5, L.depth, L.bottom, L.width);
 
+    const windX = typeof Mechanics !== 'undefined' ? Mechanics.windX : 0;
     const tr = img(theme.frame), tw = W * (theme.frameWidth || 1.10), th = tw * tr.height / tr.width;
-    ctx.save(); ctx.translate(W / 2, 0); ctx.transform(1, 0, Math.sin(t * .9) * .006, 1, 0, 0);
+    ctx.save(); ctx.translate(W / 2, 0); ctx.transform(1, 0, Math.sin(t * .9) * .006 + windX * .025 + (windX ? Math.sin(t * 7) * .004 * Math.abs(windX) : 0), 1, 0, 0);   // trees lean + flutter in a gust
     ctx.drawImage(tr, -tw / 2 - px * AMP * .85, (H - th) / 2 + H * (theme.frameY || 0) - py * AMP * .4, tw, th); ctx.restore();
 
     hooks.overlay && hooks.overlay(ctx, t, px * AMP, py * AMP);
 
     for (let i = 0; i < leaves.length; i++) {
-      const l = leaves[i]; l.y += l.vy * dt; l.rot += l.vr * dt; l.ph += dt;
+      const l = leaves[i]; l.y += l.vy * (1 + Math.abs(windX) * .4) * dt; l.rot += (l.vr + windX * 4) * dt; l.ph += dt;
+      if (windX) { l.x += windX * W * .55 * dt; if (l.x < -30) l.x += W + 60; else if (l.x > W + 30) l.x -= W + 60; }
       if (l.y > H + 20) leaves[i] = newLeaf(false);
       ctx.save(); ctx.translate(l.x + Math.sin(l.ph * 1.3) * l.sw - px * AMP * .6, l.y); ctx.rotate(l.rot); ctx.fillStyle = l.col; ctx.globalAlpha = .85;
       ctx.beginPath(); ctx.ellipse(0, 0, l.r, l.r * .55, 0, 0, 6.28); ctx.fill(); ctx.restore();

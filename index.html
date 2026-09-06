@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2f8fe0">
 <title>BONK! — Catch. Dodge. Don't get bonked.</title>
-<link rel="stylesheet" href="styles/main.css?v=0.13.0">
+<link rel="stylesheet" href="styles/main.css?v=0.14.0">
 </head>
 <body>
 <div id="backdrop"></div>
@@ -161,38 +161,39 @@
 
 <!-- Load order = dependency order (plain <script>, no bundler). Layers: core → services → data → game → ui → scenes → app -->
 <!-- core: engine-agnostic plumbing -->
-<script src="src/core/config.js?v=0.13.0"></script>
-<script src="src/core/events.js?v=0.13.0"></script>
-<script src="src/core/dom.js?v=0.13.0"></script>
-<script src="src/core/assets.js?v=0.13.0"></script>
-<script src="src/core/input.js?v=0.13.0"></script>
+<script src="src/core/config.js?v=0.14.0"></script>
+<script src="src/core/events.js?v=0.14.0"></script>
+<script src="src/core/dom.js?v=0.14.0"></script>
+<script src="src/core/assets.js?v=0.14.0"></script>
+<script src="src/core/input.js?v=0.14.0"></script>
 <!-- services: persistence, economy, telemetry, backend -->
-<script src="src/services/flags.js?v=0.13.0"></script>
-<script src="src/services/analytics.js?v=0.13.0"></script>
-<script src="src/services/save.js?v=0.13.0"></script>
-<script src="src/services/wallet.js?v=0.13.0"></script>
-<script src="src/services/store.js?v=0.13.0"></script>
-<script src="src/services/leaderboard.js?v=0.13.0"></script>
+<script src="src/services/flags.js?v=0.14.0"></script>
+<script src="src/services/analytics.js?v=0.14.0"></script>
+<script src="src/services/save.js?v=0.14.0"></script>
+<script src="src/services/wallet.js?v=0.14.0"></script>
+<script src="src/services/store.js?v=0.14.0"></script>
+<script src="src/services/leaderboard.js?v=0.14.0"></script>
 <!-- audio -->
-<script src="src/audio/sfx.js?v=0.13.0"></script>
+<script src="src/audio/sfx.js?v=0.14.0"></script>
 <!-- data: catalogues + level loader -->
-<script src="src/data/items.js?v=0.13.0"></script>
-<script src="src/data/goals.js?v=0.13.0"></script>
-<script src="src/data/levels.js?v=0.13.0"></script>
+<script src="src/data/items.js?v=0.14.0"></script>
+<script src="src/data/goals.js?v=0.14.0"></script>
+<script src="src/data/levels.js?v=0.14.0"></script>
 <!-- game: simulation + rendering -->
-<script src="src/game/background.js?v=0.13.0"></script>
-<script src="src/game/ambient.js?v=0.13.0"></script>
-<script src="src/game/effects.js?v=0.13.0"></script>
-<script src="src/game/puppy.js?v=0.13.0"></script>
-<script src="src/game/spawner.js?v=0.13.0"></script>
-<script src="src/game/game.js?v=0.13.0"></script>
-<script src="src/game/ftue.js?v=0.13.0"></script>
+<script src="src/game/background.js?v=0.14.0"></script>
+<script src="src/game/ambient.js?v=0.14.0"></script>
+<script src="src/game/effects.js?v=0.14.0"></script>
+<script src="src/game/puppy.js?v=0.14.0"></script>
+<script src="src/game/mechanics.js?v=0.14.0"></script>
+<script src="src/game/spawner.js?v=0.14.0"></script>
+<script src="src/game/game.js?v=0.14.0"></script>
+<script src="src/game/ftue.js?v=0.14.0"></script>
 <!-- ui + scenes -->
-<script src="src/ui/hud.js?v=0.13.0"></script>
-<script src="src/ui/modals.js?v=0.13.0"></script>
-<script src="src/scenes/home.js?v=0.13.0"></script>
-<script src="src/scenes/play.js?v=0.13.0"></script>
+<script src="src/ui/hud.js?v=0.14.0"></script>
+<script src="src/ui/modals.js?v=0.14.0"></script>
+<script src="src/scenes/home.js?v=0.14.0"></script>
+<script src="src/scenes/play.js?v=0.14.0"></script>
 <!-- bootstrap -->
-<script src="src/app.js?v=0.13.0"></script>
+<script src="src/app.js?v=0.14.0"></script>
 </body>
 </html>

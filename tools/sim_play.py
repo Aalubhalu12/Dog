@@ -11,32 +11,9 @@ URL=f'http://localhost:8080/index.html?a={int(time.time())}'
 CL=[]
 def check(name, ok, detail=''): CL.append((name, bool(ok), detail)); print(('✓' if ok else '✗'), name, detail)
 
-BOT = r'''
-window.__bot = (() => {
-  let on=false, raf=0, stats={frames:0, dodges:0};
-  const key = (k, down) => window.dispatchEvent(new KeyboardEvent(down?'keydown':'keyup', {key:k}));
-  let cur=null;
-  const press = k => { if (cur===k) return; if (cur) key(cur,false); cur=k; if (k) key(k,true); };
-  function think(){
-    if(!on) return; raf=requestAnimationFrame(think);
-    const S=Game.state; if(!S||!Game.active||Game.paused){ press(null); return; }
-    stats.frames++;
-    const W=BG.W,H=BG.H,box=Game.puppy.box,px=box.cx, pw=box.pw;
-    let target=null, danger=null;
-    for(const it of S.spawner.items){
-      const tta=(box.y-it.y)/Math.max(1,it.vy);        // seconds until it reaches puppy height
-      if(it.def.kind==='hazard'){ if(tta>-0.1 && tta<0.9 && Math.abs(it.x-px)<pw*.9) { if(!danger||tta<danger.tta) danger={it,tta}; } }
-      else if(tta>0 && tta<2.2){ const score=(it.def.kind==='score'?(it.def.score||10):it.def.kind==='power'?30:8) - Math.abs(it.x-px)/W*20 - tta*4; if(!target||score>target.score) target={it,score}; }
-    }
-    let goal=null;
-    if(danger){ stats.dodges++; goal = danger.it.x<px ? Math.min(W*.92, px+pw*1.4) : Math.max(W*.08, px-pw*1.4); }
-    else if(target){ goal=target.it.x; }
-    if(goal==null){ press(null); return; }
-    const dx=goal-px; if(Math.abs(dx)<pw*.12) press(null); else press(dx>0?'ArrowRight':'ArrowLeft');
-  }
-  return { start(){ on=true; think(); }, stop(){ on=false; cancelAnimationFrame(raf); press(null); }, stats };
-})();
-'''
+# the scripted player lives in tools/sim_levels.py (one bot to maintain)
+import re as _re, pathlib as _pl
+BOT = _re.search(r"BOT = r'''(.*?)'''", (_pl.Path(__file__).parent / 'sim_levels.py').read_text(), _re.S).group(1)
 res={}
 with sync_playwright() as p:
     br=p.chromium.launch(); pg=br.new_page(viewport={'width':390,'height':844},device_scale_factor=2); errs=[]
@@ -46,7 +23,7 @@ with sync_playwright() as p:
     # ---- menu
     check('Home loads, Level 1 selected', 'Level 1' in pg.evaluate('document.querySelector("#lsTitle").textContent'))
     check('Fresh save: 0 stars, 0 coins', pg.evaluate('Store.totalStars()===0 && Store.coins()===0'))
-    check('Levels loaded from JSON (3)', pg.evaluate('LEVELS.length')==3)
+    check('Levels loaded from JSON (10)', pg.evaluate('LEVELS.length')==10)
     pg.evaluate(BOT)
     # ---- play L1..L3 via UI
     pg.click('#lsPlay',force=True)

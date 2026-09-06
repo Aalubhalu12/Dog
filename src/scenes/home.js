@@ -44,7 +44,7 @@ const HomeScene = (() => {
   }
 
   /** Compact goal text for the card's middle row (mockup: "Time: 60 seconds"). */
-  const goalRow = L => { const g = L.goal || {}; return ({ bonesIn: `${g.count} bones in ${g.seconds}s`, coins: `Coins: ${g.count}`, noBomb: 'No bombs hit', combo: `Combo ×${g.mult}`, nearMiss: `Near misses: ${g.count}`, goldBones: `Gold bones: ${g.count}`, power: `Power-ups: ${g.count}` })[g.type] || Goals.label(L); };
+  const goalRow = L => { const g = L.goal || {}; return ({ bonesIn: `${g.count} bones in ${g.seconds}s`, coins: `Coins: ${g.count}`, noBomb: 'No bombs hit', combo: `Combo ×${g.mult}`, nearMiss: `Near misses: ${g.count}`, goldBones: `Gold bones: ${g.count}`, power: `Power-ups: ${g.count}`, dodge: `Dodge ${g.count} hazards` })[g.type] || Goals.label(L); };
   function select(i) {
     selected = i; const L = LEVELS[i], st = Store.levelStars(L.id), locked = L.id > unlocked();
     $('#lsGrid').querySelectorAll('.tile').forEach(t => t.classList.toggle('selected', +t.dataset.i === i));

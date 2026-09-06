@@ -10,7 +10,7 @@
  * Add a goal type: add an entry to GOALS with
  *   label(cfg)            – short text for UI
  *   init(cfg)             – returns per-run tracking state
- *   on(event, S, st, cfg, item) – events: 'catch' · 'hit' · 'near' (near-miss) · 'shielded'
+ *   on(event, S, st, cfg, item) – events: 'catch' · 'hit' · 'near' (near-miss) · 'shielded' · 'dodge' (a hazard reached the ground without touching you)
  *   done(S, st, cfg)      – true when achieved (checked at level clear)
  *   failed(S, st, cfg)    – optional: true when it can no longer be achieved (for live UI)
  *   survive               – optional flag: a "don't do X" goal; HUD never shows it as complete mid-run
@@ -57,6 +57,13 @@ const GOALS = Object.freeze({
     label: c => `Catch ${c.count} gold bone${c.count > 1 ? 's' : ''}`, short: c => `✨ ${c.count}`,
     init: () => ({ n: 0 }),
     on: (ev, S, st, c, it) => { if (ev === 'catch' && it.type === 'goldbone') st.n++; },
+    done: (S, st, c) => st.n >= c.count,
+    progress: (S, st, c) => Math.min(1, st.n / c.count),
+  },
+  dodge: {
+    label: c => `Dodge ${c.count} hazards`, short: c => `🪨 dodge ${c.count}`,
+    init: () => ({ n: 0 }),
+    on: (ev, S, st) => { if (ev === 'dodge') st.n++; },
     done: (S, st, c) => st.n >= c.count,
     progress: (S, st, c) => Math.min(1, st.n / c.count),
   },
