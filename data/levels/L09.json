@@ -2,7 +2,7 @@
   "id": 9,
   "name": "Forest Camp",
   "theme": "forest",
-  "target": 1900,
+  "target": 1800,
   "hearts": 3,
   "spawn": [
     0.85,
@@ -26,11 +26,11 @@
     }
   ],
   "weights": {
-    "bone": 32,
-    "coin": 22,
-    "rock": 22,
-    "bomb": 13,
-    "magnet": 4,
+    "bone": 34,
+    "coin": 24,
+    "rock": 20,
+    "bomb": 10,
+    "magnet": 5,
     "star": 4,
     "shield": 4,
     "goldbone": 3
@@ -41,16 +41,12 @@
     "cars": 0
   },
   "modifiers": {
-    "squirrel": true,
-    "waves": {
-      "every": 18,
-      "count": 3,
-      "gap": 0.36
-    }
+    "squirrel": true
   },
   "goal": {
-    "type": "dodge",
-    "count": 30
+    "type": "bonesIn",
+    "count": 12,
+    "seconds": 40
   },
-  "notes": "Forest 1/2. SPEED RESET. Hazard waves with one open lane. No road life \u2014 birds only."
+  "notes": "Forest \u00b7 designed length \u2248 129 s (14 pts/s)."
 }

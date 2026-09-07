@@ -1,0 +1,58 @@
+{
+  "id": 16,
+  "name": "Beach Master",
+  "theme": "beach",
+  "target": 3250,
+  "hearts": 3,
+  "spawn": [
+    0.66,
+    0.38
+  ],
+  "speed": [
+    0.34,
+    0.64
+  ],
+  "ramp": 20,
+  "safeTime": 3,
+  "stages": [
+    {
+      "time": "evening"
+    },
+    {
+      "time": "night"
+    },
+    {
+      "time": "rain"
+    }
+  ],
+  "weights": {
+    "bone": 34,
+    "coin": 22,
+    "rock": 22,
+    "bomb": 14,
+    "magnet": 4,
+    "star": 4,
+    "shield": 4,
+    "goldbone": 4
+  },
+  "ambient": {
+    "birds": 1,
+    "walkers": 1,
+    "cars": 0.4
+  },
+  "modifiers": {
+    "wind": 0.8,
+    "squirrel": true,
+    "waves": {
+      "every": 14,
+      "count": 5,
+      "gap": 0.34,
+      "mix": true
+    }
+  },
+  "goal": {
+    "type": "combo",
+    "mult": 5
+  },
+  "notes": "Beach \u00b7 designed length \u2248 180 s (18 pts/s)."
+}

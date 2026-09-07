@@ -53,13 +53,14 @@ const Game = (() => {
   const stageAmbient = S => { const a = S.level.ambient, f = { night: .35, rain: .5 }[S.level.stages[S.stage].time] || 1; return { birds: a.birds * (f < 1 ? f * .5 : 1), walkers: a.walkers * f, cars: a.cars * Math.max(f, .6) }; };
   function advanceStage(i) {
     S.stage = i; const st = S.level.stages[i], [icon, name] = STAGE_UI[st.time] || ['', st.time.toUpperCase()];
-    S.spawner.setStage(i, S.time); BG.setTime(st.time); Ambient.setDensity(stageAmbient(S));
-    FX.banner(`${icon} ${name}`, 'stage'); setTimeout(() => FX.pop(puppy.box.cx, puppy.box.y - 24, i === S.level.stages.length - 1 ? 'FULL SPEED!' : 'FASTER!', 'bad'), 700);
+    S.spawner.setStage(i, S.time); Ambient.setDensity(stageAmbient(S));
+    FX.banner(`${S.level.id}.${i + 1}  ${icon} ${name}`, 'stage'); setTimeout(() => FX.pop(puppy.box.cx, puppy.box.y - 24, i === S.level.stages.length - 1 ? 'FULL SPEED!' : 'FASTER!', 'bad'), 700);
     SFX.stage(); FX.vibrate([15, 30, 15]); puppy.squash = 1.12; puppy.puffDust(3);
     Analytics.track('stage', { id: S.level.id, stage: i, time: st.time, at: Math.round(S.time) });
     hooks.onHUD && hooks.onHUD(S);
   }
   const stageIcon = S => (STAGE_UI[S.level.stages[S.stage].time] || [''])[0];
+  const stageLabel = S => `${S.level.id}.${S.stage + 1}`;
 
   // --- update --------------------------------------------------------------
   function update(dt) {
@@ -73,7 +74,12 @@ const Game = (() => {
     FX.update(dt);
     hooks.onHUD && hooks.onHUD(S);
     if (!S.cleared && S.score >= S.level.target) { S.cleared = true; onLevelClear(); }
-    else if (!S.cleared) { const n = S.level.stages.length, want = Math.min(n - 1, Math.floor(S.score / S.level.target * n)); if (want > S.stage) advanceStage(want); }
+    else if (!S.cleared) {
+      const n = S.level.stages.length, u = S.score / S.level.target * n, want = Math.min(n - 1, Math.floor(u)); if (want > S.stage) advanceStage(want);
+      // live weather: during act i the light drifts from act i's grade toward act i+1's (starts drifting after 35 % of the act)
+      const st = S.level.stages, i = S.stage, k = Math.max(0, (u - i - .35) / .65);
+      BG.setTimeBlend(st[i].time, st[Math.min(n - 1, i + 1)].time, i < n - 1 ? k : 0);
+    }
   }
 
   // --- combo ------------------------------------------------------------------
@@ -160,6 +166,6 @@ const Game = (() => {
     pause() { if (S && !S.over) paused = true; },
     resume() { paused = false; if (cdResume) { const r = cdResume; cdResume = null; r(); } },
     stop() { if (S && !S.ended && !S.over) { Analytics.track('quit', { id: S.level.id, at: Math.round(S.time), score: S.score }); endRun('quit'); } running = false; paused = false; S = null; clearTimeout(cdTimer); cdTimer = null; cdResume = null; FX.clear(); hooks.onCountdown && hooks.onCountdown(null); },
-    get active() { return running; }, get inProgress() { return !!S && !S.over; }, get paused() { return paused; }, get state() { return S; }, get puppy() { return puppy; }, stageIcon,
+    get active() { return running; }, get inProgress() { return !!S && !S.over; }, get paused() { return paused; }, get state() { return S; }, get puppy() { return puppy; }, stageIcon, stageLabel,
   };
 })();

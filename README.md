@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.15.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.16.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -67,7 +67,7 @@ bonk/
 │   │   ├── puppy.js           #   Puppy: physics, 24 fps sheet animation, turn pivot, draw
 │   │   ├── mechanics.js       #   per-level mechanics from `modifiers`: wind · squirrel · hazard waves
 │   │   ├── spawner.js         #   Spawner: spawning, fall profiles, wind drift, magnet, collisions
-│   │   ├── background.js      #   BG: parallax renderer + THEMES (meadow/park/forest) + TIMES (morning/evening/night/rain)
+│   │   ├── background.js      #   BG: parallax renderer + THEMES (meadow/park/forest/beach) + TIMES (morning/evening/night/rain)
 │   │   ├── ambient.js         #   background life per level (birds, walkers, cars) — behind the fence
 │   │   ├── effects.js         #   FX: pop text, banners, flash, shake, particles
 │   │   └── ftue.js            #   first-time hints (move / catch / dodge / combo), once per save
@@ -78,7 +78,7 @@ bonk/
 │       ├── home.js            #   HomeScene — level board + PLAY (also the level map)
 │       └── play.js            #   PlayScene — wires Game hooks to HUD / Modals
 ├── data/
-│   └── levels/                # ★ L01.json … L10.json + index.json — one file per level
+│   └── levels/                # ★ L01.json … L16.json + index.json — one file per level
 ├── assets/images/             # everything the game SHIPS (all WebP, ≈3.9 MB)
 │   ├── bg/                    # parallax layers: sky, clouds, mountains, village (+water_mask), meadow, road, foreground_wide, trees
 │   ├── ambient/               # bird sheet, walker sheets, cars

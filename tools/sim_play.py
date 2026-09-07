@@ -23,7 +23,7 @@ with sync_playwright() as p:
     # ---- menu
     check('Home loads, Level 1 selected', 'Level 1' in pg.evaluate('document.querySelector("#lsTitle").textContent'))
     check('Fresh save: 0 stars, 0 coins', pg.evaluate('Store.totalStars()===0 && Store.coins()===0'))
-    check('Levels loaded from JSON (10)', pg.evaluate('LEVELS.length')==10)
+    check('Levels loaded from JSON (16)', pg.evaluate('LEVELS.length')==16)
     pg.evaluate(BOT)
     # ---- play L1..L3 via UI
     pg.click('#lsPlay',force=True)

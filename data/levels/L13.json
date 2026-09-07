@@ -1,15 +1,15 @@
 {
-  "id": 2,
-  "name": "Rocky Road",
-  "theme": "meadow",
-  "target": 650,
+  "id": 13,
+  "name": "Sandy Paws",
+  "theme": "beach",
+  "target": 1350,
   "hearts": 3,
   "spawn": [
-    0.9,
-    0.55
+    0.85,
+    0.5
   ],
   "speed": [
-    0.3,
+    0.28,
     0.48
   ],
   "ramp": 20,
@@ -26,14 +26,14 @@
     }
   ],
   "weights": {
-    "bone": 32,
-    "coin": 28,
-    "rock": 22,
-    "bomb": 9,
+    "bone": 34,
+    "coin": 26,
+    "rock": 18,
+    "bomb": 10,
     "magnet": 5,
     "star": 4,
     "shield": 3,
-    "goldbone": 2
+    "goldbone": 3
   },
   "ambient": {
     "birds": 0.8,
@@ -41,8 +41,8 @@
     "cars": 0
   },
   "goal": {
-    "type": "coins",
-    "count": 12
+    "type": "nearMiss",
+    "count": 5
   },
-  "notes": "Meadow \u00b7 designed length \u2248 66 s (9.5 pts/s)."
+  "notes": "Beach \u00b7 designed length \u2248 90 s (15 pts/s)."
 }

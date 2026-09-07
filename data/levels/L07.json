@@ -2,7 +2,7 @@
   "id": 7,
   "name": "Gusty Gardens",
   "theme": "park",
-  "target": 2000,
+  "target": 1500,
   "hearts": 3,
   "spawn": [
     0.78,
@@ -47,5 +47,5 @@
     "type": "power",
     "count": 4
   },
-  "notes": "Park 3/4. Stronger wind, power-ups drift."
+  "notes": "Park \u00b7 designed length \u2248 106 s (14 pts/s)."
 }

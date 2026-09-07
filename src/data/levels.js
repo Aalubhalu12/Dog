@@ -21,7 +21,7 @@
  *               Default: morning → evening → night.
  *   weights   – relative spawn chance per item key (must exist in ITEMS)
  *   safeTime  – seconds at the start with no hazards
- *   theme     – location (BG.THEMES: meadow · park · forest), default 'meadow'
+ *   theme     – location (BG.THEMES: meadow · park · forest · beach), default 'meadow'
  *   ambient   – background life density { birds, walkers, cars } each 0..1
  *   goal      – the level-specific 3rd star, { type, ... } — type must exist in GOALS   ★3
  *   notes     – (optional) designer notes, ignored by the game

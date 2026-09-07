@@ -2,6 +2,46 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.16.0] — 2026-09-07 — 4 locations × 4 levels · acts labelled 1.1 / 1.2 / 1.3 · live weather drift · length curve
+### Added
+- **Beach** location (L13–16, `assets/images/bg/beach_far/beach_mid.webp`: sea + lighthouse, umbrella, sandcastle,
+  lifeguard hut, palms). Board now shows 16 real tiles across 2 pages (17–20 "soon").
+- **Acts are named `<level>.<act>`** — HUD `LV 14.2 🌇`, banner `14.2 🌇 EVENING`.
+- **Live weather drift** (`BG.setTimeBlend`). Instead of a cut at each act, the light drifts continuously: after 35 % of
+  act 1 the morning sky starts warming toward evening and arrives exactly at 1.2; during 1.2 it darkens toward night,
+  arriving at 1.3 — a real time-lapse, with the sun sliding, stars fading in and the lantern glow ramping.
+- **Length curve.** Designed play length grows **+10 % per level from L1 (~60 s) to L10 (~2:20)**, then L11–16 mix long
+  and short (100 / 170 / 90 / 150 / 110 / 180 s) so the back half doesn't feel like one long grind. Targets are derived
+  from `length × measured points-per-second` and recorded in each level's `notes`.
+- **Speed reset at every location** (L1, L5, L9, L13 all start at `speed 0.28`).
+
+| # | Place | Name | Target | Length | Acts | 3rd star | Mechanics |
+|---|-------|------|--------|--------|------|----------|-----------|
+| 1 | Meadow | Sunny Meadow | 400 | ~60 s | morning → evening → night | bonesIn 8 | — |
+| 2 | Meadow | Rocky Road | 650 | ~66 s | morning → evening → night | coins 12 | — |
+| 3 | Meadow | Bomb Squad | 900 | ~73 s | morning → rain → night | noBomb  | — |
+| 4 | Meadow | Combo Creek | 1100 | ~80 s | morning → evening → night | combo 3 | — |
+| 5 | City Park | Park Life | 1050 | ~88 s | morning → evening → night | nearMiss 3 | — |
+| 6 | City Park | Breezy Bandstand | 1250 | ~97 s | morning → rain → night | goldBones 1 | wind 0.55 |
+| 7 | City Park | Gusty Gardens | 1500 | ~106 s | morning → evening → night | power 4 | wind 0.8 |
+| 8 | City Park | Squirrel Trouble | 1800 | ~117 s | evening → night → rain | coins 25 | wind 0.5, squirrel |
+| 9 | Forest | Forest Camp | 1800 | ~129 s | morning → evening → night | bonesIn 12 | squirrel |
+| 10 | Forest | Rock Slide | 2150 | ~142 s | morning → rain → night | dodge 30 | squirrel, waves |
+| 11 | Forest | Firefly Hollow | 1600 | ~100 s | evening → night → rain | combo 4 | wind 0.5, squirrel |
+| 12 | Forest | Forest Master | 2900 | ~170 s | morning → rain → night | goldBones 2 | wind 0.7, squirrel, waves |
+| 13 | Beach | Sandy Paws | 1350 | ~90 s | morning → evening → night | nearMiss 5 | — |
+| 14 | Beach | Sea Breeze | 2400 | ~150 s | morning → evening → rain | power 6 | wind 0.9 |
+| 15 | Beach | Crab Tide | 1850 | ~110 s | morning → evening → night | dodge 45 | wind 0.6, squirrel, waves |
+| 16 | Beach | Beach Master | 3250 | ~180 s | evening → night → rain | combo 5 | wind 0.8, squirrel, waves |
+
+### Decided (and why)
+- **No 90 s / 3 min / 10 min picker in the campaign.** Player-chosen length makes stars and leaderboards incomparable and
+  10-minute levels are a quit-magnet on mobile (avg casual session ≈ 3–4 min). A time picker belongs in a Free Play /
+  endless mode (Phase 4), where there is no target to protect.
+### Verified (scripted, 390×844, fresh save, 1 good + 1 perfect run per level)
+- 16/16 cleared by the good bot; 3rd star reached on every level. `tools/check.py` PASS · `tools/sim_play.py` 25/25 ·
+  zero console errors. `sim_levels.py` now pages the board to reach tiles 11–16.
+
 ## [0.15.0] — 2026-09-07 — Three locations · three acts per level · speed reset per location
 ### Added
 - **Locations.** Meadow (L1–4) → **City Park** (L5–8, `assets/images/bg/park_far/park_mid.webp`: skyline, bandstand,

@@ -1,48 +1,52 @@
 {
-  "id": 4,
-  "name": "Combo Creek",
-  "theme": "meadow",
-  "target": 1100,
+  "id": 11,
+  "name": "Firefly Hollow",
+  "theme": "forest",
+  "target": 1600,
   "hearts": 3,
   "spawn": [
     0.72,
     0.42
   ],
   "speed": [
-    0.34,
-    0.6
+    0.32,
+    0.58
   ],
   "ramp": 20,
   "safeTime": 2,
   "stages": [
     {
-      "time": "morning"
-    },
-    {
       "time": "evening"
     },
     {
       "time": "night"
+    },
+    {
+      "time": "rain"
     }
   ],
   "weights": {
     "bone": 32,
     "coin": 24,
-    "rock": 20,
-    "bomb": 12,
+    "rock": 22,
+    "bomb": 13,
     "magnet": 4,
     "star": 4,
     "shield": 3,
     "goldbone": 3
   },
   "ambient": {
-    "birds": 1,
-    "walkers": 0.8,
-    "cars": 0.7
+    "birds": 0.5,
+    "walkers": 0,
+    "cars": 0
+  },
+  "modifiers": {
+    "wind": 0.5,
+    "squirrel": true
   },
   "goal": {
     "type": "combo",
-    "mult": 3
+    "mult": 4
   },
-  "notes": "Meadow \u00b7 designed length \u2248 80 s (14 pts/s)."
+  "notes": "Forest \u00b7 designed length \u2248 100 s (16 pts/s)."
 }

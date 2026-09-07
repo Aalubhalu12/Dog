@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """BONK! level balance sweep — a scripted player plays EVERY level N times and reports the curve.
-    python3 tools/sim_levels.py [runs=2] [levels=1-10]     (server on :8080; needs playwright)
+    python3 tools/sim_levels.py [runs=2] [levels=1-16]     (server on :8080; needs playwright)
 
 Two bots per level:
   • "good"    – look-ahead player who dodges hazards and chases value (should clear every level ≥ 50 %)
@@ -13,7 +13,7 @@ import sys, time, json, pathlib
 from playwright.sync_api import sync_playwright
 
 RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 2
-lv = sys.argv[2] if len(sys.argv) > 2 else '1-10'
+lv = sys.argv[2] if len(sys.argv) > 2 else '1-16'
 a, b = (lv.split('-') + [lv])[:2]; LEVELS = list(range(int(a), int(b) + 1))
 URL = f'http://localhost:8080/index.html?a={int(time.time())}'
 
@@ -99,6 +99,7 @@ def play(pg, idx, perfect, timeout=240):
     pg.evaluate(f'__perfect({str(perfect).lower()})')
     # unlock through the real save (levels before idx count as cleared), then use the real board: tile → PLAY
     pg.evaluate(f'for (let i = 0; i < {idx}; i++) if (!Store.isCleared(LEVELS[i].id)) Store.recordLevel(LEVELS[i].id, 1, true); HomeScene.enter()')
+    pg.evaluate(f'HomeScene.enter(); (function(){{ const b=document.querySelector(\'.tile[data-i="{idx}"]\'); if(!b) document.querySelector("#lsNext").click(); }})()'); pg.wait_for_timeout(250)   # tile may be on page 2
     pg.evaluate(f'document.querySelector(\'.tile[data-i="{idx}"]\').click()'); pg.wait_for_timeout(150)
     pg.evaluate('document.querySelector("#lsPlay").click()')
     pg.wait_for_function('Game.active', timeout=15000)

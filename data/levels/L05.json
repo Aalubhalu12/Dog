@@ -2,7 +2,7 @@
   "id": 5,
   "name": "Park Life",
   "theme": "park",
-  "target": 1300,
+  "target": 1050,
   "hearts": 3,
   "spawn": [
     0.95,
@@ -44,5 +44,5 @@
     "type": "nearMiss",
     "count": 3
   },
-  "notes": "Park 1/4. SPEED RESET: slow again, new place. Near-miss intro."
+  "notes": "Park \u00b7 designed length \u2248 88 s (12 pts/s)."
 }

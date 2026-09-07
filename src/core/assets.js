@@ -13,7 +13,8 @@ const Assets = (() => {
     foreground: 'bg/foreground_wide.webp', road: 'bg/road.webp', meadow: 'bg/meadow.webp', water_mask: 'bg/water_mask.webp', trees: 'bg/trees.webp',
     cloud0: 'bg/cloud0.webp', cloud1: 'bg/cloud1.webp', cloud2: 'bg/cloud2.webp',
     park_far: 'bg/park_far.webp', park_mid: 'bg/park_mid.webp',           // theme 'park'   (levels 5–8)
-    forest_far: 'bg/forest_far.webp', forest_mid: 'bg/forest_mid.webp',   // theme 'forest' (levels 9–10)
+    forest_far: 'bg/forest_far.webp', forest_mid: 'bg/forest_mid.webp',   // theme 'forest' (levels 9–12)
+    beach_far: 'bg/beach_far.webp', beach_mid: 'bg/beach_mid.webp',       // theme 'beach'  (levels 13–16)
     // puppy: result-card stills + animation sheets (see src/game/puppy.js)
     puppy_yay: 'puppy/puppy_yay.webp',
     puppy_bonk: 'puppy/puppy_bonk.webp', puppy_dizzy: 'puppy/puppy_dizzy.webp',

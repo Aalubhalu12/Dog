@@ -2,7 +2,7 @@
   "id": 3,
   "name": "Bomb Squad",
   "theme": "meadow",
-  "target": 1400,
+  "target": 900,
   "hearts": 3,
   "spawn": [
     0.8,
@@ -43,5 +43,5 @@
   "goal": {
     "type": "noBomb"
   },
-  "notes": "Meadow 3/4. Bombs; first rain act."
+  "notes": "Meadow \u00b7 designed length \u2248 73 s (12 pts/s)."
 }

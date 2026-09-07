@@ -4,13 +4,13 @@
 
 Levels are **JSON files** in `data/levels/`. Copy the last one, edit, register:
 
-1. `cp data/levels/L10.json data/levels/L11.json` and edit:
+1. `cp data/levels/L16.json data/levels/L17.json` and edit:
 ```json
 {
-  "id": 11, "name": "Windy Peaks", "target": 3300, "hearts": 3,
+  "id": 17, "name": "Windy Peaks", "target": 3300, "hearts": 3,
   "spawn": [0.55, 0.35],     "speed": [0.50, 0.72],     "ramp": 60, "safeTime": 2,
   "weights": { "bone": 28, "coin": 24, "rock": 22, "bomb": 16, "magnet": 5, "star": 5 },
-  "theme": "forest",                                      // meadow · park · forest (BG.THEMES)
+  "theme": "forest",                                      // meadow · park · forest · beach (BG.THEMES)
   "stages": [ { "time": "morning" }, { "time": "rain" }, { "time": "night" } ],   // the 3 acts (morning|evening|night|rain)
   "ambient": { "birds": 1, "walkers": 0.8, "cars": 0.7 },
   "modifiers": { "wind": 0.6, "squirrel": true, "waves": { "every": 15, "count": 4, "gap": 0.35, "mix": true } },
@@ -18,14 +18,15 @@ Levels are **JSON files** in `data/levels/`. Copy the last one, edit, register:
   "notes": "designer notes — ignored by the game"
 }
 ```
-2. Add `"L11.json"` to the `levels` list in `data/levels/index.json`.
-3. (optional) `assets/images/levels/thumb_11.webp` — level-select thumbnail (falls back to thumb_1).
+2. Add `"L17.json"` to the `levels` list in `data/levels/index.json`.
+3. (optional) `assets/images/levels/thumb_17.webp` — level-select thumbnail (falls back to thumb_1).
 4. `python3 tools/check.py` — validates the file (ids consecutive, item keys exist, goal type exists, ranges sane).
-5. `python3 tools/sim_levels.py 2 11-11` — a scripted player must be able to clear it and reach the 3rd star.
+5. `python3 tools/sim_levels.py 2 17-17` — a scripted player must be able to clear it and reach the 3rd star.
 
 ### `speed` and `stages`
 `speed: [slow, fast]` — act 1 falls at `slow`, the last act at `fast`, acts in between are spaced evenly. Acts switch at
-1/3 and 2/3 of `target`. Convention: the first level of a new location goes back to `slow ≈ 0.28` (speed reset); difficulty
+1/3 and 2/3 of `target`; the light drifts toward the next act's grade during the last 65 % of each act (live weather).
+Target rule of thumb: `target ≈ intended seconds × points-per-second` (≈ 7 pts/s on L1, 15–18 pts/s from L8 on). Convention: the first level of a new location goes back to `slow ≈ 0.28` (speed reset); difficulty
 across a location grows through targets, hazard weights and `modifiers`.
 
 ### `modifiers` (all optional, all off by default — see `src/game/mechanics.js`)

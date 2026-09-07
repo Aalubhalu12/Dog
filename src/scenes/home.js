@@ -48,7 +48,7 @@ const HomeScene = (() => {
   function select(i) {
     selected = i; const L = LEVELS[i], st = Store.levelStars(L.id), locked = L.id > unlocked();
     $('#lsGrid').querySelectorAll('.tile').forEach(t => t.classList.toggle('selected', +t.dataset.i === i));
-    const PLACE = { meadow: '🏔️ Meadow', park: '🌳 City Park', forest: '🌲 Forest' };
+    const PLACE = { meadow: '🏔️ Meadow', park: '🌳 City Park', forest: '🌲 Forest', beach: '🏖️ Beach' };
     $('#lsTitle').textContent = `Level ${L.id}`; $('#lsPlace').textContent = PLACE[L.theme] || L.theme;
     const th = $('#lsThumb'); th.src = `assets/images/levels/thumb_${L.id}.webp`; th.onerror = () => { th.onerror = null; th.src = 'assets/images/levels/thumb_1.webp'; };
     th.parentElement.classList.toggle('locked', locked);

@@ -5,10 +5,10 @@
  * Layer images must be listed in assets.js. The sky, clouds, tree frame, road and the
  * fence/grass apron are shared by every location so the play lane never changes.
  *
- * Time of day / weather: BG.setTime('morning'|'evening'|'night'|'rain') — a graded
- * overlay (colour multiply + soft light), sun/moon position, star field at night and
- * rain streaks. It cross-fades over ~1.2 s so a stage change mid-run feels like a
- * cinematic time-lapse, not a cut.
+ * Time of day / weather: BG.setTime(name) snaps/fades to a grade; BG.setTimeBlend(a, b, k)
+ * holds the sky BETWEEN two grades (k = 0..1) — the game feeds it the act's progress, so the
+ * light drifts continuously (morning slowly turns to evening during act 1, evening to night
+ * during act 2) like a live time-lapse. Grades: morning · evening · night · rain.
  */
 const BG = (() => {
   const canvas = document.getElementById('bg');
@@ -36,6 +36,15 @@ const BG = (() => {
       ],
       frameWidth: 1.55, frameY: -0.02,
     },
+    beach: {             // seaside: sea + lighthouse far, umbrella / sandcastle / lifeguard hut mid
+      sky: 'sky', clouds: ['cloud0', 'cloud1', 'cloud2'], frame: 'trees', birdsAfter: 'beach_far',
+      layers: [
+        { key: 'beach_far',  depth: 0.15, bottom: 0.50, width: 1.10 },
+        { key: 'beach_mid',  depth: 0.30, bottom: 0.80, width: 1.02 },
+        { key: 'foreground', depth: 0.55, bottom: 1.01, front: true, width: 1.55 },
+      ],
+      frameWidth: 1.55, frameY: -0.02,
+    },
     forest: {            // deep forest clearing: tall pines far, campfire / log / stream mid
       sky: 'sky', clouds: ['cloud0', 'cloud1', 'cloud2'], frame: 'trees', birdsAfter: 'forest_far',
       layers: [
@@ -54,6 +63,13 @@ const BG = (() => {
     rain:    { tint: [120, 140, 165, .42], glow: [180, 200, 220, .06], sun: [.78, .09], sunA: 0,  sky: [90, 105, 125],  stars: 0, rain: 1, leaves: .5 },
   };
   let timeCur = { ...TIMES.morning }, timeTarget = TIMES.morning, timeName = 'morning', rain = [], stars = null;
+  /** Linear blend of two grades (arrays lerp, flags come from the dominant side). */
+  function blendTimes(A, B, k) {
+    const L = (a, b) => a.map((v, i) => v + (b[i] - v) * k);
+    return { tint: L(A.tint, B.tint), glow: L(A.glow, B.glow), sun: L(A.sun, B.sun), sunA: A.sunA + (B.sunA - A.sunA) * k,
+      stars: A.stars + (B.stars - A.stars) * k, rain: A.rain + (B.rain - A.rain) * k, leaves: A.leaves + (B.leaves - A.leaves) * k,
+      sky: k < .5 ? A.sky : B.sky, skyMix: (A.sky ? 1 - k : 0) + (B.sky ? k : 0), moon: k < .5 ? A.moon : B.moon, moonA: (A.moon ? 1 - k : 0) + (B.moon ? k : 0) };
+  }
   let theme = THEMES.meadow;
   let W = 0, H = 0, t0 = performance.now();
   let targetX = 0, targetY = 0, px = 0, py = 0, tiltEnabled = true, amp = 1, ambient = true;
@@ -104,7 +120,7 @@ const BG = (() => {
     const k = Math.min(1, dt / 1.2 * 1.8); const T = timeTarget, C = timeCur;
     for (const key of ['tint', 'glow', 'sun']) C[key] = C[key].map((v, i) => mix(v, T[key][i], k));
     C.sunA = mix(C.sunA, T.sunA, k); C.stars = mix(C.stars, T.stars, k); C.rain = mix(C.rain, T.rain, k); C.leaves = mix(C.leaves, T.leaves, k);
-    C.skyA = mix(C.skyA || 0, T.sky ? 1 : 0, k); if (T.sky) C.sky = T.sky; C.moon = T.moon;
+    C.skyA = mix(C.skyA || 0, T.skyMix != null ? T.skyMix : (T.sky ? 1 : 0), k); if (T.sky) C.sky = T.sky; C.moon = T.moon; C.moonA = mix(C.moonA || 0, T.moonA != null ? T.moonA : (T.moon ? 1 : 0), k);
     if (C.rain > .02) { const want = Math.round(W * H / 6000 * C.rain); while (rain.length < want) rain.push(newDrop()); if (rain.length > want) rain.length = want; } else rain.length = 0;
   }
 
@@ -196,7 +212,7 @@ const BG = (() => {
     const sx = W * TC.sun[0] - px * AMP * .1, sy = H * TC.sun[1] - py * AMP * .1;
     if (TC.sunA > .01) {
       const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, W * .42);
-      if (TC.moon) { g.addColorStop(0, 'rgba(235,240,255,.95)'); g.addColorStop(.05, 'rgba(235,240,255,.9)'); g.addColorStop(.07, 'rgba(200,215,255,.25)'); g.addColorStop(1, 'rgba(180,200,255,0)'); }
+      if (TC.moonA > .5) { g.addColorStop(0, 'rgba(235,240,255,.95)'); g.addColorStop(.05, 'rgba(235,240,255,.9)'); g.addColorStop(.07, 'rgba(200,215,255,.25)'); g.addColorStop(1, 'rgba(180,200,255,0)'); }
       else { g.addColorStop(0, 'rgba(255,250,210,.85)'); g.addColorStop(.12, 'rgba(255,245,190,.45)'); g.addColorStop(1, 'rgba(255,240,180,0)'); }
       ctx.globalAlpha = TC.sunA; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1;
     }
@@ -248,9 +264,9 @@ const BG = (() => {
     // --- time-of-day grade: multiply tint (shadows go blue at night / grey in rain) + soft warm glow (evening) ---
     if (TC.tint[3] > .01) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(${TC.tint[0] | 0},${TC.tint[1] | 0},${TC.tint[2] | 0},${TC.tint[3].toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
     if (TC.glow[3] > .01) { ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.fillStyle = `rgba(${TC.glow[0] | 0},${TC.glow[1] | 0},${TC.glow[2] | 0},${TC.glow[3].toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
-    if (TC.moon) {                                                            // a little lantern light around the puppy so he stays readable at night
+    if (TC.moonA > .02) {                                                     // a little lantern light around the puppy so he stays readable at night
       const lx = hooks.lightX != null ? hooks.lightX : W / 2, ly = H * CONFIG.PUPPY.GROUND_Y - H * .06;
-      const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, W * .38); lg.addColorStop(0, `rgba(255,225,160,${(.22 * TC.tint[3] / .58).toFixed(3)})`); lg.addColorStop(1, 'rgba(255,225,160,0)');
+      const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, W * .38); lg.addColorStop(0, `rgba(255,225,160,${(.22 * TC.moonA).toFixed(3)})`); lg.addColorStop(1, 'rgba(255,225,160,0)');
       ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = lg; ctx.fillRect(0, 0, W, H); ctx.restore();
     }
     if (rain.length) {                                                        // rain streaks, slight slant with the wind
@@ -270,6 +286,8 @@ const BG = (() => {
     setAmp(v) { amp = v; }, setTilt(v) { tiltEnabled = v; },
     setTheme(name) { theme = THEMES[name] || THEMES.meadow; initClouds(); },
     /** Cross-fade to a time-of-day / weather grade ('morning' | 'evening' | 'night' | 'rain'); snap = no fade (level start). */
+    /** Hold the light between grade `a` and grade `b` at k (0..1). Eased by the same smoother as setTime. */
+    setTimeBlend(a, b, k) { const A = TIMES[a] || TIMES.morning, B = TIMES[b] || A; timeTarget = blendTimes(A, B, Math.max(0, Math.min(1, k))); timeName = k < .5 ? a : b; },
     setTime(name, snap = false) { timeTarget = TIMES[name] || TIMES.morning; timeName = name in TIMES ? name : 'morning'; if (snap) { timeCur = { ...timeTarget, tint: [...timeTarget.tint], glow: [...timeTarget.glow], sun: [...timeTarget.sun], skyA: timeTarget.sky ? 1 : 0, sky: timeTarget.sky }; rain.length = 0; } },
     get time() { return timeName; }, THEMES, TIMES,
   };

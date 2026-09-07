@@ -2,7 +2,7 @@
   "id": 6,
   "name": "Breezy Bandstand",
   "theme": "park",
-  "target": 1700,
+  "target": 1250,
   "hearts": 3,
   "spawn": [
     0.85,
@@ -47,5 +47,5 @@
     "type": "goldBones",
     "count": 1
   },
-  "notes": "Park 2/4. First wind. Rain act."
+  "notes": "Park \u00b7 designed length \u2248 97 s (13 pts/s)."
 }

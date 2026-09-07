@@ -1,16 +1,16 @@
 {
-  "id": 10,
-  "name": "Rock Slide",
+  "id": 12,
+  "name": "Forest Master",
   "theme": "forest",
-  "target": 2150,
+  "target": 2900,
   "hearts": 3,
   "spawn": [
-    0.78,
-    0.46
+    0.68,
+    0.4
   ],
   "speed": [
-    0.3,
-    0.54
+    0.34,
+    0.62
   ],
   "ramp": 20,
   "safeTime": 3,
@@ -26,14 +26,14 @@
     }
   ],
   "weights": {
-    "bone": 32,
+    "bone": 34,
     "coin": 22,
     "rock": 22,
     "bomb": 13,
     "magnet": 4,
     "star": 4,
     "shield": 4,
-    "goldbone": 3
+    "goldbone": 4
   },
   "ambient": {
     "birds": 0.6,
@@ -41,16 +41,18 @@
     "cars": 0
   },
   "modifiers": {
+    "wind": 0.7,
     "squirrel": true,
     "waves": {
-      "every": 18,
-      "count": 3,
-      "gap": 0.36
+      "every": 16,
+      "count": 4,
+      "gap": 0.36,
+      "mix": true
     }
   },
   "goal": {
-    "type": "dodge",
-    "count": 30
+    "type": "goldBones",
+    "count": 2
   },
-  "notes": "Forest \u00b7 designed length \u2248 142 s (15 pts/s)."
+  "notes": "Forest \u00b7 designed length \u2248 170 s (17 pts/s)."
 }
