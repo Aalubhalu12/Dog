@@ -12,11 +12,16 @@
  *   target    – score needed to clear the level                         ★1
  *   hearts    – lives at start (also the max)
  *   spawn     – [startInterval, endInterval] seconds between spawns
- *   speed     – [startSpeed, endSpeed] fall speed (stage heights / second)
- *   ramp      – seconds over which spawn/speed go from start → end
+ *   speed     – [slow, fast] fall speed (stage heights / second): stage 1 of the level runs at `slow`,
+ *               the last stage at `fast`, stages in between are spaced evenly (see `stages`)
+ *   ramp      – seconds over which each stage eases from 90 % to 100 % of its own speed
+ *   stages    – (optional) the level's 3 acts, each { time } with time ∈ morning|evening|night|rain.
+ *               Act k begins when score reaches k/N of `target`: the light changes (BG.setTime), items
+ *               fall faster (slow → medium → fast) and hazards pause 1.5 s so the change is never a cheap hit.
+ *               Default: morning → evening → night.
  *   weights   – relative spawn chance per item key (must exist in ITEMS)
  *   safeTime  – seconds at the start with no hazards
- *   theme     – background theme key (BG.THEMES), default 'meadow'
+ *   theme     – location (BG.THEMES: meadow · park · forest), default 'meadow'
  *   ambient   – background life density { birds, walkers, cars } each 0..1
  *   goal      – the level-specific 3rd star, { type, ... } — type must exist in GOALS   ★3
  *   notes     – (optional) designer notes, ignored by the game
@@ -32,6 +37,8 @@ const Levels = (() => {
   const ROOT = 'data/levels/';
   const NUM = (v, lo, hi) => typeof v === 'number' && v >= lo && v <= hi;
   const PAIR = v => Array.isArray(v) && v.length === 2 && v.every(n => typeof n === 'number' && n > 0);
+  const TIMES = ['morning', 'evening', 'night', 'rain'];                       // must match BG.TIMES
+  const DEFAULT_STAGES = [{ time: 'morning' }, { time: 'evening' }, { time: 'night' }];
 
   /** Returns [] if valid, else a list of problems. */
   function validate(L) {
@@ -48,6 +55,7 @@ const Levels = (() => {
     else for (const k in L.weights) { if (!(k in ITEMS)) p.push(`weights: unknown item '${k}'`); if (!NUM(L.weights[k], 0, 1000)) p.push(`weights.${k} must be 0..1000`); }
     if (L.weights && !Object.keys(L.weights).some(k => ITEMS[k] && ITEMS[k].kind === 'score')) p.push('weights must include at least one score item (bone)');
     if (L.theme != null && typeof L.theme !== 'string') p.push('theme must be a string');
+    if (L.stages != null) { if (!Array.isArray(L.stages) || L.stages.length < 1 || L.stages.length > 5 || !L.stages.every(s => s && TIMES.includes(s.time))) p.push(`stages must be 1..5 of { time: ${TIMES.join('|')} }`); }
     if (L.ambient) for (const k of ['birds', 'walkers', 'cars']) if (L.ambient[k] != null && !NUM(L.ambient[k], 0, 1)) p.push(`ambient.${k} must be 0..1`);
     if (L.goal) { if (!L.goal.type || !(L.goal.type in GOALS)) p.push(`goal.type '${L.goal && L.goal.type}' unknown (GOALS: ${Object.keys(GOALS).join(', ')})`); }
     const M = L.modifiers || {};
@@ -58,7 +66,7 @@ const Levels = (() => {
   }
 
   function normalise(L) {
-    return Object.freeze({ theme: 'meadow', ambient: { birds: 0, walkers: 0, cars: 0 }, safeTime: 0, modifiers: {}, ...L, ambient: { birds: 0, walkers: 0, cars: 0, ...(L.ambient || {}) } });
+    return Object.freeze({ theme: 'meadow', ambient: { birds: 0, walkers: 0, cars: 0 }, safeTime: 0, modifiers: {}, stages: DEFAULT_STAGES, ...L, ambient: { birds: 0, walkers: 0, cars: 0, ...(L.ambient || {}) } });
   }
 
   const fetchJSON = async url => { const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + CONFIG.VERSION, { cache: 'no-cache' }); if (!r.ok) throw new Error(`${url} → HTTP ${r.status}`); return r.json(); };

@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.14.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.15.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -67,7 +67,7 @@ bonk/
 │   │   ├── puppy.js           #   Puppy: physics, 24 fps sheet animation, turn pivot, draw
 │   │   ├── mechanics.js       #   per-level mechanics from `modifiers`: wind · squirrel · hazard waves
 │   │   ├── spawner.js         #   Spawner: spawning, fall profiles, wind drift, magnet, collisions
-│   │   ├── background.js      #   BG: parallax renderer + THEMES + camera framing
+│   │   ├── background.js      #   BG: parallax renderer + THEMES (meadow/park/forest) + TIMES (morning/evening/night/rain)
 │   │   ├── ambient.js         #   background life per level (birds, walkers, cars) — behind the fence
 │   │   ├── effects.js         #   FX: pop text, banners, flash, shake, particles
 │   │   └── ftue.js            #   first-time hints (move / catch / dodge / combo), once per save
@@ -118,7 +118,8 @@ bonk/
 | Add a power-up | `items.js` (`POWERS`) + handle in `game.js` / `spawner.js` | |
 | Change puppy speed / size | `src/core/config.js` → `PUPPY` | |
 | Add a sound | `src/audio/sfx.js` | reference by key from an item |
-| Add a background theme | `src/game/background.js` → `THEMES` | set `theme:` on a level |
+| Add a location | `src/game/background.js` → `THEMES` + 2 keyed layers in `assets/images/bg/` | set `theme:` on a level |
+| Change a level's acts (time of day) | `data/levels/L*.json` → `stages` | grades live in `BG.TIMES` |
 | Tune background life (cars/people/birds) | `src/game/ambient.js` → `CFG` | spawn intervals, caps, road position |
 | Wind / squirrel / hazard waves on a level | `data/levels/L*.json` → `modifiers` | logic in `src/game/mechanics.js` |
 | Add a screen (shop, level select) | new `src/scenes/*.js` + `.scene` div in `index.html` + register in `src/app.js` | |

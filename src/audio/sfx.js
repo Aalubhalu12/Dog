@@ -67,6 +67,7 @@ const SFX = (() => {
     combo:    (n = 1) => { const f = 660 * Math.pow(1.122, Math.min(n, 8)); tone(f, f * 1.25, .09, 'square', .22); },   // rises with the chain
     phew:     () => { noise(.16, .18, 900); tone(520, 700, .16, 'sine', .3, .04); },
     star1: (i = 0) => { const f = [784, 988, 1319][i] || 1319; tone(f, f, .22, 'triangle', .55); tone(f * 2, f * 2, .18, 'sine', .25, .02); },
+    stage:  () => { tone(523, 523, .12, 'triangle', .35); tone(659, 659, .12, 'triangle', .35, .12); tone(784, 784, .22, 'triangle', .4, .24); },   // act change chime
     // — mechanics —
     whoosh: () => { noise(.9, .22, 900); noise(.6, .12, 2200); },                                                               // wind gust telegraph
     squeak: () => { tone(1500, 2100, .08, 'square', .18); tone(1900, 1400, .10, 'square', .16, .1); },                          // squirrel

@@ -1,18 +1,30 @@
 {
   "id": 3,
   "name": "Bomb Squad",
-  "target": 1500,
+  "theme": "meadow",
+  "target": 1400,
   "hearts": 3,
   "spawn": [
-    0.6,
-    0.38
+    0.8,
+    0.48
   ],
   "speed": [
-    0.45,
-    0.65
+    0.32,
+    0.54
   ],
-  "ramp": 60,
+  "ramp": 20,
   "safeTime": 2,
+  "stages": [
+    {
+      "time": "morning"
+    },
+    {
+      "time": "rain"
+    },
+    {
+      "time": "night"
+    }
+  ],
   "weights": {
     "bone": 30,
     "coin": 26,
@@ -23,14 +35,13 @@
     "shield": 4,
     "goldbone": 3
   },
-  "theme": "meadow",
   "ambient": {
-    "birds": 1,
+    "birds": 0.8,
     "walkers": 0.8,
-    "cars": 0.7
+    "cars": 0.5
   },
   "goal": {
     "type": "noBomb"
   },
-  "notes": "The lane gets busy. Bombs are the threat."
+  "notes": "Meadow 3/4. Bombs; first rain act."
 }

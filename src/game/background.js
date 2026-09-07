@@ -1,8 +1,14 @@
 /**
  * BONK! — Parallax background renderer (shared by menu + gameplay)
  * ---------------------------------------------------------------
- * Future themes: add a THEMES entry with its own layer keys and call
- * BG.setTheme('name'). Layer images must be listed in assets.js.
+ * Themes: a THEMES entry lists the parallax layers (back → front); BG.setTheme('name').
+ * Layer images must be listed in assets.js. The sky, clouds, tree frame, road and the
+ * fence/grass apron are shared by every location so the play lane never changes.
+ *
+ * Time of day / weather: BG.setTime('morning'|'evening'|'night'|'rain') — a graded
+ * overlay (colour multiply + soft light), sun/moon position, star field at night and
+ * rain streaks. It cross-fades over ~1.2 s so a stage change mid-run feels like a
+ * cinematic time-lapse, not a cut.
  */
 const BG = (() => {
   const canvas = document.getElementById('bg');
@@ -21,7 +27,33 @@ const BG = (() => {
       frameWidth: 1.55,  // tree frame pushed outward → more open play area
       frameY: -0.02,
     },
+    park: {              // city park: skyline far, bandstand / fountain / ice-cream cart mid, same lane
+      sky: 'sky', clouds: ['cloud0', 'cloud1', 'cloud2'], frame: 'trees', birdsAfter: 'park_far',
+      layers: [
+        { key: 'park_far',  depth: 0.15, bottom: 0.56 },
+        { key: 'park_mid',  depth: 0.30, bottom: 0.79, width: 1.05 },
+        { key: 'foreground',depth: 0.55, bottom: 1.01, front: true, width: 1.55 },
+      ],
+      frameWidth: 1.55, frameY: -0.02,
+    },
+    forest: {            // deep forest clearing: tall pines far, campfire / log / stream mid
+      sky: 'sky', clouds: ['cloud0', 'cloud1', 'cloud2'], frame: 'trees', birdsAfter: 'forest_far',
+      layers: [
+        { key: 'forest_far', depth: 0.15, bottom: 0.66, width: 1.08 },
+        { key: 'forest_mid', depth: 0.30, bottom: 0.80, width: 1.02 },
+        { key: 'foreground', depth: 0.55, bottom: 1.01, front: true, width: 1.55 },
+      ],
+      frameWidth: 1.55, frameY: -0.02,
+    },
   };
+  /** Time-of-day / weather grades. tint = multiply colour+alpha, glow = soft-light colour+alpha, sun = [x,y] fraction, sunA = sun alpha. */
+  const TIMES = {
+    morning: { tint: [255, 255, 255, 0],   glow: [255, 240, 200, .08], sun: [.78, .09], sunA: 1,  sky: null,           stars: 0, rain: 0, leaves: 1 },
+    evening: { tint: [255, 170, 110, .30], glow: [255, 140, 60, .22],  sun: [.22, .26], sunA: 1,  sky: [255, 120, 60],  stars: 0, rain: 0, leaves: 1 },
+    night:   { tint: [40, 60, 130, .58],   glow: [120, 160, 255, .10], sun: [.80, .10], sunA: .9, sky: [10, 20, 60],    stars: 1, rain: 0, leaves: .4, moon: true },
+    rain:    { tint: [120, 140, 165, .42], glow: [180, 200, 220, .06], sun: [.78, .09], sunA: 0,  sky: [90, 105, 125],  stars: 0, rain: 1, leaves: .5 },
+  };
+  let timeCur = { ...TIMES.morning }, timeTarget = TIMES.morning, timeName = 'morning', rain = [], stars = null;
   let theme = THEMES.meadow;
   let W = 0, H = 0, t0 = performance.now();
   let targetX = 0, targetY = 0, px = 0, py = 0, tiltEnabled = true, amp = 1, ambient = true;
@@ -35,6 +67,7 @@ const BG = (() => {
     leaves.length = 0; const n = Math.round(Math.max(10, W * H / 45000));
     while (leaves.length < n) leaves.push(newLeaf(true));
   }
+  function newDrop() { return { x: Math.random() * (W + 80) - 40, y: -Math.random() * H, l: 10 + Math.random() * 12, v: H * (1.1 + Math.random() * .5) }; }
   function newLeaf(anywhere) {
     return { x: Math.random() * W, y: anywhere ? Math.random() * H : -20, r: 3 + Math.random() * 5, rot: Math.random() * 6.28,
       vr: (Math.random() - .5) * 3, vy: 25 + Math.random() * 35, ph: Math.random() * 6.28, sw: 15 + Math.random() * 25,
@@ -65,6 +98,15 @@ const BG = (() => {
   }
 
   const img = k => Assets.img(k);
+  const mix = (a, b, k) => a + (b - a) * k;
+  /** Ease the current grade toward the target (called every frame). */
+  function updateTime(dt) {
+    const k = Math.min(1, dt / 1.2 * 1.8); const T = timeTarget, C = timeCur;
+    for (const key of ['tint', 'glow', 'sun']) C[key] = C[key].map((v, i) => mix(v, T[key][i], k));
+    C.sunA = mix(C.sunA, T.sunA, k); C.stars = mix(C.stars, T.stars, k); C.rain = mix(C.rain, T.rain, k); C.leaves = mix(C.leaves, T.leaves, k);
+    C.skyA = mix(C.skyA || 0, T.sky ? 1 : 0, k); if (T.sky) C.sky = T.sky; C.moon = T.moon;
+    if (C.rain > .02) { const want = Math.round(W * H / 6000 * C.rain); while (rain.length < want) rain.push(newDrop()); if (rain.length > want) rain.length = want; } else rain.length = 0;
+  }
 
   // --- animated water -----------------------------------------------------
   // The village painting already contains the lake; we lay a masked, slowly
@@ -140,18 +182,29 @@ const BG = (() => {
     py += ((targetY + Math.cos(t * .27) * .10) - py) * Math.min(1, dt * 3.5);
     const AMP = W * .045 * amp;
 
+    updateTime(dt); const TC = timeCur;
     const sky = img(theme.sky), sw = W * 1.06, sh = Math.max(H * 1.06, sw * sky.height / sky.width);
     ctx.drawImage(sky, (W - sw) / 2 - px * AMP * .05, (H - sh) / 2 - py * AMP * .05, sw, sh);
-
-    const sx = W * .78 - px * AMP * .1, sy = H * .09 - py * AMP * .1;
-    const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, W * .42);
-    g.addColorStop(0, 'rgba(255,250,210,.85)'); g.addColorStop(.12, 'rgba(255,245,190,.45)'); g.addColorStop(1, 'rgba(255,240,180,0)');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    if (TC.skyA > .01 && TC.sky) {                                            // sky grade: sunset orange / night blue / rain grey, strongest at the top
+      const sg = ctx.createLinearGradient(0, 0, 0, H * .8); sg.addColorStop(0, `rgba(${TC.sky.join(',')},${(.85 * TC.skyA).toFixed(3)})`); sg.addColorStop(1, `rgba(${TC.sky.join(',')},${(.35 * TC.skyA).toFixed(3)})`);
+      ctx.fillStyle = sg; ctx.fillRect(0, 0, W, H);
+    }
+    if (TC.stars > .01) {                                                     // star field (night) — twinkles slowly
+      if (!stars) stars = Array.from({ length: 70 }, () => ({ x: Math.random(), y: Math.random() * .5, r: .6 + Math.random() * 1.2, ph: Math.random() * 6.28 }));
+      ctx.fillStyle = '#fff'; for (const s of stars) { ctx.globalAlpha = TC.stars * (.35 + .65 * Math.abs(Math.sin(t * .7 + s.ph))); ctx.beginPath(); ctx.arc(s.x * W - px * AMP * .04, s.y * H, s.r, 0, 6.28); ctx.fill(); } ctx.globalAlpha = 1;
+    }
+    const sx = W * TC.sun[0] - px * AMP * .1, sy = H * TC.sun[1] - py * AMP * .1;
+    if (TC.sunA > .01) {
+      const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, W * .42);
+      if (TC.moon) { g.addColorStop(0, 'rgba(235,240,255,.95)'); g.addColorStop(.05, 'rgba(235,240,255,.9)'); g.addColorStop(.07, 'rgba(200,215,255,.25)'); g.addColorStop(1, 'rgba(180,200,255,0)'); }
+      else { g.addColorStop(0, 'rgba(255,250,210,.85)'); g.addColorStop(.12, 'rgba(255,245,190,.45)'); g.addColorStop(1, 'rgba(255,240,180,0)'); }
+      ctx.globalAlpha = TC.sunA; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1;
+    }
 
     for (const c of clouds) {
       c.x += (c.v / W) * dt * 4; if (c.x > 1.15) c.x = -.35;
       const im = img(c.k), w = W * c.s, h = w * im.height / im.width;
-      ctx.globalAlpha = .95; ctx.drawImage(im, c.x * W - px * AMP * c.d * 3, c.y * H + Math.sin(t * .6 + c.y * 20) * 4 - py * AMP * c.d, w, h);
+      ctx.globalAlpha = .95 - TC.tint[3] * .5; ctx.drawImage(im, c.x * W - px * AMP * c.d * 3, c.y * H + Math.sin(t * .6 + c.y * 20) * 4 - py * AMP * c.d, w, h);
     }
     ctx.globalAlpha = 1;
     // Back layers. Birds are drawn right AFTER the mountains so they fly in front
@@ -164,7 +217,7 @@ const BG = (() => {
     }
     if (ambient && !birdsDrawn) Ambient.drawSky(ctx, t, px * AMP);
 
-    ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = .10 + Math.sin(t * .8) * .03;
+    ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = (.10 + Math.sin(t * .8) * .03) * TC.sunA * (TC.moon ? .4 : 1);
     for (let i = 0; i < 4; i++) {
       ctx.save(); ctx.translate(sx, sy); ctx.rotate(-.55 - i * .14 + Math.sin(t * .2 + i) * .03);
       const rg = ctx.createLinearGradient(0, 0, 0, H * 1.2); rg.addColorStop(0, '#fff'); rg.addColorStop(1, 'rgba(255,255,255,0)');
@@ -184,15 +237,30 @@ const BG = (() => {
 
     hooks.overlay && hooks.overlay(ctx, t, px * AMP, py * AMP);
 
-    for (let i = 0; i < leaves.length; i++) {
+    const leafN = Math.round(leaves.length * TC.leaves);
+    for (let i = 0; i < leafN; i++) {
       const l = leaves[i]; l.y += l.vy * (1 + Math.abs(windX) * .4) * dt; l.rot += (l.vr + windX * 4) * dt; l.ph += dt;
       if (windX) { l.x += windX * W * .55 * dt; if (l.x < -30) l.x += W + 60; else if (l.x > W + 30) l.x -= W + 60; }
       if (l.y > H + 20) leaves[i] = newLeaf(false);
       ctx.save(); ctx.translate(l.x + Math.sin(l.ph * 1.3) * l.sw - px * AMP * .6, l.y); ctx.rotate(l.rot); ctx.fillStyle = l.col; ctx.globalAlpha = .85;
       ctx.beginPath(); ctx.ellipse(0, 0, l.r, l.r * .55, 0, 0, 6.28); ctx.fill(); ctx.restore();
     }
+    // --- time-of-day grade: multiply tint (shadows go blue at night / grey in rain) + soft warm glow (evening) ---
+    if (TC.tint[3] > .01) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(${TC.tint[0] | 0},${TC.tint[1] | 0},${TC.tint[2] | 0},${TC.tint[3].toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+    if (TC.glow[3] > .01) { ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.fillStyle = `rgba(${TC.glow[0] | 0},${TC.glow[1] | 0},${TC.glow[2] | 0},${TC.glow[3].toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+    if (TC.moon) {                                                            // a little lantern light around the puppy so he stays readable at night
+      const lx = hooks.lightX != null ? hooks.lightX : W / 2, ly = H * CONFIG.PUPPY.GROUND_Y - H * .06;
+      const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, W * .38); lg.addColorStop(0, `rgba(255,225,160,${(.22 * TC.tint[3] / .58).toFixed(3)})`); lg.addColorStop(1, 'rgba(255,225,160,0)');
+      ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = lg; ctx.fillRect(0, 0, W, H); ctx.restore();
+    }
+    if (rain.length) {                                                        // rain streaks, slight slant with the wind
+      ctx.save(); ctx.strokeStyle = 'rgba(210,230,255,.55)'; ctx.lineWidth = 1.2; ctx.lineCap = 'round'; ctx.globalAlpha = Math.min(1, TC.rain);
+      const slant = W * .06 + windX * W * .25; ctx.beginPath();
+      for (const d of rain) { d.y += d.v * dt; d.x += slant * dt * (d.v / H); if (d.y > H + 20) { d.y = -20 - Math.random() * 40; d.x = Math.random() * (W + 80) - 40; } ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - slant * .03, d.y - d.l); }
+      ctx.stroke(); ctx.restore();
+    }
     const v = ctx.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * .85);
-    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(10,30,60,.35)'); ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(10,30,60,${(.35 + TC.tint[3] * .25).toFixed(3)})`); ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
   }
 
   return {
@@ -201,5 +269,8 @@ const BG = (() => {
     get W() { return W; }, get H() { return H; },
     setAmp(v) { amp = v; }, setTilt(v) { tiltEnabled = v; },
     setTheme(name) { theme = THEMES[name] || THEMES.meadow; initClouds(); },
+    /** Cross-fade to a time-of-day / weather grade ('morning' | 'evening' | 'night' | 'rain'); snap = no fade (level start). */
+    setTime(name, snap = false) { timeTarget = TIMES[name] || TIMES.morning; timeName = name in TIMES ? name : 'morning'; if (snap) { timeCur = { ...timeTarget, tint: [...timeTarget.tint], glow: [...timeTarget.glow], sun: [...timeTarget.sun], skyA: timeTarget.sky ? 1 : 0, sky: timeTarget.sky }; rain.length = 0; } },
+    get time() { return timeName; }, THEMES, TIMES,
   };
 })();

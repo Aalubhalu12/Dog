@@ -17,6 +17,7 @@ const Game = (() => {
       lives: carry ? carry.lives : L.hearts, mult: 1, powers: { magnet: 0, star: 0, shield: 0 },
       combo: { n: 0, mult: 1, best: 0, bestMult: 1 }, nearMisses: 0, shieldSaves: 0, nearCd: 0,
       spawner: new Spawner(L), cleared: false, over: false, lastHit: null,
+      stage: 0,                                                   // act index into L.stages (morning → evening → night)
     };
   }
 
@@ -26,8 +27,8 @@ const Game = (() => {
     S.startedAt = performance.now(); S.ended = false;
     Analytics.track('level_start', { id: S.level.id, idx: levelIdx, carry: !!carry, plays: (Store.levelProgress()[S.level.id] || {}).plays || 0 });
     Store.bumpStat('runs');
-    Input.reset(); FX.clear(); BG.setTheme(S.level.theme);
-    Ambient.setDensity(S.level.ambient); Ambient.reset();   // background life grows level by level
+    Input.reset(); FX.clear(); BG.setTheme(S.level.theme); BG.setTime(S.level.stages[0].time, true);
+    Ambient.setDensity(stageAmbient(S)); Ambient.reset();   // background life grows level by level (and thins at night / in rain)
     Mechanics.start(S.level);                                // wind / squirrel / waves — only if the level asks
     hooks.onStart && hooks.onStart(S);
     countdown(() => { running = true; });
@@ -47,6 +48,19 @@ const Game = (() => {
     start(Math.min(S.levelIdx + 1, LEVELS.length - 1), carry);
   }
 
+  // --- acts: the level's 3 stages (time of day + pace) --------------------
+  const STAGE_UI = { morning: ['☀️', 'MORNING'], evening: ['🌇', 'EVENING'], night: ['🌙', 'NIGHT'], rain: ['🌧️', 'RAIN'] };
+  const stageAmbient = S => { const a = S.level.ambient, f = { night: .35, rain: .5 }[S.level.stages[S.stage].time] || 1; return { birds: a.birds * (f < 1 ? f * .5 : 1), walkers: a.walkers * f, cars: a.cars * Math.max(f, .6) }; };
+  function advanceStage(i) {
+    S.stage = i; const st = S.level.stages[i], [icon, name] = STAGE_UI[st.time] || ['', st.time.toUpperCase()];
+    S.spawner.setStage(i, S.time); BG.setTime(st.time); Ambient.setDensity(stageAmbient(S));
+    FX.banner(`${icon} ${name}`, 'stage'); setTimeout(() => FX.pop(puppy.box.cx, puppy.box.y - 24, i === S.level.stages.length - 1 ? 'FULL SPEED!' : 'FASTER!', 'bad'), 700);
+    SFX.stage(); FX.vibrate([15, 30, 15]); puppy.squash = 1.12; puppy.puffDust(3);
+    Analytics.track('stage', { id: S.level.id, stage: i, time: st.time, at: Math.round(S.time) });
+    hooks.onHUD && hooks.onHUD(S);
+  }
+  const stageIcon = S => (STAGE_UI[S.level.stages[S.stage].time] || [''])[0];
+
   // --- update --------------------------------------------------------------
   function update(dt) {
     if (!running || paused || S.over) return;
@@ -59,6 +73,7 @@ const Game = (() => {
     FX.update(dt);
     hooks.onHUD && hooks.onHUD(S);
     if (!S.cleared && S.score >= S.level.target) { S.cleared = true; onLevelClear(); }
+    else if (!S.cleared) { const n = S.level.stages.length, want = Math.min(n - 1, Math.floor(S.score / S.level.target * n)); if (want > S.stage) advanceStage(want); }
   }
 
   // --- combo ------------------------------------------------------------------
@@ -145,6 +160,6 @@ const Game = (() => {
     pause() { if (S && !S.over) paused = true; },
     resume() { paused = false; if (cdResume) { const r = cdResume; cdResume = null; r(); } },
     stop() { if (S && !S.ended && !S.over) { Analytics.track('quit', { id: S.level.id, at: Math.round(S.time), score: S.score }); endRun('quit'); } running = false; paused = false; S = null; clearTimeout(cdTimer); cdTimer = null; cdResume = null; FX.clear(); hooks.onCountdown && hooks.onCountdown(null); },
-    get active() { return running; }, get inProgress() { return !!S && !S.over; }, get paused() { return paused; }, get state() { return S; }, get puppy() { return puppy; },
+    get active() { return running; }, get inProgress() { return !!S && !S.over; }, get paused() { return paused; }, get state() { return S; }, get puppy() { return puppy; }, stageIcon,
   };
 })();

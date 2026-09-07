@@ -1,36 +1,46 @@
 {
   "id": 9,
-  "name": "Rock Slide",
-  "target": 2800,
+  "name": "Forest Camp",
+  "theme": "forest",
+  "target": 1900,
   "hearts": 3,
   "spawn": [
-    0.46,
-    0.31
+    0.85,
+    0.5
   ],
   "speed": [
-    0.57,
-    0.79
+    0.28,
+    0.48
   ],
-  "ramp": 70,
+  "ramp": 20,
   "safeTime": 3,
+  "stages": [
+    {
+      "time": "morning"
+    },
+    {
+      "time": "evening"
+    },
+    {
+      "time": "night"
+    }
+  ],
   "weights": {
     "bone": 32,
     "coin": 22,
     "rock": 22,
-    "bomb": 14,
+    "bomb": 13,
     "magnet": 4,
     "star": 4,
     "shield": 4,
     "goldbone": 3
   },
-  "theme": "meadow",
   "ambient": {
-    "birds": 1,
-    "walkers": 0.8,
-    "cars": 0.8
+    "birds": 0.6,
+    "walkers": 0,
+    "cars": 0
   },
   "modifiers": {
-    "wind": 0.5,
     "squirrel": true,
     "waves": {
       "every": 18,
@@ -42,5 +52,5 @@
     "type": "dodge",
     "count": 30
   },
-  "notes": "Hazard waves: a warning, then a burst of rocks across the lane \u2014 one lane is always open. Find the gap."
+  "notes": "Forest 1/2. SPEED RESET. Hazard waves with one open lane. No road life \u2014 birds only."
 }

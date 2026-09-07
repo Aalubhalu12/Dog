@@ -39,32 +39,51 @@ window.__bot = (() => {
     const W=BG.W,box=Game.puppy.box,pw=box.pw,wind=Mechanics.windX*W*.30,vx=Game.puppy.vx;
     const px = box.cx + vx/12;                              // where the puppy STOPS if we release now (friction 12/s)
     const HOR=1.3, items=S.spawner.items, haz=[];
-    const arrive = it => { const tta=(box.y-it.y)/Math.max(1,it.vy); const m=it.F===Spawner.FALL.heavy?0:it.F===Spawner.FALL.tumble?.7:1; return { tta, fx: it.x + wind*m*Math.max(0,tta) }; };
-    for (const it of items) if (it.def.kind==='hazard') { const a=arrive(it); if (a.tta>-0.15 && a.tta<HOR) haz.push({it, ...a}); }
+    // contact window of a falling thing: t0 = when it can first touch the puppy's head, t1 = when it has passed his feet (then it's gone)
+    const arrive = it => { const r=it.size*.36, v=Math.max(1,it.vy), t0=(box.y-r-it.y)/v, t1=(box.y+box.h+r-it.y)/v, tta=(box.y-it.y)/v;
+      const m=it.F===Spawner.FALL.heavy?0:it.F===Spawner.FALL.tumble?.7:1; return { t0, t1, tta, fx: it.x + wind*m*Math.max(0,tta) }; };
+    for (const it of items) if (it.def.kind==='hazard') { const a=arrive(it); if (a.t1 > 0 && a.t0 < HOR) haz.push({it, ...a}); }
     const clear = x => { let c=1e9; for (const h of haz) c=Math.min(c, Math.abs(h.fx-x) - h.it.size*.36 - box.w*.5); return c; };
     const nearGoal = S.level.goal && S.level.goal.type==='nearMiss';
     const SAFE = pw*.20, MAXV = W*1.05;
-    const crosses = (x0, x1) => { const lo=Math.min(x0,x1)-SAFE*.5, hi=Math.max(x0,x1)+SAFE*.5; return haz.some(h => h.fx>lo && h.fx<hi); };   // path passes under a falling hazard
+    const edge = Math.max(W*.06, Game.puppy.width*.42) + 2, LO = edge, HI = W - edge;      // the puppy's real clamp
+    const reach = x => Math.abs(x-px)/MAXV + .10;
+    const hits = (h, x) => Math.abs(h.fx-x) - h.it.size*.36 - box.w*.5 < SAFE;
+    // Standing at x is safe if (a) no hazard over x is in contact during [arrival-.05, arrival+.5] and
+    // (b) every hazard we run under is either already past our feet or still above our head when we cross it.
+    const safeAt = x => { const ta = reach(x);
+      for (const h of haz) {
+        if (hits(h,x) && h.t0 < ta + .5 && h.t1 > ta - .05) return false;
+        const lo=Math.min(px,x)-SAFE*.6, hi=Math.max(px,x)+SAFE*.6;
+        if (h.fx>lo && h.fx<hi && Math.abs(h.fx-px) > SAFE*.5) { const tc=Math.abs(h.fx-px)/MAXV + .08; if (h.t0 - .10 < tc && tc < h.t1 + .05) return false; } }
+      return true; };
     let goal=null;
-    if (clear(px) < SAFE) {                                 // in danger → nearest safe spot we can reach without crossing under another hazard
+    // near-miss goal: brave mode — the hazard's landing spot is certain once it's below ~40 % height; stand just outside its edge
+    let flirt=null;
+    if (nearGoal && S.goal && Goals.progress(S) < 1) { const h=haz.filter(x=>x.t0>0 && x.it.y > BG.H*.35).reduce((m,x)=>!m||x.t0<m.t0?x:m, null);
+      if (h && h.t0 < .8) { const side = box.cx<h.fx?-1:1; const g = h.fx + side*(box.w*.5 + h.it.size*.36 + pw*.09);
+        if (g>=LO && g<=HI && reach(g) < h.t0 - .03 && haz.every(o => o===h || !(Math.abs(o.fx-g) - o.it.size*.36 - box.w*.5 < SAFE && o.t0 < reach(g)+.6 && o.t1 > reach(g)-.05))) flirt = g; } }
+    const threatened = haz.some(h => hits(h,px) && h.t0 < .9 && h.t1 > 0);
+    if (flirt != null) { goal = flirt; hold = null; }
+    else if (threatened) {
       stats.dodges++;
       let best=null;
-      for (let k=1;k<=18;k++) for (const d of [1,-1]) { const x=box.cx+d*k*pw*.12; if (x<W*.07||x>W*.93) continue; if (clear(x)<SAFE) continue;
-        // don't run under a *different* hazard on the way
-        const lo=Math.min(box.cx,x), hi=Math.max(box.cx,x); let through=false; for (const h of haz) { if (Math.abs(h.fx-box.cx) - h.it.size*.36 - box.w*.5 < SAFE) continue; if (h.fx>lo&&h.fx<hi) through=true; } if (through) continue;
-        const cost=k + (hold!=null && Math.sign(x-box.cx)!==Math.sign(hold-box.cx) ? 6 : 0) + (nearGoal ? Math.max(0, clear(x)-pw*.16)/pw*4 : 0);
+      for (let k=0;k<=24;k++) for (const d of (k? [1,-1] : [1])) { const x=px+d*k*pw*.12; if (x<LO||x>HI) continue; if (!safeAt(x)) continue;
+        const cost=k + (hold!=null ? Math.abs(x-hold)/pw*3 : 0) + (nearGoal ? Math.max(0, clear(x)-pw*.16)/pw*4 : 0);
         if (!best||cost<best.cost) best={x,cost}; }
-      goal = best ? best.x : hold != null ? hold : (box.cx < W*.5 ? W*.92 : W*.08);
+      if (!best) {                                              // nothing provably safe: least-bad = where the contact window is furthest from our arrival
+        let bestS=-1; for (let k=0;k<=24;k++) for (const d of [1,-1]) { const x=px+d*k*pw*.12; if (x<LO||x>HI) continue; let sc=1e9; for (const h of haz) if (hits(h,x)) sc=Math.min(sc, h.t0 > reach(x) ? h.t0-reach(x) : reach(x)-h.t1); if (sc>bestS) { bestS=sc; best={x}; } } }
+      goal = best ? (Math.abs(best.x-px) < 1 ? null : best.x) : null;
       hold = goal;
     } else {
       hold = null;
       let target=null;
       for (const it of items) { if (it.def.kind==='hazard') continue; const a=arrive(it); if (a.tta<=0||a.tta>2.4) continue;
-        if (clear(a.fx) < SAFE*1.3 || crosses(px, a.fx)) continue;         // never chase into / under a rock
-        const v = val(S,it) - Math.abs(a.fx-px)/W*20 - a.tta*4;
-        if (!target||v>target.v) target={v, fx:a.fx}; }
+        const fx = Math.max(LO, Math.min(HI, a.fx));
+        if (!safeAt(fx)) continue;                                // never chase into / under a rock
+        const v = val(S,it) - Math.abs(fx-px)/W*20 - a.tta*4;
+        if (!target||v>target.v) target={v, fx}; }
       if (target) goal=target.fx;
-      else if (nearGoal && haz.length) { const h=haz.reduce((m,x)=>x.tta<m.tta?x:m); const side = box.cx<h.fx?-1:1; goal = h.fx + side*(box.w*.5 + h.it.size*.36 + pw*.09); if (crosses(px, goal)) goal=null; }   // flirt with the rock
     }
     if(goal==null){ press(null); return; }
     const dx=goal-px; if(Math.abs(dx)<pw*.08) press(null); else press(dx>0?'ArrowRight':'ArrowLeft');
@@ -76,7 +95,7 @@ window.__perfect = on => { if(!window.__origPick) window.__origPick = Spawner.pi
   Spawner.pick = on ? (w => { const k = window.__origPick(w); return ITEMS[k].kind==='hazard' ? 'bone' : k; }) : window.__origPick; };
 '''
 
-def play(pg, idx, perfect, timeout=200):
+def play(pg, idx, perfect, timeout=240):
     pg.evaluate(f'__perfect({str(perfect).lower()})')
     # unlock through the real save (levels before idx count as cleared), then use the real board: tile → PLAY
     pg.evaluate(f'for (let i = 0; i < {idx}; i++) if (!Store.isCleared(LEVELS[i].id)) Store.recordLevel(LEVELS[i].id, 1, true); HomeScene.enter()')

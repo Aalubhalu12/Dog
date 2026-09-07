@@ -1,37 +1,48 @@
 {
   "id": 5,
-  "name": "Close Call",
-  "target": 2000,
+  "name": "Park Life",
+  "theme": "park",
+  "target": 1300,
   "hearts": 3,
   "spawn": [
-    0.52,
-    0.34
+    0.95,
+    0.58
   ],
   "speed": [
-    0.52,
-    0.72
+    0.28,
+    0.44
   ],
-  "ramp": 60,
-  "safeTime": 2,
+  "ramp": 20,
+  "safeTime": 3,
+  "stages": [
+    {
+      "time": "morning"
+    },
+    {
+      "time": "evening"
+    },
+    {
+      "time": "night"
+    }
+  ],
   "weights": {
-    "bone": 30,
-    "coin": 22,
-    "rock": 24,
-    "bomb": 12,
-    "magnet": 4,
+    "bone": 34,
+    "coin": 28,
+    "rock": 18,
+    "bomb": 8,
+    "magnet": 5,
     "star": 4,
     "shield": 3,
     "goldbone": 3
   },
-  "theme": "meadow",
   "ambient": {
-    "birds": 1,
+    "birds": 0.7,
     "walkers": 0.8,
-    "cars": 0.7
+    "cars": 0.6
   },
   "goal": {
     "type": "nearMiss",
-    "count": 4
+    "count": 3
   },
-  "notes": "Rocks everywhere. Rewards brave dodging (near misses)."
+  "notes": "Park 1/4. SPEED RESET: slow again, new place. Near-miss intro."
 }

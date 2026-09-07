@@ -1,5 +1,5 @@
 # BONK! — Status & Next Steps
-_Updated 2026-09-07 · current build **v0.14.0** (Phases 1–2 done, Phase 3 content shipped — music + playtest balance open) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
+_Updated 2026-09-07 · current build **v0.15.0** (Phases 1–2 done, Phase 3 content shipped: 3 locations × 3 acts — music + playtest balance open) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
 
 ---
 
@@ -7,7 +7,8 @@ _Updated 2026-09-07 · current build **v0.14.0** (Phases 1–2 done, Phase 3 con
 
 ### Core game (MVP — accepted)
 - Catch/dodge loop: bones +10, coins +1, magnet, 2× star, rocks (BONK!, −heart), bombs (dizzy)
-- 10 levels with 3 lives each (targets 400 → 3000), level-by-level ambient life (birds → villagers → cars)
+- 10 levels in 3 locations (Meadow 1–4 · City Park 5–8 · Forest 9–10), each level = 3 acts (morning → evening → night / rain) with slow → medium → fast pace; speed resets at every new location
+- 3 lives each (targets 400 → 2300), level-by-level ambient life (birds → villagers → cars; thinner at night, none in the forest)
 - Phase 3 mechanics per level via `modifiers`: wind gusts (L6+), thief squirrel (L8+), hazard waves with one open lane (L9–10) — `src/game/mechanics.js`
 - Balance sweep tool `tools/sim_levels.py` (every level, fresh save, real UI): all 10 clearable, 3 stars reachable
 - Fixed-step 120 Hz simulation, smooth movement, camera pulled back, natural item falling

@@ -6,7 +6,7 @@
  * Item definitions live in src/data/items.js
  */
 const CONFIG = Object.freeze({
-  VERSION: '0.14.0',
+  VERSION: '0.15.0',
   STORAGE_PREFIX: 'bonk_',
 
   /** Player (puppy) */
@@ -40,7 +40,7 @@ const CONFIG = Object.freeze({
     MISS_RESETS: true,    // letting a bone hit the ground breaks the chain (hazards always do)
   },
   /** Near-miss: a hazard passes within this many puppy-widths of the puppy without hitting */
-  NEAR_MISS: { MARGIN: 0.18, COINS: 1, COOLDOWN: 0.8 },
+  NEAR_MISS: { MARGIN: 0.30, COINS: 1, COOLDOWN: 0.8 },   // 0.18 was ~20 px on a phone: technically a near miss, but nobody felt it
 
   /** Leaderboard (src/services/leaderboard.js): local-first, server only in limited daily windows */
   LEADERBOARD: {

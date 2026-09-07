@@ -2,6 +2,47 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.15.0] — 2026-09-07 — Three locations · three acts per level · speed reset per location
+### Added
+- **Locations.** Meadow (L1–4) → **City Park** (L5–8, `assets/images/bg/park_far/park_mid.webp`: skyline, bandstand,
+  fountain, ice-cream cart) → **Forest** (L9–10, `forest_far/forest_mid.webp`: pines, campfire, log, stream). Sky, clouds,
+  tree frame, road and the fence/grass apron are shared so the play lane never changes. `BG.THEMES` has all three.
+- **Three acts per level** (`stages` in the level JSON, default morning → evening → night). Act k starts when score
+  reaches k/3 of the target: the light cross-fades over ~1.2 s (`BG.setTime`), a "🌇 EVENING" banner + chime, the puppy
+  puffs dust, items fall faster ("FASTER!" / "FULL SPEED!"), and hazards pause 1.5 s so the change is never a cheap hit.
+  Times: **morning** (as before) · **evening** (orange sky, warm soft-light, low sun) · **night** (blue multiply,
+  stars, moon, a lantern glow that follows the puppy so he stays readable) · **rain** (grey grade, slanted streaks that
+  lean with the wind). Background life thins at night / in rain.
+- **Speed reset per location.** Level 1 of every location starts at the game's original L1 pace (`speed[0] ≈ .28`);
+  within a level the acts go slow → medium → fast (`speed[0]` → `speed[1]`); across a location, targets, hazard weights
+  and mechanics grow — not raw speed. HUD shows the act (`LV 6 🌙`); the level card shows the location.
+
+| # | Place | Name | Target | Speed | Acts | 3rd star | Mechanics |
+|---|-------|------|--------|-------|------|----------|-----------|
+| 1 | Meadow | Sunny Meadow | 400 | 0.28→0.42 | morning → evening → night | bonesIn 8 | — |
+| 2 | Meadow | Rocky Road | 900 | 0.3→0.48 | morning → evening → night | coins 12 | — |
+| 3 | Meadow | Bomb Squad | 1400 | 0.32→0.54 | morning → rain → night | noBomb  | — |
+| 4 | Meadow | Combo Creek | 1900 | 0.34→0.6 | morning → evening → night | combo 3 | — |
+| 5 | City Park | Park Life | 1300 | 0.28→0.44 | morning → evening → night | nearMiss 3 | — |
+| 6 | City Park | Breezy Bandstand | 1700 | 0.3→0.5 | morning → rain → night | goldBones 1 | wind 0.55 |
+| 7 | City Park | Gusty Gardens | 2000 | 0.32→0.56 | morning → evening → night | power 4 | wind 0.8 |
+| 8 | City Park | Squirrel Trouble | 2000 | 0.34→0.62 | evening → night → rain | coins 25 | wind 0.5, squirrel |
+| 9 | Forest | Forest Camp | 1900 | 0.28→0.48 | morning → evening → night | dodge 30 | squirrel, waves |
+| 10 | Forest | Forest Master | 2300 | 0.3→0.58 | morning → rain → night | combo 5 | wind 0.7, squirrel, waves |
+
+### Fixed (found by the balance sweep)
+- **Hazard waves left no real gap.** "One open lane of count+1" was a 34 px slot for an 80 px puppy on a 390 px phone.
+  Waves now carve a gap of 1.25 × the puppy's width at a random spot and spread the rocks around it.
+- **Near-miss margin** `0.18` puppy-widths (~20 px) was too tight to feel — nobody earned "PHEW!". Now `0.30`.
+- Ambient road life is off in the forest (no road there).
+### Changed
+- `Spawner` pace is act-driven: `setStage(i, t)` / `pace(t)` replace the old level-long ramp; `safeUntil` covers the
+  act change. `Levels.validate` checks `stages`. `tools/sim_levels.py` bot rewritten around contact windows (t0/t1)
+  and reachable-safe-spot search — it now clears every level; `sim_play.py` shares it.
+### Verified (scripted, 390×844, fresh save, 2 good runs + 1 perfect run per level)
+- All 10 levels cleared by the good bot; 3rd star reached on every level (L1–L9 ★★★ in good runs, L10 ★☆★ with the
+  ×5 combo reached in the perfect run). `tools/check.py` PASS · `tools/sim_play.py` 25/25 · zero console errors.
+
 ## [0.14.0] — 2026-09-07 — Phase 3: levels 4–10, wind, squirrel, hazard waves
 ### Added
 - **Levels 4–10** (`data/levels/L04–L10.json`, thumbnails `thumb_4..10.webp`) — the board is now 10 real tiles.

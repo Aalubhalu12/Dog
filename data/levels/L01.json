@@ -1,6 +1,7 @@
 {
   "id": 1,
   "name": "Sunny Meadow",
+  "theme": "meadow",
   "target": 400,
   "hearts": 3,
   "spawn": [
@@ -9,10 +10,21 @@
   ],
   "speed": [
     0.28,
-    0.4
+    0.42
   ],
-  "ramp": 60,
+  "ramp": 20,
   "safeTime": 3,
+  "stages": [
+    {
+      "time": "morning"
+    },
+    {
+      "time": "evening"
+    },
+    {
+      "time": "night"
+    }
+  ],
   "weights": {
     "bone": 36,
     "coin": 30,
@@ -23,7 +35,6 @@
     "shield": 3,
     "goldbone": 2
   },
-  "theme": "meadow",
   "ambient": {
     "birds": 0.6,
     "walkers": 0,
@@ -34,5 +45,5 @@
     "count": 8,
     "seconds": 30
   },
-  "notes": "Quiet morning: just birds. Teaches catch + dodge."
+  "notes": "Meadow 1/4. Teaches: catch, dodge, the three acts (morning \u2192 evening \u2192 night)."
 }

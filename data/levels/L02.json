@@ -1,18 +1,30 @@
 {
   "id": 2,
   "name": "Rocky Road",
+  "theme": "meadow",
   "target": 900,
   "hearts": 3,
   "spawn": [
-    0.7,
-    0.45
-  ],
-  "speed": [
-    0.38,
+    0.9,
     0.55
   ],
-  "ramp": 60,
-  "safeTime": 2,
+  "speed": [
+    0.3,
+    0.48
+  ],
+  "ramp": 20,
+  "safeTime": 3,
+  "stages": [
+    {
+      "time": "morning"
+    },
+    {
+      "time": "evening"
+    },
+    {
+      "time": "night"
+    }
+  ],
   "weights": {
     "bone": 32,
     "coin": 28,
@@ -23,7 +35,6 @@
     "shield": 3,
     "goldbone": 2
   },
-  "theme": "meadow",
   "ambient": {
     "birds": 0.8,
     "walkers": 0.6,
@@ -33,5 +44,5 @@
     "type": "coins",
     "count": 12
   },
-  "notes": "Villagers come out. More rocks."
+  "notes": "Meadow 2/4. More rocks, villagers appear."
 }

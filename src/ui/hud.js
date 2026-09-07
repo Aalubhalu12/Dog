@@ -21,7 +21,7 @@ const HUD = (() => {
   function update(S) {
     el.score.textContent = S.score.toLocaleString(); el.coins.textContent = S.coins.toLocaleString();
     el.best.textContent = Math.max(S.score, Store.best()).toLocaleString();
-    el.level.textContent = `LV ${S.level.id}`;
+    el.level.textContent = `LV ${S.level.id} ${Game.stageIcon(S)}`;
     if (S.score !== lastScore) { lastScore = S.score; restartAnimation(el.score, 'bump'); }
     el.progress.style.width = (S.cleared ? 100 : Math.min(100, S.score / S.level.target * 100)) + '%';
     let html = '';

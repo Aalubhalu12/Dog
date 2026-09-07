@@ -54,7 +54,7 @@ From you: 30 min playtest + feedback (which level, what felt unfair, was combo u
 
 ---
 
-## Phase 3 — Content (levels 4–10)  (`v0.14` — content + mechanics shipped 2026-09-07; music + playtest balance open)
+## Phase 3 — Content (levels 4–10)  (`v0.15` — 3 locations × 3 acts shipped 2026-09-07; music + playtest balance open)
 **Goal:** the level board is full and the curve feels right.
 
 Build

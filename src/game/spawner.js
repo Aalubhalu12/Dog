@@ -3,7 +3,16 @@
  * Reads level difficulty from the level object and item data from ITEMS.
  */
 class Spawner {
-  constructor(level) { this.level = level; this.items = []; this.timer = .8; }
+  constructor(level) { this.level = level; this.items = []; this.timer = .8; this.stage = 0; this.stageAt = 0; this.safeUntil = level.safeTime || 0; }
+
+  /** Enter act `i` at level time `time`: pace steps up, hazards pause briefly so the light change is never a cheap hit. */
+  setStage(i, time) { this.stage = i; this.stageAt = time; this.safeUntil = Math.max(this.safeUntil, time + 1.5); }
+  /** 0..1 pace within the level: which act we're in (stepped) + a soft 90→100 % ease inside the act. */
+  pace(time) {
+    const L = this.level, n = (L.stages || []).length || 1, k = n > 1 ? this.stage / (n - 1) : 1;
+    const ease = Math.max(0, Math.min(1, (time - this.stageAt) / L.ramp));
+    return { k, mul: .9 + .1 * ease };
+  }
 
   /**
    * Fall profiles — how an item moves once spawned (all values relative to level fall speed `v`).
@@ -31,17 +40,17 @@ class Spawner {
   spawn(time) {
     const L = this.level;
     let type = Spawner.pick(L.weights);
-    if (time < (L.safeTime || 0) && ITEMS[type].kind === 'hazard') type = 'bone';
+    if (time < this.safeUntil && ITEMS[type].kind === 'hazard') type = 'bone';
     this.spawnAt(type, null, time, 1);
-    const p = Math.max(0, Math.min(1, time / L.ramp));
-    this.timer = Spawner.lerp(L.spawn[0], L.spawn[1], p) * (.8 + Math.random() * .4);
+    const { k, mul } = this.pace(time);
+    this.timer = Spawner.lerp(L.spawn[0], L.spawn[1], k) / mul * (.8 + Math.random() * .4);
   }
 
   /** Spawn a specific item. xFrac null = random lane position; speedMul scales the level fall speed (hazard waves use ~1.08). */
   spawnAt(type, xFrac, time, speedMul = 1) {
-    const L = this.level, W = BG.W, H = BG.H, p = Math.max(0, Math.min(1, time / L.ramp));
+    const L = this.level, W = BG.W, H = BG.H, { k, mul } = this.pace(time);
     const def = ITEMS[type], size = W * def.size, margin = W * .05 + size / 2, F = Spawner.FALL[def.fall] || Spawner.FALL.tumble;
-    const v = H * Spawner.lerp(L.speed[0], L.speed[1], p) * (.9 + Math.random() * .25) * F.term * speedMul;
+    const v = H * Spawner.lerp(L.speed[0], L.speed[1], k) * mul * (.9 + Math.random() * .25) * F.term * speedMul;
     const x = xFrac == null ? margin + Math.random() * (W - margin * 2) : margin + xFrac * (W - margin * 2);
     this.items.push({ type, def, F, x, y: -size, size,
       vy: v * F.start, vt: v, age: 0,

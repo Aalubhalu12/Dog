@@ -12,8 +12,8 @@
  *                              hits the ground and scampers off with it. Visual only — the miss already
  *                              broke the combo. Pure character, zero difficulty.
  *   Waves     { waves: { every, count, gap, mix } }  Every `every` s a "⚠ INCOMING!" warning, then `count`
- *                              hazards `gap` s apart sweeping across `count+1` lanes — ONE lane is always left
- *                              open ("find the gap"). Rocks; `mix` adds bombs. Regular spawning pauses during
+ *                              hazards `gap` s apart sweeping across the lane with a puppy-sized gap (1.25 × his
+ *                              width) carved out at a random spot ("find the gap"). Rocks; `mix` adds bombs. Regular spawning pauses during
  *                              the wave so it reads as a pattern, never a wall. Rocks ignore wind, so the gap holds.
  *
  * Public: Mechanics.start(level) · update(dt, S) · windX (px/s drift factor for Spawner) · drawBehind(c,t)
@@ -27,7 +27,7 @@ const Mechanics = (() => {
   let sq = null;                                   // { x, y, dir, phase: 'in'|'grab'|'out', t, bone:{x,y} }
   let sqCd = 0;
   // --- waves state ---
-  let wave = { next: 0, warn: 0, left: 0, gapT: 0, dir: 1, x: 0, active: false };
+  let wave = { next: 0, warn: 0, left: 0, gapT: 0, xs: [], i: 0, active: false };
 
   const rnd = (a, b) => a + Math.random() * (b - a);
   const stats = { gusts: 0, grabs: 0, waves: 0 };        // per-run counters (analytics + tools/sim_levels.py)
@@ -36,7 +36,7 @@ const Mechanics = (() => {
     L = level; M = level.modifiers || {}; W = BG.W; H = BG.H; stats.gusts = stats.grabs = stats.waves = 0;
     wind = { on: false, str: M.wind || 0, dir: Math.random() < .5 ? -1 : 1, t: 0, next: M.wind ? rnd(6, 9) : Infinity, tele: 0, cur: 0 };
     sq = null; sqCd = 0;
-    const wv = M.waves; wave = { next: wv ? Math.max(wv.every * .6, (level.safeTime || 0) + 6) : Infinity, warn: 0, left: 0, gapT: 0, dir: 1, x: 0, active: false };
+    const wv = M.waves; wave = { next: wv ? Math.max(wv.every * .6, (level.safeTime || 0) + 6) : Infinity, warn: 0, left: 0, gapT: 0, xs: [], i: 0, active: false };
   }
 
   // ---------------------------------------------------------------- wind
@@ -104,16 +104,23 @@ const Mechanics = (() => {
     const wv = M.waves; if (!wv) return;
     if (!wave.active) {
       wave.next -= dt;
-      if (wave.next <= 0) { wave.active = true; wave.warn = 1.1; wave.left = wv.count; wave.gapT = 0; wave.dir = Math.random() < .5 ? -1 : 1; wave.hole = Math.floor(Math.random() * (wv.count + 1)); wave.i = 0; stats.waves++; FX.banner('⚠ INCOMING!', 'warn'); SFX.alarm(); FX.vibrate([30, 40, 30]); }
+      if (wave.next <= 0) {
+        // Lay the wave out ONCE: `count` hazards spread across the lane with a gap carved out that the puppy actually
+        // fits through (1.25 × his width — on a phone the naive "one lane of count+1" left a 34 px slot for an 80 px dog).
+        const p = Game.puppy, size = W * ITEMS.rock.size, lo = W * .05 + size / 2, hi = W - lo, hole = Math.min((hi - lo) * .5, p.width * 1.25);
+        const hx = lo + hole / 2 + Math.random() * (hi - lo - hole), leftW = hx - hole / 2 - lo, tot = hi - lo - hole;
+        const xs = []; for (let i = 0; i < wv.count; i++) { const u = (i + .5) / wv.count * tot; xs.push(u < leftW ? lo + u : hx + hole / 2 + (u - leftW)); }
+        if (Math.random() < .5) xs.reverse();                                          // sweep direction
+        wave.xs = xs.map(x => (x - lo) / (hi - lo)); wave.i = 0;
+        wave.active = true; wave.warn = 1.1; wave.left = wv.count; wave.gapT = 0; stats.waves++; FX.banner('⚠ INCOMING!', 'warn'); SFX.alarm(); FX.vibrate([30, 40, 30]);
+      }
       return;
     }
     if (wave.warn > 0) { wave.warn -= dt; return; }
     wave.gapT -= dt;
     if (wave.gapT <= 0 && wave.left > 0) {
-      if (wave.i === wave.hole) wave.i++;                                            // skip the open lane
-      const lanes = wv.count + 1, f = (wave.i + .5) / lanes, x = wave.dir > 0 ? f : 1 - f;
-      const type = wv.mix && wave.i % 2 === 1 ? 'bomb' : 'rock'; wave.i++;
-      S.spawner.spawnAt(type, x, S.time, 1.08);
+      const type = wv.mix && wave.i % 2 === 1 ? 'bomb' : 'rock';
+      S.spawner.spawnAt(type, wave.xs[wave.i++], S.time, 1.08);
       wave.left--; wave.gapT = wv.gap;
     }
     if (wave.left <= 0 && wave.gapT <= -.4) { wave.active = false; wave.next = wv.every; }

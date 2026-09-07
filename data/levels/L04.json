@@ -1,18 +1,30 @@
 {
   "id": 4,
   "name": "Combo Creek",
-  "target": 1700,
+  "theme": "meadow",
+  "target": 1900,
   "hearts": 3,
   "spawn": [
-    0.56,
-    0.36
+    0.72,
+    0.42
   ],
   "speed": [
-    0.48,
-    0.68
+    0.34,
+    0.6
   ],
-  "ramp": 60,
+  "ramp": 20,
   "safeTime": 2,
+  "stages": [
+    {
+      "time": "morning"
+    },
+    {
+      "time": "evening"
+    },
+    {
+      "time": "night"
+    }
+  ],
   "weights": {
     "bone": 32,
     "coin": 24,
@@ -23,15 +35,14 @@
     "shield": 3,
     "goldbone": 3
   },
-  "theme": "meadow",
   "ambient": {
-    "birds": 0.8,
-    "walkers": 0.6,
-    "cars": 0.5
+    "birds": 1,
+    "walkers": 0.8,
+    "cars": 0.7
   },
   "goal": {
     "type": "combo",
     "mult": 3
   },
-  "notes": "Faster lane. Teaches chaining: keep the combo alive to reach \u00d73."
+  "notes": "Meadow 4/4. Fastest meadow level \u2014 chain catches."
 }

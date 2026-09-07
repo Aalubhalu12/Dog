@@ -10,7 +10,8 @@ Levels are **JSON files** in `data/levels/`. Copy the last one, edit, register:
   "id": 11, "name": "Windy Peaks", "target": 3300, "hearts": 3,
   "spawn": [0.55, 0.35],     "speed": [0.50, 0.72],     "ramp": 60, "safeTime": 2,
   "weights": { "bone": 28, "coin": 24, "rock": 22, "bomb": 16, "magnet": 5, "star": 5 },
-  "theme": "meadow",
+  "theme": "forest",                                      // meadow · park · forest (BG.THEMES)
+  "stages": [ { "time": "morning" }, { "time": "rain" }, { "time": "night" } ],   // the 3 acts (morning|evening|night|rain)
   "ambient": { "birds": 1, "walkers": 0.8, "cars": 0.7 },
   "modifiers": { "wind": 0.6, "squirrel": true, "waves": { "every": 15, "count": 4, "gap": 0.35, "mix": true } },
   "goal": { "type": "power", "count": 4 },
@@ -22,12 +23,17 @@ Levels are **JSON files** in `data/levels/`. Copy the last one, edit, register:
 4. `python3 tools/check.py` — validates the file (ids consecutive, item keys exist, goal type exists, ranges sane).
 5. `python3 tools/sim_levels.py 2 11-11` — a scripted player must be able to clear it and reach the 3rd star.
 
+### `speed` and `stages`
+`speed: [slow, fast]` — act 1 falls at `slow`, the last act at `fast`, acts in between are spaced evenly. Acts switch at
+1/3 and 2/3 of `target`. Convention: the first level of a new location goes back to `slow ≈ 0.28` (speed reset); difficulty
+across a location grows through targets, hazard weights and `modifiers`.
+
 ### `modifiers` (all optional, all off by default — see `src/game/mechanics.js`)
 | key | value | effect |
 |---|---|---|
 | `wind` | 0..1 | gusts every 7–13 s push light items sideways (never rocks/bombs); telegraphed by chevrons + leaves + puppy lean |
 | `squirrel` | `true` | squirrel steals bones that hit the ground (visual only) |
-| `waves` | `{ every, count, gap, mix }` | every `every` s: warning, then `count` rocks across `count+1` lanes, one lane always open; `mix` alternates bombs |
+| `waves` | `{ every, count, gap, mix }` | every `every` s: warning, then `count` rocks spread across the lane with a puppy-sized gap at a random spot; `mix` alternates bombs |
 
 That's it. The level board, HUD, star goals, clear card and `Store.recordLevel` all read from the loaded `LEVELS` array.
 A level file with problems is **skipped with a console error** instead of breaking the game; `Levels.validate(obj)` returns the list of problems.
