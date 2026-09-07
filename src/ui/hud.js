@@ -9,7 +9,7 @@ const HUD = (() => {
   let comboKey = '';
   let zones = null, zoneW = 0;
   let goalState = '';
-  let lastPower = '', lastScore = -1;
+  let lastPower = '', lastScore = -1, lastCoins = -1, lastProg = '', lastLevel = '';
 
   function hearts(S, animLost) {
     el.hearts.innerHTML = '';
@@ -19,11 +19,11 @@ const HUD = (() => {
     }
   }
   function update(S) {
-    el.score.textContent = S.score.toLocaleString(); el.coins.textContent = S.coins.toLocaleString();
-    el.best.textContent = Math.max(S.score, Store.best()).toLocaleString();
-    el.level.textContent = `LV ${Game.stageLabel(S)} ${Game.stageIcon(S)}`;
-    if (S.score !== lastScore) { lastScore = S.score; restartAnimation(el.score, 'bump'); }
-    el.progress.style.width = (S.cleared ? 100 : Math.min(100, S.score / S.level.target * 100)) + '%';
+    // DOM writes only on change — this runs every rendered frame and layout/style work is what stutters low-end phones
+    if (S.score !== lastScore) { lastScore = S.score; el.score.textContent = S.score.toLocaleString(); el.best.textContent = Math.max(S.score, Store.best()).toLocaleString(); restartAnimation(el.score, 'bump'); }
+    if (S.coins !== lastCoins) { lastCoins = S.coins; el.coins.textContent = S.coins.toLocaleString(); }
+    const lv = `LV ${Game.stageLabel(S)} ${Game.stageIcon(S)}`; if (lv !== lastLevel) { lastLevel = lv; el.level.textContent = lv; }
+    const pw = (Game.progress(S) * 100).toFixed(1) + '%'; if (pw !== lastProg) { lastProg = pw; el.progress.style.width = pw; }
     let html = '';
     for (const k in S.powers) if (S.powers[k] > 0) { const P = POWERS[k];
       html += k === 'shield' ? `<div class="power shield"><img src="${Assets.url('shield')}">🛡</div>`
@@ -61,7 +61,7 @@ const HUD = (() => {
   }
   function reset(S) {
     comboKey = ''; el.combo.classList.remove('on', 'max', 'pulse'); combo(S);
-    hearts(S); el.hint.style.opacity = (S && S.levelIdx > 0) || !Store.ftueDone() ? 0 : 1; lastPower = null; goalState = ''; zones = null;
+    hearts(S); el.hint.style.opacity = (S && S.levelIdx > 0) || !Store.ftueDone() ? 0 : 1; lastPower = null; lastScore = -1; lastCoins = -1; lastProg = ''; lastLevel = ''; goalState = ''; zones = null;
     el.chip.classList.remove('done', 'failed', 'hide'); el.chip.style.display = S.goal ? '' : 'none';
     if (S.goal) { el.goalText.textContent = Goals.short(S.level); el.chip.title = Goals.label(S.level); el.chip.querySelector('img').src = Assets.url('star_grey'); el.goalBar.style.width = '0%'; }
     update(S);

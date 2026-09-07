@@ -2,6 +2,25 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.16.1] — 2026-09-08 — Lag fix (adaptive quality) · "Continue" carry-over bug
+### Fixed
+- **Levels after a "▶ LEVEL n" continue were finishing instantly.** The carried run score counted toward the next
+  level's target, so by level 3–5 you'd arrive already past it (L5 cleared in 1 s at act 5.1, no acts, no play).
+  Level progress is now `score − carried-in score` (`S.base`); the run total is still what the HUD, best and
+  leaderboard show. Verified: L1→L5 in one continue chain now take 23 / 39 / 34 / 42 / 47 s with all 3 acts.
+- **Lag.** Profiling (390×844 @2×, 2-core sandbox) showed ~55 ms frames: the puppy's i-frame `shadowBlur` glow,
+  water ripples, god rays, the soft-light grade and the vignette gradient dominate, and the HUD rewrote the DOM 120×/s.
+  - New `src/core/perf.js` — **adaptive quality tiers**. Frame time is measured every second; 2 s under ~45 fps steps
+    down a tier, 15 s of comfortable 60 fps steps back up. Tier 2 = everything · tier 1 = DPR ≤ 1.5, half-res water,
+    no soft-light · tier 0 = DPR 1, no water/rays/soft-light. Devices with ≤ 2 cores or ≤ 2 GB start at tier 1.
+    QA override `?q=0|1|2`. Level-end analytics carry `q`.
+  - HUD updates once per rendered frame (not per 120 Hz physics step) and only writes DOM nodes whose value changed.
+  - Vignette gradient is cached instead of rebuilt every frame.
+  - Measured on the sandbox: 57 ms (tier 2) → 32 ms (tier 1) → 17 ms (tier 0) per frame; auto mode settles at tier 0 in
+    ~4 s and stays at 60 fps. The picture at tier 0 is visually the same game (see docs/screenshots/perf_lite.png).
+### Verified
+- `tools/check.py` PASS · `tools/sim_play.py` 25/25 · zero console errors.
+
 ## [0.16.0] — 2026-09-07 — 4 locations × 4 levels · acts labelled 1.1 / 1.2 / 1.3 · live weather drift · length curve
 ### Added
 - **Beach** location (L13–16, `assets/images/bg/beach_far/beach_mid.webp`: sea + lighthouse, umbrella, sandcastle,

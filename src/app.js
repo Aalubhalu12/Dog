@@ -56,6 +56,7 @@
     const scene = SCENES[current].obj;
     let steps = 0; while (acc >= STEP && steps < 12) { scene.frame(now, STEP, /*simOnly*/ true); acc -= STEP; steps++; }
     scene.frame(now, 0, /*simOnly*/ false, dtReal);         // render once (background/ambient use real frame dt)
+    Perf.frame(performance.now() - now);                    // adaptive quality: how long did this frame take us?
     requestAnimationFrame(frame);
   }
 

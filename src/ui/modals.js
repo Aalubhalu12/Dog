@@ -18,7 +18,7 @@ const Modals = (() => {
     $('#oScore').textContent = S.score.toLocaleString(); $('#oBones').textContent = S.bones; $('#oCoins').textContent = S.coins;
     $('#overBadge').innerHTML = S.isNewBest ? '<span class="newbest">🏆 NEW BEST!</span>' : '';
     $('#overPose').src = Assets.url(S.lastHit === 'bonk' ? 'puppy_bonk' : 'puppy_dizzy');
-    $('#oExtra').innerHTML = extras(S) + `<span>🎯 ${Math.min(100, Math.round(S.score / S.level.target * 100))}% of ${S.level.target.toLocaleString()}</span>`;
+    $('#oExtra').innerHTML = extras(S) + `<span>🎯 ${Math.round(Game.progress(S) * 100)}% of ${S.level.target.toLocaleString()}</span>`;
     open('#modalOver');
   }
   const extras = S => {

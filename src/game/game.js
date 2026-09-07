@@ -13,7 +13,8 @@ const Game = (() => {
     const L = getLevel(levelIdx);
     return {
       level: L, levelIdx, time: 0,
-      score: carry ? carry.score : 0, coins: carry ? carry.coins : 0, bones: carry ? carry.bones : 0,
+      score: carry ? carry.score : 0, base: carry ? carry.score : 0,   // score = run total (best/leaderboard); base = what was carried in → level progress = score - base
+      coins: carry ? carry.coins : 0, bones: carry ? carry.bones : 0,
       lives: carry ? carry.lives : L.hearts, mult: 1, powers: { magnet: 0, star: 0, shield: 0 },
       combo: { n: 0, mult: 1, best: 0, bestMult: 1 }, nearMisses: 0, shieldSaves: 0, nearCd: 0,
       spawner: new Spawner(L), cleared: false, over: false, lastHit: null,
@@ -72,10 +73,10 @@ const Game = (() => {
     Mechanics.update(dt, S);
     S.spawner.update(dt, S.time, puppy, S.powers, onCatch, onMiss, onNear, onDodge);
     FX.update(dt);
-    hooks.onHUD && hooks.onHUD(S);
-    if (!S.cleared && S.score >= S.level.target) { S.cleared = true; onLevelClear(); }
+    const ls = S.score - S.base;                                   // this level's own score — carried score never shortens a level
+    if (!S.cleared && ls >= S.level.target) { S.cleared = true; onLevelClear(); }
     else if (!S.cleared) {
-      const n = S.level.stages.length, u = S.score / S.level.target * n, want = Math.min(n - 1, Math.floor(u)); if (want > S.stage) advanceStage(want);
+      const n = S.level.stages.length, u = ls / S.level.target * n, want = Math.min(n - 1, Math.floor(u)); if (want > S.stage) advanceStage(want);
       // live weather: during act i the light drifts from act i's grade toward act i+1's (starts drifting after 35 % of the act)
       const st = S.level.stages, i = S.stage, k = Math.max(0, (u - i - .35) / .65);
       BG.setTimeBlend(st[i].time, st[Math.min(n - 1, i + 1)].time, i < n - 1 ? k : 0);
@@ -154,7 +155,7 @@ const Game = (() => {
   function endRun(result) {
     if (!S || S.ended) return; S.ended = true;
     const duration = Math.round((performance.now() - S.startedAt) / 1000);
-    Analytics.track('level_end', { id: S.level.id, result, score: S.score, stars: S.stars || Goals.stars(S), starsN: (S.stars || []).filter(Boolean).length, coins: S.coins, bones: S.bones, duration, heartsLost: S.heartsLost || 0, comboBest: S.combo.best, comboMult: S.combo.bestMult, nearMisses: S.nearMisses, shieldSaves: S.shieldSaves });
+    Analytics.track('level_end', { id: S.level.id, result, score: S.score, stars: S.stars || Goals.stars(S), starsN: (S.stars || []).filter(Boolean).length, coins: S.coins, bones: S.bones, duration, heartsLost: S.heartsLost || 0, comboBest: S.combo.best, comboMult: S.combo.bestMult, nearMisses: S.nearMisses, shieldSaves: S.shieldSaves, q: Perf.tier });
     Store.bumpStat(result === 'win' ? 'wins' : result === 'lose' ? 'losses' : 'quits'); Store.bumpStat('bones', S.bones); Store.bumpStat('playSec', duration);
   }
 
@@ -167,5 +168,7 @@ const Game = (() => {
     resume() { paused = false; if (cdResume) { const r = cdResume; cdResume = null; r(); } },
     stop() { if (S && !S.ended && !S.over) { Analytics.track('quit', { id: S.level.id, at: Math.round(S.time), score: S.score }); endRun('quit'); } running = false; paused = false; S = null; clearTimeout(cdTimer); cdTimer = null; cdResume = null; FX.clear(); hooks.onCountdown && hooks.onCountdown(null); },
     get active() { return running; }, get inProgress() { return !!S && !S.over; }, get paused() { return paused; }, get state() { return S; }, get puppy() { return puppy; }, stageIcon, stageLabel,
+    /** 0..1 progress of the current level (per-level score / target). */
+    progress(S) { return S.cleared ? 1 : Math.min(1, (S.score - S.base) / S.level.target); },
   };
 })();

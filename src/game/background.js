@@ -13,7 +13,8 @@
 const BG = (() => {
   const canvas = document.getElementById('bg');
   const ctx = canvas.getContext('2d');
-  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const DPR_CAP = [1, 1.5, 2];                                      // per quality tier (Perf)
+  let DPR = Math.min(window.devicePixelRatio || 1, DPR_CAP[Perf.tier]);
 
   const THEMES = {
     meadow: {
@@ -76,6 +77,7 @@ const BG = (() => {
   const clouds = [], leaves = [];
 
   function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, DPR_CAP[Perf.tier]);
     const r = canvas.getBoundingClientRect();
     W = Math.round(r.width); H = Math.round(r.height);
     canvas.width = W * DPR; canvas.height = H * DPR;
@@ -131,6 +133,7 @@ const BG = (() => {
   const WATER = { ALPHA: .55, SPEED: .05, GLINTS: 16 };
   const wc = document.createElement('canvas'), wctx = wc.getContext('2d');
   let glints = null;
+  const vig = { k: '', g: null };                                   // cached vignette gradient
   function drawWater(L, dx, dy, t) {
     const mask = img(L.water); if (!mask || BG._noWater) return;
     const im = img(L.key), over = (L.width || 1) * (1.04 + .12 * L.depth), w = W * over, h = w * im.height / im.width;
@@ -142,7 +145,7 @@ const BG = (() => {
       mask._bb = { x: minx / c.width, y: miny / c.height, w: (maxx - minx) / c.width, h: (maxy - miny) / c.height }; }
     const bb = mask._bb, bx = x0 + bb.x * w, by = y0 + bb.y * h, bw = bb.w * w, bh = bb.h * h;
     if (bw < 4 || bh < 4) return;
-    const S = Math.min(2, DPR), cw = Math.ceil(bw * S), chh = Math.ceil(bh * S);
+    const S = Math.min(Perf.tier >= 2 ? 2 : 1, DPR), cw = Math.ceil(bw * S), chh = Math.ceil(bh * S);
     if (wc.width !== cw || wc.height !== chh) { wc.width = cw; wc.height = chh; }
     if (!glints) glints = Array.from({ length: WATER.GLINTS }, () => ({ x: Math.random(), y: Math.random(), ph: Math.random() * 6.28, sp: .6 + Math.random() * .8, s: .6 + Math.random() * .8 }));
     const g = wctx; g.setTransform(S, 0, 0, S, 0, 0); g.clearRect(0, 0, bw, bh);
@@ -228,18 +231,19 @@ const BG = (() => {
     let birdsDrawn = false;
     for (const L of theme.layers) if (!L.front && !L.mid) {
       drawCover(img(L.key), -px * AMP * L.depth, -py * AMP * L.depth * .5, L.depth, L.bottom, L.width);
-      if (L.water) drawWater(L, -px * AMP * L.depth, -py * AMP * L.depth * .5, t);
+      if (L.water && Perf.tier > 0) drawWater(L, -px * AMP * L.depth, -py * AMP * L.depth * .5, t);
       if (ambient && !birdsDrawn && L.key === (theme.birdsAfter || 'mountains')) { Ambient.drawSky(ctx, t, px * AMP); birdsDrawn = true; }
     }
     if (ambient && !birdsDrawn) Ambient.drawSky(ctx, t, px * AMP);
 
+    if (Perf.tier > 0) {                                                       // god rays — the priciest blend on the screen, lite tier skips them
     ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = (.10 + Math.sin(t * .8) * .03) * TC.sunA * (TC.moon ? .4 : 1);
     for (let i = 0; i < 4; i++) {
       ctx.save(); ctx.translate(sx, sy); ctx.rotate(-.55 - i * .14 + Math.sin(t * .2 + i) * .03);
       const rg = ctx.createLinearGradient(0, 0, 0, H * 1.2); rg.addColorStop(0, '#fff'); rg.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = rg; ctx.beginPath(); ctx.moveTo(-8, 0); ctx.lineTo(8, 0); ctx.lineTo(W * .16, H * 1.2); ctx.lineTo(-W * .16, H * 1.2); ctx.closePath(); ctx.fill(); ctx.restore();
     }
-    ctx.restore();
+    ctx.restore(); }
 
     for (const L of theme.layers) if (L.mid) drawCover(img(L.key), -px * AMP * L.depth, -py * AMP * L.depth * .5, L.depth, L.bottom, L.width);
     if (ambient) Ambient.drawRoad(ctx, t, px * AMP);
@@ -263,7 +267,7 @@ const BG = (() => {
     }
     // --- time-of-day grade: multiply tint (shadows go blue at night / grey in rain) + soft warm glow (evening) ---
     if (TC.tint[3] > .01) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(${TC.tint[0] | 0},${TC.tint[1] | 0},${TC.tint[2] | 0},${TC.tint[3].toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
-    if (TC.glow[3] > .01) { ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.fillStyle = `rgba(${TC.glow[0] | 0},${TC.glow[1] | 0},${TC.glow[2] | 0},${TC.glow[3].toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+    if (TC.glow[3] > .01 && Perf.tier >= 2) { ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.fillStyle = `rgba(${TC.glow[0] | 0},${TC.glow[1] | 0},${TC.glow[2] | 0},${TC.glow[3].toFixed(3)})`; ctx.fillRect(0, 0, W, H); ctx.restore(); }
     if (TC.moonA > .02) {                                                     // a little lantern light around the puppy so he stays readable at night
       const lx = hooks.lightX != null ? hooks.lightX : W / 2, ly = H * CONFIG.PUPPY.GROUND_Y - H * .06;
       const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, W * .38); lg.addColorStop(0, `rgba(255,225,160,${(.22 * TC.moonA).toFixed(3)})`); lg.addColorStop(1, 'rgba(255,225,160,0)');
@@ -275,12 +279,13 @@ const BG = (() => {
       for (const d of rain) { d.y += d.v * dt; d.x += slant * dt * (d.v / H); if (d.y > H + 20) { d.y = -20 - Math.random() * 40; d.x = Math.random() * (W + 80) - 40; } ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - slant * .03, d.y - d.l); }
       ctx.stroke(); ctx.restore();
     }
-    const v = ctx.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * .85);
-    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(10,30,60,${(.35 + TC.tint[3] * .25).toFixed(3)})`); ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+    const va = (.35 + TC.tint[3] * .25).toFixed(2), vk = `${W}x${H}:${va}`;
+    if (vig.k !== vk) { const v = ctx.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * .85); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(10,30,60,${va})`); vig.k = vk; vig.g = v; }
+    ctx.fillStyle = vig.g; ctx.fillRect(0, 0, W, H);
   }
 
   return {
-    init() { resize(); initClouds(); window.addEventListener('resize', resize); enableTilt(); document.addEventListener('pointerdown', enableTilt, { once: true }); },
+    init() { resize(); initClouds(); window.addEventListener('resize', resize); Events.on('perf:tier', resize); enableTilt(); document.addEventListener('pointerdown', enableTilt, { once: true }); },
     draw, ctx,
     get W() { return W; }, get H() { return H; },
     setAmp(v) { amp = v; }, setTilt(v) { tiltEnabled = v; },
