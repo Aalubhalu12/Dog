@@ -33,6 +33,7 @@ const BG = (() => {
       layers: [
         { key: 'park_far',  depth: 0.15, bottom: 0.56 },
         { key: 'park_mid',  depth: 0.30, bottom: 0.79, width: 1.05 },
+        { key: 'meadow',    depth: 0.42, bottom: 0.95, width: 1.30, mid: true },   // grass ground under the road (no sky gap behind the fence)
         { key: 'foreground',depth: 0.55, bottom: 1.01, front: true, width: 1.55 },
       ],
       frameWidth: 1.55, frameY: -0.02,
@@ -42,6 +43,7 @@ const BG = (() => {
       layers: [
         { key: 'beach_far',  depth: 0.15, bottom: 0.50, width: 1.10 },
         { key: 'beach_mid',  depth: 0.30, bottom: 0.80, width: 1.02 },
+        { key: 'meadow',    depth: 0.42, bottom: 0.95, width: 1.30, mid: true },   // grass ground under the road (no sky gap behind the fence)
         { key: 'foreground', depth: 0.55, bottom: 1.01, front: true, width: 1.55 },
       ],
       frameWidth: 1.55, frameY: -0.02,
@@ -51,6 +53,7 @@ const BG = (() => {
       layers: [
         { key: 'forest_far', depth: 0.15, bottom: 0.66, width: 1.08 },
         { key: 'forest_mid', depth: 0.30, bottom: 0.80, width: 1.02 },
+        { key: 'meadow',    depth: 0.42, bottom: 0.95, width: 1.30, mid: true },   // grass ground under the road (no sky gap behind the fence)
         { key: 'foreground', depth: 0.55, bottom: 1.01, front: true, width: 1.55 },
       ],
       frameWidth: 1.55, frameY: -0.02,

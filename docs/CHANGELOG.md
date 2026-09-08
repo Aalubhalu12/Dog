@@ -2,6 +2,45 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.17.0] — 2026-09-09 — Relative-drag controls · rigged puppy · wider lane
+### Changed — controls (the thumb never hides the dog)
+- **Relative drag** is the default: put a finger ANYWHERE and slide — the puppy moves the same distance × 1.3
+  (Settings → Sensitivity 0.8–2.0×). A new drag always starts from where the puppy is, so there is no jump, and
+  the dog is never under your thumb. Critically-damped spring (`DRAG_SPRING 140`): weight, no overshoot.
+- **Hold ◀ ▶** alternate scheme in Settings (left half = left, right half = right; sliding across switches).
+- Arrow buttons removed (assets too). Keyboard unchanged. FTUE / How-to copy updated.
+### Changed — space to run
+- Puppy height 13.5 % → **10.5 %** of the stage (≈15 % of a phone's width), ground line 0.845 → **0.85** (paws on the
+  grass in front of the fence), movement bounds **edge to edge** (clamped by half the body, not a fixed 6 % margin).
+  Lane on a 390 px phone: ~270 px → ~330 px of travel with a smaller dog.
+- Park / Forest / Beach get the meadow grass layer under the road, so there is no sky gap behind the fence
+  at the new eye line.
+### Changed — the puppy is now a rig (`src/game/rig.js`)
+- 7 painted parts (torso, head, ear ×2, tail, mouth, front/hind legs ×2 — `assets/images/puppy/rig/`) on a small
+  skeleton, animated procedurally every frame. No sprite sheets, no clip frames, no crossfades.
+- **Gait:** stance/swing split with the paw sweeping back linearly during stance → paws lock to the ground at every
+  speed (no skating); cadence and stride length scale with speed; trot below 55 %, gallop above; knee/hock fold as
+  a shear; body bounce per stride; lean into acceleration / sit back when braking.
+- **Alive layer:** head looks at the nearest good item falling toward him (or the hazard about to land); ears and
+  tail are under-damped springs kicked by acceleration and bounce (they whip on turns and flop when he stops);
+  tail wags (faster when happy); blinks; pants when running hard or happy; breathing when idle; after a few seconds
+  standing still he sniffs, shakes his ears or scratches.
+- **Expressions:** yay (ears up, mouth open, hop with tucked front paws), bonk (ears/tail down, eyes squeezed,
+  head flinch), dizzy (half-lidded, head wobble, stars), celebrate (sit-up bounce ×2). Landing squash; turn pivot.
+- `Puppy` keeps the same public surface (box, x, vx, inv, stun, setPose, celebrate, surprised …) so Game,
+  Mechanics, FTUE and the bots are untouched. `tools/rig/preview.html` = live tuning page; `tools/rig/key_parts.py`
+  cuts parts from `art/reference/rig_parts_src.png`.
+- Removed: puppy sprite sheets (1.7 MB), `art/clips`, `tools/build_puppy_sheets.py`, `clip_utils.py`,
+  `grade_puppy.py`, `light_puppy.py`, `docs/ANIMATION_BRIEF.md`.
+### Balance
+- L2 coin goal 12 → 10 (smaller dog catches fewer coins in a 66 s level).
+### Verified (390×844 @2×, fresh save)
+- All 16 levels cleared by the good bot with the 3rd star reached (1 good + 1 perfect run each) after the geometry
+  change · `tools/check.py` PASS · `tools/sim_play.py` 25/25 · both control schemes exercised by script (slide left
+  → x 0.08; hold right half → 0.92, left half → 0.08; setting persists) · zero console errors.
+- Frame time (sandbox 2-core): tier 2 57 → **35 ms**, tier 1 32 → **21 ms**, tier 0 17 ms — the rig is cheaper than the
+  sheets (small parts, no 10 k-px-wide textures).
+
 ## [0.16.1] — 2026-09-08 — Lag fix (adaptive quality) · "Continue" carry-over bug
 ### Fixed
 - **Levels after a "▶ LEVEL n" continue were finishing instantly.** The carried run score counted toward the next

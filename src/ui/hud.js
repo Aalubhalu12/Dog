@@ -4,10 +4,9 @@
 const HUD = (() => {
   const el = { score: $('#hScore'), best: $('#hBest'), coins: $('#hCoins'), hearts: $('#hearts'), level: $('#hLevel'),
                power: $('#powerbar'), progress: $('#levelProgress'), hint: $('#hint'), cd: $('#countdown'), cdNum: $('#countNum'),
-               chip: $('#goalChip'), goalText: $('#goalText'), goalBar: $('#goalBar'), ctlL: $('#ctlL'), ctlR: $('#ctlR'), stage: $('#stage'),
+               chip: $('#goalChip'), goalText: $('#goalText'), goalBar: $('#goalBar'), stage: $('#stage'),
                combo: $('#combo'), comboPaws: $('#comboPaws'), comboMult: $('#comboMult') };
   let comboKey = '';
-  let zones = null, zoneW = 0;
   let goalState = '';
   let lastPower = '', lastScore = -1, lastCoins = -1, lastProg = '', lastLevel = '';
 
@@ -30,13 +29,6 @@ const HUD = (() => {
                              : `<div class="power"><i style="width:${S.powers[k] / ITEMS[P.icon].dur * 100}%"></i><img src="${Assets.url(P.icon)}">${P.label}${S.powers[k].toFixed(0)}s</div>`; }
     if (html !== lastPower) { el.power.innerHTML = html; lastPower = html; }
     if (Input.any || (S && S.time > 4)) el.hint.style.opacity = 0;   // hide on first input or after 4 s
-    // arrow buttons go translucent while the puppy runs underneath them (canvas is below the DOM)
-    if (!zones || zoneW !== el.stage.clientWidth) { zoneW = el.stage.clientWidth; const sr = el.stage.getBoundingClientRect();
-      zones = [el.ctlL, el.ctlR].map(b => { const r = b.getBoundingClientRect(); return [(r.left - sr.left) / sr.width, (r.right - sr.left) / sr.width]; }); zones.top = el.ctlL.getBoundingClientRect().top - sr.top; }
-    const bx = Game.puppy.box, x0 = (bx.cx - bx.pw * .5) / BG.W, x1 = (bx.cx + bx.pw * .5) / BG.W;
-    const under = Game.puppy.groundY > zones.top;   // only when the layout actually puts the puppy under the buttons (v0.12.2: it doesn't)
-    el.ctlL.classList.toggle('ghost', under && x0 < zones[0][1] && x1 > zones[0][0]);
-    el.ctlR.classList.toggle('ghost', under && x0 < zones[1][1] && x1 > zones[1][0]);
     // goal chip: live progress, then done/failed state; fades out 3 s after resolving
     if (S.goal) {
       const done = !S.goal.def.survive && S.goal.def.done(S, S.goal.st, S.goal.cfg), failed = !done && Goals.failed(S);
@@ -61,7 +53,7 @@ const HUD = (() => {
   }
   function reset(S) {
     comboKey = ''; el.combo.classList.remove('on', 'max', 'pulse'); combo(S);
-    hearts(S); el.hint.style.opacity = (S && S.levelIdx > 0) || !Store.ftueDone() ? 0 : 1; lastPower = null; lastScore = -1; lastCoins = -1; lastProg = ''; lastLevel = ''; goalState = ''; zones = null;
+    hearts(S); el.hint.style.opacity = (S && S.levelIdx > 0) || !Store.ftueDone() ? 0 : 1; lastPower = null; lastScore = -1; lastCoins = -1; lastProg = ''; lastLevel = ''; goalState = '';
     el.chip.classList.remove('done', 'failed', 'hide'); el.chip.style.display = S.goal ? '' : 'none';
     if (S.goal) { el.goalText.textContent = Goals.short(S.level); el.chip.title = Goals.label(S.level); el.chip.querySelector('img').src = Assets.url('star_grey'); el.goalBar.style.width = '0%'; }
     update(S);

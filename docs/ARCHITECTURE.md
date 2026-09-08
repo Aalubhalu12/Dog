@@ -142,5 +142,5 @@ S.spawner.items.push({ type:'rock', def, x: Game.puppy.x*W, y: H*.5, size: W*def
 - `src/services/leaderboard.js` — local-first leaderboard, cached server view, daily-window sync (see docs/LEADERBOARD.md)
 - `firebase/` — Cloud Function + Firestore indexes/rules for the leaderboard
 
-## Adaptive quality (`src/core/perf.js`)
+## Adaptive quality (`src/game/rig.js` — procedural puppy (parts + skeleton; `Puppy` drives it, see file header) · `src/core/perf.js`)
 The main loop reports each rendered frame's wall time to `Perf.frame(ms)`. A median > 22 ms (or p90 > 34 ms) for ~2 s steps the tier down; ~15 s of < 12 ms steps it up. `BG` reads `Perf.tier` for the canvas DPR cap (1 / 1.5 / 2), water ripples (off / half-res / full), god rays (off below tier 1) and the soft-light grade (tier 2 only). Simulation is never affected. Devices with ≤ 2 cores or ≤ 2 GB start at tier 1; `?q=0|1|2` locks a tier for QA; `level_end` analytics carry `q`.

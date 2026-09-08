@@ -71,6 +71,8 @@ const Game = (() => {
     for (const k in S.powers) if (S.powers[k] > 0 && k !== 'shield') { S.powers[k] -= dt; if (S.powers[k] <= 0) { S.powers[k] = 0; if (k === 'star') S.mult = 1; } }
     if (S.nearCd > 0) S.nearCd -= dt;
     Mechanics.update(dt, S);
+    // eyes: watch the nearest good thing that is still above him (or the hazard about to land on him)
+    { let best = null, bd = 1e9; const b = puppy.box; for (const it of S.spawner.items) { if (it.dead || it.y > b.cy) continue; const w = it.def.kind === 'hazard' ? 1.6 : 1, d = (Math.abs(it.x - b.cx) + (b.cy - it.y) * .6) * w; if (d < bd) { bd = d; best = it; } } puppy.lookAt(best ? best.x : null, best ? best.y : null); }
     S.spawner.update(dt, S.time, puppy, S.powers, onCatch, onMiss, onNear, onDodge);
     FX.update(dt);
     const ls = S.score - S.base;                                   // this level's own score — carried score never shortens a level

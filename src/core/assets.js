@@ -18,15 +18,15 @@ const Assets = (() => {
     // puppy: result-card stills + animation sheets (see src/game/puppy.js)
     puppy_yay: 'puppy/puppy_yay.webp',
     puppy_bonk: 'puppy/puppy_bonk.webp', puppy_dizzy: 'puppy/puppy_dizzy.webp',
-    idle_sheet: 'puppy/idle_sheet.webp', run_sheet: 'puppy/run_sheet.webp',
-    yay_sheet: 'puppy/yay_sheet.webp', bonk_sheet: 'puppy/bonk_sheet.webp', dizzy_sheet: 'puppy/dizzy_sheet.webp',
+    // puppy rig parts (src/game/rig.js) — side view facing right
+    rig_torso: 'puppy/rig/torso.webp', rig_head: 'puppy/rig/head.webp', rig_ear: 'puppy/rig/ear.webp', rig_tail: 'puppy/rig/tail.webp',
+    rig_mouth: 'puppy/rig/mouth.webp', rig_leg_front: 'puppy/rig/leg_front.webp', rig_leg_hind: 'puppy/rig/leg_hind.webp',
     // items (keys must match src/data/items.js)
     bone: 'items/bone.webp', coin: 'items/coin.webp', magnet: 'items/magnet.webp',
     star: 'items/star.webp', rock: 'items/rock.webp', bomb: 'items/bomb.webp',
     goldbone: 'items/goldbone.webp', shield: 'items/shield.webp',
     // ui
     heart: 'ui/heart.webp', heart_empty: 'ui/heart_empty.webp', trophy: 'ui/trophy.webp', star_gold: 'ui/star_gold.webp', star_grey: 'ui/star_grey.webp', lock: 'ui/lock.webp',
-    btn_left: 'ui/btn_left.webp', btn_right: 'ui/btn_right.webp',
     // ambient life (decorative)
     car0: 'ambient/car0.webp', car1: 'ambient/car1.webp', car2: 'ambient/car2.webp',
     walker0: 'ambient/walker0_sheet.webp', walker1: 'ambient/walker1_sheet.webp', bird_sheet: 'ambient/bird_sheet.webp',

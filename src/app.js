@@ -30,6 +30,14 @@
         if (key === 'tilt') BG.setTilt(on); if (key === 'sound') syncSound(on); };
     });
     syncSound(Store.setting('sound')); BG.setTilt(Store.setting('tilt'));
+    // controls: scheme segmented buttons + drag sensitivity slider
+    const seg = document.querySelectorAll('#ctrlMode button'), slider = $('#sensRange'), sensRow = $('#sensRow');
+    const syncCtrl = () => { const m = Input.mode; seg.forEach(b => b.classList.toggle('on', b.dataset.mode === m)); sensRow.style.display = m === 'drag' ? '' : 'none'; };
+    seg.forEach(b => b.onclick = () => { SFX.click(); Input.setMode(b.dataset.mode); Store.setSetting('control', Input.mode); syncCtrl(); });
+    slider.value = Input.sensitivity; $('#sensVal').textContent = Input.sensitivity.toFixed(1) + '×';
+    slider.oninput = () => { Input.setSensitivity(slider.value); $('#sensVal').textContent = Input.sensitivity.toFixed(1) + '×'; };
+    slider.onchange = () => { Store.setSetting('sens', Input.sensitivity); SFX.click(); };
+    syncCtrl();
     // data actions
     $('#btnExportLog').onclick = () => {
       SFX.click(); const data = Analytics.export();
@@ -74,7 +82,8 @@
   loadAll.catch(err => { console.error(err); const l = $('#loader'); l.innerHTML = `<div style="color:#fff;font-weight:800;padding:24px;text-align:center">😿 Could not load the game.<br><small>${String(err.message || err)}</small><br><br><button onclick="location.reload()" style="font:inherit;padding:8px 20px;border-radius:12px;border:0">Retry</button></div>`; });
   loadAll.then(() => {
     BG.init();
-    Input.bind({ leftBtn: $('#ctlL'), rightBtn: $('#ctlR'), dragSurface: $('#bg'), canvas: $('#bg') });
+    Input.bind({ dragSurface: $('#bg'), canvas: $('#bg') }); Input.setPuppyX(() => Game.puppy.x);
+    Input.setMode(Store.setting('control', 'drag')); Input.setSensitivity(Store.setting('sens', CONFIG.PUPPY.DRAG_SENS));
     HomeScene.bind(app); PlayScene.bind(app); bindSettings();
     Leaderboard.init();                                              // local-first; syncs only inside daily windows
     $('#appVersion').textContent = 'v' + CONFIG.VERSION;

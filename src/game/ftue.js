@@ -16,7 +16,7 @@
 const FTUE = (() => {
   const el = { box: $('#ftue'), text: $('#ftueText') };
   const STEPS = {
-    move:  { text: 'Drag or hold ◀ ▶ to run!', hand: true,  done: () => Math.abs(Game.puppy.x - .5) > .12 || Input.any, timeout: 8 },
+    move:  { text: 'Slide your thumb to run! 👉', hand: true,  done: () => Math.abs(Game.puppy.x - .5) > .12 || Input.any, timeout: 8 },
     catch: { text: 'Catch the bones! 🦴',       hand: false, done: S => S.bones > 0, timeout: 10 },
     dodge: { text: 'Dodge the rocks! 🪨',       hand: false, done: S => hazardsPassed(S) > 0 || (S.heartsLost || 0) > 0, timeout: 7 },
     combo: { text: 'Keep catching for a COMBO 🐾', hand: false, done: S => S.combo.mult >= 2 || S.combo.n === 0 && sinceStep > 2, timeout: 6 },

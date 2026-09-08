@@ -1,5 +1,5 @@
 # BONK! — Status & Next Steps
-_Updated 2026-09-07 · current build **v0.16.1** (Phases 1–2 done, Phase 3 content shipped: 4 locations × 4 levels × 3 acts — music + playtest balance open) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
+_Updated 2026-09-07 · current build **v0.17.0** (Phases 1–2 done, Phase 3 content shipped: 4 locations × 4 levels × 3 acts — music + playtest balance open) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
 
 ---
 
@@ -18,14 +18,14 @@ _Updated 2026-09-07 · current build **v0.16.1** (Phases 1–2 done, Phase 3 con
 - Run 16 f · Idle 24 f · Yay 24 f · Bonk 24 f · Dizzy 24 f — all from the video, one generic sheet player
 - Colour-graded to match logo/meadow, medium size (11–13.5 % of screen height), faster (edge-to-edge ≈ 1 s)
 - Turn-flicker fixed, edge clamp follows body, drag-to-move on the field
-- Reusable pipeline: `tools/build_puppy_sheets.py`, `tools/grade_puppy.py`, brief in `ANIMATION_BRIEF.md`
+- (v0.17) replaced by a procedural rig — see the v0.17.0 changelog entry
 
 ### Progression & UI
 - **3-star objectives** per level (target · no heart lost · level goal), sticky, saved per level; live goal chip in HUD; stars + chimes on the win card
 - **Level select board** (mockup-faithful): 5 × 2 wooden tiles, pages, thumbnails, details card, big Play
 - Menu: PLAY continues from furthest level, LEVELS button with total stars
 - "Premium casual" look: wood-framed cards, glossy buttons, icon rows on pause / game over / win
-- Cache-busting (`?v=`), README / CHANGELOG / ADDING_CONTENT / ANIMATION_BRIEF kept current
+- Cache-busting (`?v=`), README / CHANGELOG / ADDING_CONTENT kept current
 
 ### Phase 1 — Foundation (v0.9.0) ✅
 - Save v2 (versioned doc + migration + backup/corrupt recovery), Wallet, Levels as JSON with validator, Analytics buffer + export, Flags, Events, Reset progress, extended `tools/check.py`

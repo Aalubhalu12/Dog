@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.16.1 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.17.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -65,6 +65,7 @@ bonk/
 │   │   └── levels.js          #   loads + validates data/levels/*.json into LEVELS
 │   ├── game/                  # simulation + canvas rendering (never touches the DOM except FX)
 │   │   ├── game.js            #   Game controller: score, lives, powers, combo, near-miss, shield, flow
+│   │   ├── rig.js             #   Rig: procedural cut-out puppy (skeleton, gait, look-at, ears/tail springs, blink, fidgets)
 │   │   ├── puppy.js           #   Puppy: physics, 24 fps sheet animation, turn pivot, draw
 │   │   ├── mechanics.js       #   per-level mechanics from `modifiers`: wind · squirrel · hazard waves
 │   │   ├── spawner.js         #   Spawner: spawning, fall profiles, wind drift, magnet, collisions
@@ -99,10 +100,7 @@ bonk/
     ├── bump.py                # bump VERSION everywhere it must match
     ├── serve.sh               # local dev server
     ├── optimize_assets.py     # PNG/JPG → WebP for new art
-    ├── build_puppy_sheets.py  # cut sprite sheets from art/clips/*.mp4 (opencv, numpy, Pillow)
-    ├── clip_utils.py          #   helpers for the above
-    ├── grade_puppy.py         #   colour grade (imported by light_puppy.py)
-    └── light_puppy.py         #   ONE-SHOT grade + pseudo-3D relight for freshly built sheets
+    └── rig/                   # puppy rig: key_parts.py (parts sheet → webp parts) · preview.html (tune the skeleton live)
 ```
 
 ★ = **data files**. Most future content (new levels, items, power-ups) only touches these.

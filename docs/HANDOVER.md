@@ -17,7 +17,7 @@ No build step, no npm, no framework. Plain HTML5 Canvas + JS + CSS. Everything u
 | `docs/ADDING_CONTENT.md` | copy-paste recipes for levels / goals / items / power-ups / scenes |
 | `docs/PHASES.md` → `docs/LAUNCH_PLAN.md` | the work plan (7 phases) and launch scope (shop, ads, Firebase, Android) |
 | `docs/PHASE2_PLAN.md` | LOCKED design principles — do not violate (no selling power, timers are stars not game-over, no energy wall) |
-| `docs/ANIMATION_BRIEF.md` + `art/README.md` | how the puppy animation is produced from AI clips |
+| `art/README.md` + `src/game/rig.js` header | how the puppy rig is built and animated (parts sheet → `tools/rig/key_parts.py` → procedural skeleton) |
 
 ## 2. Mental model
 - `index.html` holds all screen markup; scripts load in dependency order at the bottom (`core → game → ui → scenes → app`).
@@ -30,7 +30,7 @@ No build step, no npm, no framework. Plain HTML5 Canvas + JS + CSS. Everything u
 ## 3. Conventions
 - **Versioning:** bump `CONFIG.VERSION` → mirror in every `?v=` in `index.html` and README → CHANGELOG entry → `tools/check.py` green. `check.py` fails if they drift.
 - **Assets:** drop PNG/JPG in `assets/images/<group>/`, run `tools/optimize_assets.py` (→ WebP), add a key in `src/core/assets.js`. Sprites ≤ 500 px, backgrounds ≤ 900 px wide.
-- **Puppy art:** never hand-edit sheets. Regenerate from `art/clips` with `tools/build_puppy_sheets.py`, then (only for fresh sheets) `tools/grade_puppy.py`. Shipped sheets are already graded.
+- **Puppy art:** the puppy is a rig (`src/game/rig.js`), not sprite sheets. Repaint = new `art/reference/rig_parts_src.png` → `tools/rig/key_parts.py`; motion = code in `rig.js` (check it in `tools/rig/preview.html` before touching the game).
 - **Ambient life:** stays behind the fence, subtle, progresses per level (L1 birds → L2 walkers → L3 cars). Don't add clutter to level 1.
 - **Style:** 2-space indent, `const` modules, no dependencies without a discussion. Keep the "cute, not oversaturated" look.
 - **Persistence:** everything through `Store` (`bonk_*` keys). Phase 1 replaces it with a versioned `bonk_save` + migration — build new features on that, not on new raw keys.

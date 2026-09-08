@@ -2,9 +2,8 @@
 
 | Folder | Contents | Used by |
 |---|---|---|
-| `reference/` | Original mockups (`mockup_gameplay.png`, `home_mockup.png`), the puppy character reference (green-screen + transparent) used as the identity reference for every AI video generation, and the generated home-screen sources (`home_plate_source.png`, `home_logo_source.png`, `home_dog_source_a/b.png`) the shipped `assets/images/home/*.webp` were keyed from | design reference, `docs/ANIMATION_BRIEF.md` |
-| `clips/` | AI-generated green-screen puppy clips, 24 fps: `run_treadmill.mp4`, `hop.mp4` (idle + yay), `bonk.mp4`, `dizzy.mp4` | `tools/build_puppy_sheets.py` |
+| `reference/` | Original mockups (`mockup_gameplay.png`, `home_mockup.png`), the puppy character reference (green-screen + transparent), **`rig_parts_src.png`** (the magenta-keyed parts sheet the rig is cut from — torso, head, ear, tail, mouth, front leg, hind leg), location layer sources (`*_far_src.png`, `*_mid_src.png`) and the home-screen sources the shipped `assets/images/home/*.webp` were keyed from | design reference, `tools/rig/key_parts.py` |
 | `ui/` | Raw sheets the icons / gold bone / shield biscuit were cut from | one-off |
 
-Everything the game actually ships is under `assets/` (all WebP, ≈3.9 MB).
-`art/clips/*.mp4` is git-ignored because of size (≈7 MB) — keep them in Drive/LFS; the pipeline only needs them when re-cutting the puppy sheets.
+Everything the game actually ships is under `assets/` (all WebP).
+The puppy is a **procedural rig** since v0.17 (`src/game/rig.js`): 7 painted parts in `assets/images/puppy/rig/`, animated in code — there are no animation sheets or video clips any more. To repaint him, replace `rig_parts_src.png` (same 3-row layout) and run `python3 tools/rig/key_parts.py`; tune pivots/anchors in `rig.js` with `tools/rig/preview.html`.
