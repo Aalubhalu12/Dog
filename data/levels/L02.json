@@ -2,7 +2,7 @@
   "id": 2,
   "name": "Rocky Road",
   "theme": "meadow",
-  "target": 650,
+  "target": 1300,
   "hearts": 3,
   "spawn": [
     0.9,
@@ -44,5 +44,5 @@
     "type": "coins",
     "count": 10
   },
-  "notes": "Meadow \u00b7 designed length \u2248 66 s (9.5 pts/s)."
+  "notes": "Meadow · designed length ≈ 132 s (9.5 pts/s)."
 }

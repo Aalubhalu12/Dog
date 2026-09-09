@@ -6,14 +6,14 @@
  * Item definitions live in src/data/items.js
  */
 const CONFIG = Object.freeze({
-  VERSION: '0.17.0',
+  VERSION: '0.17.1',
   STORAGE_PREFIX: 'bonk_',
 
   /** Player (puppy) */
   PUPPY: {
     HEIGHT_FRAC: 0.105,    // puppy body height as fraction of stage height (v0.17: smaller → more room to run)
     MAX_WIDTH_FRAC: 0.20,  // cap so it never gets too wide on narrow screens (~15 % of a phone's width)
-    GROUND_Y: 0.85,       // ground line (fraction of stage height): paws on the grass just in front of the fence; the strip below is thumb space (relative drag)
+    GROUND_Y: 0.68,       // ground line (fraction of stage height): puppy stands a little below centre so the thumb never covers him; the tall grass apron below is thumb space
     MIN_X: 0.0,           // movement bounds (fraction of width) — edge to edge; Puppy clamps by half its body
     MAX_X: 1.0,
     MAX_SPEED: 1.05,      // stage widths / second (~0.85 s edge-to-edge) — snappy

@@ -20,10 +20,10 @@ const BG = (() => {
     meadow: {
       sky: 'sky', clouds: ['cloud0', 'cloud1', 'cloud2'], frame: 'trees',
       layers: [
-        { key: 'mountains', depth: 0.15, bottom: 0.60 },
-        { key: 'village',   depth: 0.30, bottom: 0.80, water: 'water_mask' },
+        { key: 'mountains', depth: 0.15, bottom: 0.50 },
+        { key: 'village',   depth: 0.30, bottom: 0.70, water: 'water_mask' },
         { key: 'meadow',    depth: 0.42, bottom: 0.95, width: 1.30, mid: true },
-        { key: 'foreground',depth: 0.55, bottom: 1.01, front: true, width: 1.55 },   // taller grass apron: fence sits behind the puppy, buttons on the grass below him
+        { key: 'foreground',depth: 0.55, bottom: 1.01, front: true, width: 1.55 },   // tall grass apron (fence + ~40% of the screen of lawn): the puppy runs on its upper part, the thumb slides on the lower part
       ],
       frameWidth: 1.55,  // tree frame pushed outward → more open play area
       frameY: -0.02,
@@ -31,9 +31,9 @@ const BG = (() => {
     park: {              // city park: skyline far, bandstand / fountain / ice-cream cart mid, same lane
       sky: 'sky', clouds: ['cloud0', 'cloud1', 'cloud2'], frame: 'trees', birdsAfter: 'park_far',
       layers: [
-        { key: 'park_far',  depth: 0.15, bottom: 0.56 },
-        { key: 'park_mid',  depth: 0.30, bottom: 0.79, width: 1.05 },
-        { key: 'meadow',    depth: 0.42, bottom: 0.95, width: 1.30, mid: true },   // grass ground under the road (no sky gap behind the fence)
+        { key: 'park_far',  depth: 0.15, bottom: 0.46 },
+        { key: 'park_mid',  depth: 0.30, bottom: 0.69, width: 1.05 },
+        { key: 'meadow',    depth: 0.42, bottom: 0.82, width: 1.30, mid: true },   // grass ground under the road (no sky gap behind the fence)
         { key: 'foreground',depth: 0.55, bottom: 1.01, front: true, width: 1.55 },
       ],
       frameWidth: 1.55, frameY: -0.02,
@@ -41,9 +41,9 @@ const BG = (() => {
     beach: {             // seaside: sea + lighthouse far, umbrella / sandcastle / lifeguard hut mid
       sky: 'sky', clouds: ['cloud0', 'cloud1', 'cloud2'], frame: 'trees', birdsAfter: 'beach_far',
       layers: [
-        { key: 'beach_far',  depth: 0.15, bottom: 0.50, width: 1.10 },
-        { key: 'beach_mid',  depth: 0.30, bottom: 0.80, width: 1.02 },
-        { key: 'meadow',    depth: 0.42, bottom: 0.95, width: 1.30, mid: true },   // grass ground under the road (no sky gap behind the fence)
+        { key: 'beach_far',  depth: 0.15, bottom: 0.41, width: 1.10 },
+        { key: 'beach_mid',  depth: 0.30, bottom: 0.70, width: 1.02 },
+        { key: 'meadow',    depth: 0.42, bottom: 0.82, width: 1.30, mid: true },   // grass ground under the road (no sky gap behind the fence)
         { key: 'foreground', depth: 0.55, bottom: 1.01, front: true, width: 1.55 },
       ],
       frameWidth: 1.55, frameY: -0.02,
@@ -51,9 +51,9 @@ const BG = (() => {
     forest: {            // deep forest clearing: tall pines far, campfire / log / stream mid
       sky: 'sky', clouds: ['cloud0', 'cloud1', 'cloud2'], frame: 'trees', birdsAfter: 'forest_far',
       layers: [
-        { key: 'forest_far', depth: 0.15, bottom: 0.66, width: 1.08 },
-        { key: 'forest_mid', depth: 0.30, bottom: 0.80, width: 1.02 },
-        { key: 'meadow',    depth: 0.42, bottom: 0.95, width: 1.30, mid: true },   // grass ground under the road (no sky gap behind the fence)
+        { key: 'forest_far', depth: 0.15, bottom: 0.56, width: 1.08 },
+        { key: 'forest_mid', depth: 0.30, bottom: 0.70, width: 1.02 },
+        { key: 'meadow',    depth: 0.42, bottom: 0.82, width: 1.30, mid: true },   // grass ground under the road (no sky gap behind the fence)
         { key: 'foreground', depth: 0.55, bottom: 1.01, front: true, width: 1.55 },
       ],
       frameWidth: 1.55, frameY: -0.02,

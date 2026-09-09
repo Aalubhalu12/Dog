@@ -2,7 +2,7 @@
   "id": 15,
   "name": "Crab Tide",
   "theme": "beach",
-  "target": 1850,
+  "target": 3700,
   "hearts": 3,
   "spawn": [
     0.72,
@@ -53,5 +53,5 @@
     "type": "dodge",
     "count": 45
   },
-  "notes": "Beach \u00b7 designed length \u2248 110 s (17 pts/s)."
+  "notes": "Beach · designed length ≈ 220 s (17 pts/s)."
 }

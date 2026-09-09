@@ -2,7 +2,7 @@
   "id": 14,
   "name": "Sea Breeze",
   "theme": "beach",
-  "target": 2400,
+  "target": 4800,
   "hearts": 3,
   "spawn": [
     0.78,
@@ -47,5 +47,5 @@
     "type": "power",
     "count": 6
   },
-  "notes": "Beach \u00b7 designed length \u2248 150 s (16 pts/s)."
+  "notes": "Beach · designed length ≈ 300 s (16 pts/s)."
 }

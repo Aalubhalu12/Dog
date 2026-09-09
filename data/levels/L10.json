@@ -2,7 +2,7 @@
   "id": 10,
   "name": "Rock Slide",
   "theme": "forest",
-  "target": 2150,
+  "target": 4300,
   "hearts": 3,
   "spawn": [
     0.78,
@@ -52,5 +52,5 @@
     "type": "dodge",
     "count": 30
   },
-  "notes": "Forest \u00b7 designed length \u2248 142 s (15 pts/s)."
+  "notes": "Forest · designed length ≈ 284 s (15 pts/s)."
 }

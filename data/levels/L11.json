@@ -2,7 +2,7 @@
   "id": 11,
   "name": "Firefly Hollow",
   "theme": "forest",
-  "target": 1600,
+  "target": 3200,
   "hearts": 3,
   "spawn": [
     0.72,
@@ -48,5 +48,5 @@
     "type": "combo",
     "mult": 4
   },
-  "notes": "Forest \u00b7 designed length \u2248 100 s (16 pts/s)."
+  "notes": "Forest · designed length ≈ 200 s (16 pts/s)."
 }

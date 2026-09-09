@@ -2,7 +2,7 @@
   "id": 7,
   "name": "Gusty Gardens",
   "theme": "park",
-  "target": 1500,
+  "target": 3000,
   "hearts": 3,
   "spawn": [
     0.78,
@@ -47,5 +47,5 @@
     "type": "power",
     "count": 4
   },
-  "notes": "Park \u00b7 designed length \u2248 106 s (14 pts/s)."
+  "notes": "Park · designed length ≈ 212 s (14 pts/s)."
 }

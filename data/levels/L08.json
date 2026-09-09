@@ -2,7 +2,7 @@
   "id": 8,
   "name": "Squirrel Trouble",
   "theme": "park",
-  "target": 1800,
+  "target": 3600,
   "hearts": 3,
   "spawn": [
     0.68,
@@ -48,5 +48,5 @@
     "type": "coins",
     "count": 25
   },
-  "notes": "Park \u00b7 designed length \u2248 117 s (15.5 pts/s)."
+  "notes": "Park · designed length ≈ 234 s (15.5 pts/s)."
 }

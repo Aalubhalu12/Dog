@@ -2,7 +2,7 @@
   "id": 13,
   "name": "Sandy Paws",
   "theme": "beach",
-  "target": 1350,
+  "target": 2700,
   "hearts": 3,
   "spawn": [
     0.85,
@@ -44,5 +44,5 @@
     "type": "nearMiss",
     "count": 5
   },
-  "notes": "Beach \u00b7 designed length \u2248 90 s (15 pts/s)."
+  "notes": "Beach · designed length ≈ 180 s (15 pts/s)."
 }

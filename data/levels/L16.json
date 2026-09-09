@@ -2,7 +2,7 @@
   "id": 16,
   "name": "Beach Master",
   "theme": "beach",
-  "target": 3250,
+  "target": 5800,
   "hearts": 3,
   "spawn": [
     0.66,
@@ -54,5 +54,5 @@
     "type": "combo",
     "mult": 5
   },
-  "notes": "Beach \u00b7 designed length \u2248 180 s (18 pts/s)."
+  "notes": "Beach · designed length ≈ 320 s (18 pts/s)."
 }

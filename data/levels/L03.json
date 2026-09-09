@@ -2,7 +2,7 @@
   "id": 3,
   "name": "Bomb Squad",
   "theme": "meadow",
-  "target": 900,
+  "target": 1800,
   "hearts": 3,
   "spawn": [
     0.8,
@@ -43,5 +43,5 @@
   "goal": {
     "type": "noBomb"
   },
-  "notes": "Meadow \u00b7 designed length \u2248 73 s (12 pts/s)."
+  "notes": "Meadow · designed length ≈ 146 s (12 pts/s)."
 }

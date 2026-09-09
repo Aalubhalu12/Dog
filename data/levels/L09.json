@@ -2,7 +2,7 @@
   "id": 9,
   "name": "Forest Camp",
   "theme": "forest",
-  "target": 1800,
+  "target": 3600,
   "hearts": 3,
   "spawn": [
     0.85,
@@ -48,5 +48,5 @@
     "count": 12,
     "seconds": 40
   },
-  "notes": "Forest \u00b7 designed length \u2248 129 s (14 pts/s)."
+  "notes": "Forest · designed length ≈ 258 s (14 pts/s)."
 }

@@ -2,7 +2,7 @@
   "id": 12,
   "name": "Forest Master",
   "theme": "forest",
-  "target": 2900,
+  "target": 5200,
   "hearts": 3,
   "spawn": [
     0.68,
@@ -54,5 +54,5 @@
     "type": "goldBones",
     "count": 2
   },
-  "notes": "Forest \u00b7 designed length \u2248 170 s (17 pts/s)."
+  "notes": "Forest · designed length ≈ 305 s (17 pts/s)."
 }

@@ -11,7 +11,7 @@
  */
 const Ambient = (() => {
   const CFG = {
-    ROAD_Y: 0.735,          // road band centre (fraction of stage height) — sits behind the fence
+    ROAD_Y: 0.565,          // road band centre (fraction of stage height) — sits just behind the fence top
     ROAD_H: 0.045,          // road band height (fraction of stage height)
     CAR_EVERY: [3.5, 8],    // seconds between cars (random range)
     WALKER_EVERY: [3.5, 8], // seconds between walkers

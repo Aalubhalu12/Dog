@@ -95,7 +95,7 @@ window.__perfect = on => { if(!window.__origPick) window.__origPick = Spawner.pi
   Spawner.pick = on ? (w => { const k = window.__origPick(w); return ITEMS[k].kind==='hazard' ? 'bone' : k; }) : window.__origPick; };
 '''
 
-def play(pg, idx, perfect, timeout=240):
+def play(pg, idx, perfect, timeout=600):
     pg.evaluate(f'__perfect({str(perfect).lower()})')
     # unlock through the real save (levels before idx count as cleared), then use the real board: tile → PLAY
     pg.evaluate(f'for (let i = 0; i < {idx}; i++) if (!Store.isCleared(LEVELS[i].id)) Store.recordLevel(LEVELS[i].id, 1, true); HomeScene.enter()')

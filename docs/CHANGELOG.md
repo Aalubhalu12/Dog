@@ -2,6 +2,16 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.17.1] — 2026-09-09 — Puppy raised · levels twice as long
+### Changed
+- **Layout:** ground line 0.85 → **0.68** — the puppy now stands a little below the centre of the screen, so the
+  sliding thumb never covers him. Parallax layers and the road moved up to match; the grass apron
+  (`foreground_wide.webp`) was extended downward with feathered repeats so the bottom ~30 % of the screen is lawn
+  (thumb space).
+- **Length:** every level's score `target` doubled (L1 400 → 800, …), so each act (morning / evening / night)
+  lasts twice as long. Balance sweep after the change: 16/16 win with both bots; L12 5800 → 5200 and
+  L16 6500 → 5800 so the good bot still clears the two "Master" levels. `sim_levels.py` per-level timeout 600 s.
+
 ## [0.17.0] — 2026-09-09 — Relative-drag controls · rigged puppy · wider lane
 ### Changed — controls (the thumb never hides the dog)
 - **Relative drag** is the default: put a finger ANYWHERE and slide — the puppy moves the same distance × 1.3

@@ -1,5 +1,5 @@
 # BONK! — Status & Next Steps
-_Updated 2026-09-07 · current build **v0.17.0** (Phases 1–2 done, Phase 3 content shipped: 4 locations × 4 levels × 3 acts — music + playtest balance open) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
+_Updated 2026-09-09 · current build **v0.17.1** (Phases 1–2 done, Phase 3 content shipped: 4 locations × 4 levels × 3 acts — music + playtest balance open) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
 
 ---
 
