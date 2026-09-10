@@ -2,6 +2,21 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.18.0] — 2026-09-09 — Background music · volume sliders
+### Added
+- **Music** (`src/audio/music.js`, procedural Web Audio — no files, ~0 KB): a soft 8-bar loop at 84–100 BPM — warm
+  detuned-triangle pad chords (Cmaj7 · Am7 · Fmaj7 · G6 …), a kalimba-style lead composed in the major pentatonic
+  (no dissonant intervals → never grating), a round sine bass and, in Park/Beach, a whisper of shaker. The lead
+  alternates two phrases (A A B A) and thins out every other pass so the loop breathes instead of nagging.
+- Each **location has its own key / tempo / brightness** (Meadow C 92, Park D 100 + shaker, Forest G 84 darker,
+  Beach E 96 swung). **Night and rain** lower the filters and drop notes (sparser, calmer). Home menu plays a quieter
+  variant. Bar-aligned key changes, ducks to 35 % on pause, fades out for the level-clear / game-over jingles.
+- **Settings:** the single Sound toggle became two sliders — 🔊 Sound (SFX) and 🎵 Music (default 70 %) — persisted
+  in Save (`settings.sfxVol` / `musicVol`). The home 🔊 button is now a master mute for both.
+### Verified
+- Offline render of the loop (spectrogram): no clicks (max sample jump 0.011), energy 300–800 Hz dominant, < 0.3 %
+  above 4 kHz; peak −18 dBFS at 70 % under the SFX. Sliders persist across reload; pause duck / resume; mute toggle.
+
 ## [0.17.1] — 2026-09-09 — Puppy raised · levels twice as long
 ### Changed
 - **Layout:** ground line 0.85 → **0.68** — the puppy now stands a little below the centre of the screen, so the

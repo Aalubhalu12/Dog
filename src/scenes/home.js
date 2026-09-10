@@ -88,7 +88,7 @@ const HomeScene = (() => {
 
   return {
     bind,
-    enter() { render(); },
+    enter() { render(); Music.play('home'); },
     exit() {},
     frame() {},   // home is a painted plate (assets/images/home/plate.webp) + DOM — nothing to draw on the canvas
   };

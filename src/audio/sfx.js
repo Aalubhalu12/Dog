@@ -5,9 +5,10 @@
  * player here and keep the same public keys so game code doesn't change.
  */
 const SFX = (() => {
-  let ctx = null, master = null, enabled = true;
+  let ctx = null, master = null, enabled = true, volume = 1;
+  const BASE = 0.35;
   const ensure = () => {
-    if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = 0.35; master.connect(ctx.destination); }
+    if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = BASE * volume; master.connect(ctx.destination); }
     if (ctx.state === 'suspended') ctx.resume();
     return ctx;
   };
@@ -82,6 +83,10 @@ const SFX = (() => {
     ...lib,
     play: k => lib[k] && lib[k](),
     unlock: () => { try { ensure(); } catch (e) {} },
+    /** Shared AudioContext (Music rides on the same unlock). */
+    context: () => ensure(),
     setEnabled: v => { enabled = v; },
+    setVolume: v => { volume = Math.max(0, Math.min(1, +v || 0)); if (master) master.gain.setTargetAtTime(BASE * volume, ctx.currentTime, .05); },
+    get volume() { return volume; },
   };
 })();

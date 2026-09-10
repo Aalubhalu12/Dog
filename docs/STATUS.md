@@ -1,5 +1,5 @@
 # BONK! — Status & Next Steps
-_Updated 2026-09-09 · current build **v0.17.1** (Phases 1–2 done, Phase 3 content shipped: 4 locations × 4 levels × 3 acts — music + playtest balance open) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
+_Updated 2026-09-09 · current build **v0.18.0** (Phases 1–3 done: 4 locations × 4 levels × 3 acts, music + sliders — playtest balance open) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
 
 ---
 
@@ -53,7 +53,7 @@ Ordered by impact; each item is a self-contained ship.
 | 5 | **Local analytics log** (session, level start/end, stars, retries, deaths by item) | Required to measure the M1 gate | S |
 | 6 | **Save v2** — schema version + migration (before any wallet/shop) | Prevents progress loss when data shape changes | S |
 | 7 | Levels → JSON data (mechanics, goals, rewards) | Lets you add levels without touching code | S |
-| 8 | Music loop (meadow) + proper SFX mix | Currently SFX only | M |
+| 8 | ~~Music loop + SFX mix~~ ✅ v0.18 procedural loop per location, SFX/music sliders | | M |
 
 **M1 gate:** playtest with ~5 people — is it fun without village/chest/shop? (retry rate, voluntary replays from the analytics log)
 
@@ -75,5 +75,4 @@ Ordered by impact; each item is a self-contained ship.
 
 ## Known gaps / small polish backlog
 - Level board side decorations (signposts, dog house) from the mockup — skipped so far to keep the parallax clean
-- Settings: no separate music/SFX sliders yet (one sound toggle)
 - Permanent hosting: GitHub Pages at https://aalubhalu12.github.io/Dog/ (repo Aalubhalu12/Dog); tunnels are only needed for testing uncommitted work

@@ -23,12 +23,19 @@
 
   // --- settings toggles ---------------------------------------------------
   function bindSettings() {
-    const syncSound = on => { $('#btnSound').textContent = on ? '🔊' : '🔇'; SFX.setEnabled(on); };
+    // sound: master mute (🔊 button on home) + two volume sliders (sfx / music) that persist
+    const syncSound = on => { $('#btnSound').textContent = on ? '🔊' : '🔇'; SFX.setEnabled(on); Music.setEnabled(on); };
     document.querySelectorAll('.toggle').forEach(tg => {
       const key = tg.dataset.setting; tg.classList.toggle('on', Store.setting(key));
-      tg.onclick = () => { tg.classList.toggle('on'); const on = tg.classList.contains('on'); Store.setSetting(key, on); SFX.click();
-        if (key === 'tilt') BG.setTilt(on); if (key === 'sound') syncSound(on); };
+      tg.onclick = () => { tg.classList.toggle('on'); const on = tg.classList.contains('on'); Store.setSetting(key, on); SFX.click(); if (key === 'tilt') BG.setTilt(on); };
     });
+    const vol = (id, key, def, apply) => {
+      const r = $('#' + id + 'Range'), lbl = $('#' + id + 'Val'), show = v => { lbl.textContent = Math.round(v * 100) + '%'; };
+      const v0 = Store.setting(key, def); r.value = v0; apply(v0); show(v0);
+      r.oninput = () => { apply(+r.value); show(+r.value); };
+      r.onchange = () => { Store.setSetting(key, +r.value); if (key === 'sfxVol') SFX.bone(); };
+    };
+    vol('sfx', 'sfxVol', 1, v => SFX.setVolume(v)); vol('music', 'musicVol', .7, v => Music.setVolume(v));
     syncSound(Store.setting('sound')); BG.setTilt(Store.setting('tilt'));
     // controls: scheme segmented buttons + drag sensitivity slider
     const seg = document.querySelectorAll('#ctrlMode button'), slider = $('#sensRange'), sensRow = $('#sensRow');
@@ -50,7 +57,7 @@
       SFX.click(); if (!confirm('Reset ALL progress, coins and stars? This cannot be undone.')) return;
       Store.resetAll(); Analytics.track('reset_progress'); Modals.closeAll(); app.goHome(); Modals.toast('Progress reset');
     };
-    $('#btnSound').onclick = () => { const tg = $('[data-setting="sound"]'); tg.classList.toggle('on'); const on = tg.classList.contains('on'); Store.setSetting('sound', on); syncSound(on); SFX.click(); };
+    $('#btnSound').onclick = () => { const on = !Store.setting('sound'); Store.setSetting('sound', on); syncSound(on); SFX.unlock(); SFX.click(); if (on) Music.play('home'); };
   }
 
   // --- main loop ----------------------------------------------------------

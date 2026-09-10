@@ -85,7 +85,7 @@ One versioned document in localStorage: **`bonk_save`** (`v: 2`) plus **`bonk_sa
 ```
 { v, createdAt, updatedAt, best, coins,
   levels: { [id]: { best, cleared, stars:[b,b,b], plays } },
-  settings: { sound, vib, tilt, music }, ftue: { done }, shop: { owned, equipped },
+  settings: { sound, vib, tilt, control, sens, sfxVol, musicVol }, ftue: { done }, shop: { owned, equipped },
   daily: { streak, last }, stats: { runs, wins, losses, quits, bones, playSec } }
 ```
 - `Save` — load (with migrations from the v1 scattered keys `bonk_best/coins/levels/set_*`), debounced write, backup, corrupt-recovery, `get/set/update/reset/replace/toJSON`. Cloud save (Phase 5) calls `Save.replace(doc)` / `Save.toJSON()`.

@@ -28,7 +28,7 @@ const Game = (() => {
     S.startedAt = performance.now(); S.ended = false;
     Analytics.track('level_start', { id: S.level.id, idx: levelIdx, carry: !!carry, plays: (Store.levelProgress()[S.level.id] || {}).plays || 0 });
     Store.bumpStat('runs');
-    Input.reset(); FX.clear(); BG.setTheme(S.level.theme); BG.setTime(S.level.stages[0].time, true);
+    Input.reset(); FX.clear(); BG.setTheme(S.level.theme); BG.setTime(S.level.stages[0].time, true); Music.play(S.level.theme, S.level.stages[0].time);
     Ambient.setDensity(stageAmbient(S)); Ambient.reset();   // background life grows level by level (and thins at night / in rain)
     Mechanics.start(S.level);                                // wind / squirrel / waves — only if the level asks
     hooks.onStart && hooks.onStart(S);
@@ -54,7 +54,7 @@ const Game = (() => {
   const stageAmbient = S => { const a = S.level.ambient, f = { night: .35, rain: .5 }[S.level.stages[S.stage].time] || 1; return { birds: a.birds * (f < 1 ? f * .5 : 1), walkers: a.walkers * f, cars: a.cars * Math.max(f, .6) }; };
   function advanceStage(i) {
     S.stage = i; const st = S.level.stages[i], [icon, name] = STAGE_UI[st.time] || ['', st.time.toUpperCase()];
-    S.spawner.setStage(i, S.time); Ambient.setDensity(stageAmbient(S));
+    S.spawner.setStage(i, S.time); Ambient.setDensity(stageAmbient(S)); Music.setTime(st.time);
     FX.banner(`${S.level.id}.${i + 1}  ${icon} ${name}`, 'stage'); setTimeout(() => FX.pop(puppy.box.cx, puppy.box.y - 24, i === S.level.stages.length - 1 ? 'FULL SPEED!' : 'FASTER!', 'bad'), 700);
     SFX.stage(); FX.vibrate([15, 30, 15]); puppy.squash = 1.12; puppy.puffDust(3);
     Analytics.track('stage', { id: S.level.id, stage: i, time: st.time, at: Math.round(S.time) });
@@ -141,14 +141,14 @@ const Game = (() => {
     }
   }
   function onLevelClear() {
-    SFX.win(); FX.vibrate([30, 30, 30, 30, 80]); FX.banner('LEVEL CLEAR!'); puppy.celebrate();
+    Music.stop(.8); SFX.win(); FX.vibrate([30, 30, 30, 30, 80]); FX.banner('LEVEL CLEAR!'); puppy.celebrate();
     FX.burst(puppy.box.cx, puppy.box.y, ['#ffd23a', '#ff7ab6', '#7fe3ff', '#8ef08a', '#fff'], 30, 1.8);
     S.stars = Goals.stars(S); S.newStars = Store.recordLevel(S.level.id, S.score, true, S.stars);
     Store.setBest(S.score); endRun('win');
     setTimeout(() => { paused = true; hooks.onLevelClear && hooks.onLevelClear(S); }, 1300);
   }
   function onGameOver() {
-    running = false; SFX.over();
+    running = false; Music.stop(1.2); SFX.over();
     S.isNewBest = S.score > 0 && Store.setBest(S.score); S.stars = Goals.stars(S); Store.recordLevel(S.level.id, S.score, false, S.stars); endRun('lose');
     hooks.onGameOver && hooks.onGameOver(S);
   }

@@ -11,7 +11,7 @@
  *   best: 0,                                   // all-time best score
  *   coins: 0,                                  // wallet (see Wallet)
  *   levels: { [id]: { best, cleared, stars:[b,b,b], plays } },
- *   settings: { sound, vib, tilt, music },
+ *   settings: { sound, vib, tilt, control, sens, sfxVol, musicVol },
  *   ftue: { done: false },                     // first-time-user experience shown?
  *   shop: { owned: ['classic'], equipped: 'classic' },
  *   daily: { streak: 0, last: null },          // reserved: daily bonus (Phase 4)
@@ -35,7 +35,7 @@ const Save = (() => {
   const fresh = () => ({
     v: SCHEMA, createdAt: Date.now(), updatedAt: Date.now(),
     best: 0, coins: 0, levels: {},
-    settings: { sound: true, vib: true, tilt: true, music: true },
+    settings: { sound: true, vib: true, tilt: true, sfxVol: 1, musicVol: .7 },
     ftue: { done: false },
     shop: { owned: ['classic'], equipped: 'classic' },
     daily: { streak: 0, last: null },
@@ -62,7 +62,7 @@ const Save = (() => {
       const P = CONFIG.STORAGE_PREFIX, g = (k, def) => { try { const v = localStorage.getItem(P + k); return v == null ? def : JSON.parse(v); } catch (e) { return def; } };
       d.best = g('best', d.best || 0); d.coins = g('coins', d.coins || 0);
       const lv = g('levels', {}); for (const id in lv) d.levels[id] = { best: lv[id].best || 0, cleared: !!lv[id].cleared, stars: lv[id].stars || [false, false, false], plays: 0 };
-      d.settings = { sound: g('set_sound', true), vib: g('set_vib', true), tilt: g('set_tilt', true), music: true };
+      d.settings = { sound: g('set_sound', true), vib: g('set_vib', true), tilt: g('set_tilt', true), sfxVol: 1, musicVol: .7 };
       d.v = 2; return d;
     },
   };

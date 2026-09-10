@@ -39,7 +39,7 @@ No build step, no npm, no framework. Plain HTML5 Canvas + JS + CSS. Everything u
 - Globals instead of ES modules (fine for now; boundaries are clean, conversion is mechanical).
 - No unit tests — `tools/check.py` is the safety net; add tests when the save/wallet layer lands (Phase 1).
 - Levels are JS objects, not JSON yet (Phase 1).
-- No music; SFX and puppy voice are procedural Web Audio (Phase 3 adds a loop and sliders).
+- Music, SFX and puppy voice are all procedural Web Audio (no audio files). `Music` shares SFX's AudioContext; scenes call `Music.play(theme, time)`, `duck`, `stop`.
 - Level thumbnails are static WebPs per level id (`assets/images/levels/thumb_<id>.webp`); missing → falls back to thumb_1.
 
 ## 5. Debug hooks (browser console)

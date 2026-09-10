@@ -6,7 +6,7 @@ const PlayScene = (() => {
 
   let retryArmed = 0;
   const armInstantRetry = () => { retryArmed = performance.now(); };
-  const pause = () => { if (!Game.inProgress || Game.paused) return; Game.pause(); Modals.open('#modalPause'); Analytics.track('pause', { id: Game.state.level.id, at: Math.round(Game.state.time) }); };
+  const pause = () => { if (!Game.inProgress || Game.paused) return; Game.pause(); Music.duck(true); Modals.open('#modalPause'); Analytics.track('pause', { id: Game.state.level.id, at: Math.round(Game.state.time) }); };
   const togglePause = (onlyPause) => { if (Modals.isOpen('#modalPause')) { if (!onlyPause) { Modals.close('#modalPause'); Game.resume(); } } else pause(); };
 
   function bind(a) {
@@ -25,7 +25,7 @@ const PlayScene = (() => {
     Input.setActiveCheck(() => Game.active && !Game.paused);
     Input.setPauseHandler(togglePause);
     $('#btnPause').onclick = () => { SFX.click(); pause(); };
-    $('#btnResume').onclick = () => { SFX.click(); Modals.close('#modalPause'); Game.resume(); };
+    $('#btnResume').onclick = () => { SFX.click(); Modals.close('#modalPause'); Music.duck(false); Game.resume(); };
     $('#btnRestart').onclick = () => { SFX.click(); Modals.close('#modalPause'); Analytics.track('retry', { id: Game.state.level.id, from: 'pause' }); Game.start(Game.state.levelIdx); };
     $('#btnQuit').onclick = () => { SFX.click(); app.goHome(); };
     $('#btnAgain').onclick = () => { SFX.click(); Modals.close('#modalOver'); Analytics.track('retry', { id: Game.state.level.id, from: 'gameover' }); Game.start(Game.state.levelIdx); };

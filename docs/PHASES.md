@@ -61,7 +61,7 @@ Build
 - Levels 4–10 in JSON with names, targets, 3-star goals, thumbnails
 - New mechanics: wind gusts (L6+), thief squirrel (L8+), faster/mixed hazard waves (L9–10)
 - Ambient life per level following the location rule (still behind the fence, subtle)
-- Music loop (meadow) + SFX mix pass; music/SFX sliders
+- ~~Music loop + SFX mix pass; music/SFX sliders~~ ✅ v0.18.0 (procedural, per location + time of day)
 - Balance pass from Playtest #1 data
 
 Done when
