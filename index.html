@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" href="assets/icons/favicon.png">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <title>BONK! — Catch. Dodge. Don't get bonked.</title>
-<link rel="stylesheet" href="styles/main.css?v=0.19.0">
+<link rel="stylesheet" href="styles/main.css?v=0.20.0">
 </head>
 <body>
 <div id="backdrop"></div>
@@ -43,6 +43,7 @@
     <button class="hm-sound" id="btnSound" aria-label="Sound">🔊</button>
     <button class="hm-sound hm-profile" id="btnProfile" aria-label="Profile">🐶</button>
     <button class="hm-gift" id="btnDaily" aria-label="Daily bonus"><span>🎁</span><i id="dailyDot"></i></button>
+    <button class="hm-gift hm-remix" id="btnRemix" aria-label="Daily Remix"><span>🎲</span><i id="remixDot"></i></button>
       </div>
 
   <div class="scene" id="hud">
@@ -140,6 +141,7 @@
       </div>
       <div class="minirow" id="oExtra"></div>
       <div class="btns">
+        <button class="btn btn-primary btn-pink" id="btnRevive" hidden><span>💗 REVIVE <small>📺</small></span></button>
         <button class="btn btn-primary btn-green" id="btnAgain"><span>↻ TRY AGAIN</span></button>
         <div class="btn-row"><button class="btn btn-sec" id="btnOverMap" title="Level map">🗺️</button><button class="btn btn-sec" id="btnHome" title="Menu">🏠</button></div>
       </div>
@@ -159,6 +161,7 @@
       </div>
       <div class="minirow" id="wExtra"></div>
       <div class="btns">
+        <button class="btn btn-mini btn-gold" id="btnDouble" hidden>📺 2× COINS (+<span id="dblN">0</span>)</button>
         <button class="btn btn-primary btn-green" id="btnContinue"><span>▶ NEXT LEVEL</span></button>
         <div class="btn-row"><button class="btn btn-sec" id="btnWinRetry" title="Replay for more stars">↻</button><button class="btn btn-sec" id="btnWinMap" title="Level map">🗺️</button><button class="btn btn-sec" id="btnWinHome" title="Menu">🏠</button></div>
       </div>
@@ -190,6 +193,46 @@
     </div>
   </div>
 
+  <div class="modal" id="modalShop">
+    <div class="card shop">
+      <h2>Shop</h2>
+      <div class="lb-tabs"><button class="lb-tab on" data-tab="skins">🐶 Skins</button><button class="lb-tab" data-tab="ads">🚫 Ads</button><button class="lb-tab" data-tab="club">👑 Club</button></div>
+      <div class="shop-wallet"><img src="assets/images/items/coin.webp" alt=""><b id="shopCoins">0</b></div>
+      <div class="shop-pane" id="paneSkins">
+        <div class="skin-stage"><canvas id="skinCanvas" width="300" height="240"></canvas><div class="skin-name" id="skinName"></div><div class="skin-desc" id="skinDesc"></div></div>
+        <div class="skin-grid" id="skinGrid"></div>
+        <button class="btn btn-primary btn-green skin-cta" id="btnSkinCta"><span>EQUIP</span></button>
+      </div>
+      <div class="shop-pane" id="paneAds" hidden>
+        <div class="iap-card"><div class="iap-icon">🚫</div><h3>Remove Ads</h3><p>No interstitials, ever. Rewarded bonuses (revive, 2× coins) stay optional.</p><button class="btn btn-primary btn-green" id="btnRemoveAds"><span>₹149 · ONE-TIME</span></button></div>
+        <p class="small">Purchases are simulated in this build (mock store). Real payments arrive with the Android release.</p>
+      </div>
+      <div class="shop-pane" id="paneClub" hidden>
+        <div class="iap-card club"><div class="iap-icon">👑</div><h3>Bonk Club</h3><ul id="clubBenefits"></ul><p class="small"><b>No gameplay advantage — ever.</b></p><button class="btn btn-primary" id="btnClub" disabled><span>₹99/month · COMING ON ANDROID</span></button></div>
+      </div>
+      <div class="row small"><span></span><span class="links"><button class="link" id="btnShopRestore">Restore purchases</button></span></div>
+      <button class="btn-x close" data-close aria-label="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="modal" id="modalRemix">
+    <div class="card">
+      <h2>Daily Remix</h2>
+      <div class="rmx-head"><img id="rmxThumb" src="assets/images/levels/thumb_1.webp" alt=""><div><b id="rmxName"></b><small id="rmxSub"></small></div></div>
+      <div class="rmx-mods" id="rmxMods"></div>
+      <div class="stats rmx-stats">
+        <div class="stat"><img src="assets/images/ui/trophy.webp" alt=""><b id="rmxBest">0</b><span>TODAY'S BEST</span></div>
+        <div class="stat"><span class="ghost">👻</span><b id="rmxGhost">0</b><span>YESTERDAY</span></div>
+        <div class="stat"><img src="assets/images/items/coin.webp" alt=""><b id="rmxReward">+150</b><span id="rmxRewardL">REWARD</span></div>
+      </div>
+      <p class="small" id="rmxNext"></p>
+      <div class="btns"><button class="btn btn-primary btn-green" id="btnRemixPlay"><span>▶ PLAY REMIX</span></button></div>
+      <button class="btn-x close" data-close aria-label="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="admock" id="adMock"><div class="ad-box"><div class="ad-kind" id="adKind"></div><div class="ad-body">🐾<br><small>Imagine a very nice ad here</small><br><em id="adPlace"></em></div><div class="ad-btns"><button class="btn btn-sec ad-skip" id="adSkip" title="Close without reward">✕</button><button class="btn btn-primary btn-green ad-done" id="adDone"><span>3s</span></button></div></div></div>
+
   <div class="modal" id="modalCredits">
     <div class="card">
       <h2>Credits</h2>
@@ -209,45 +252,48 @@
 
 <!-- Load order = dependency order (plain <script>, no bundler). Layers: core → services → data → game → ui → scenes → app -->
 <!-- core: engine-agnostic plumbing -->
-<script src="src/core/config.js?v=0.19.0"></script>
-<script src="src/core/events.js?v=0.19.0"></script>
-<script src="src/core/perf.js?v=0.19.0"></script>
-<script src="src/core/dom.js?v=0.19.0"></script>
-<script src="src/core/assets.js?v=0.19.0"></script>
-<script src="src/core/input.js?v=0.19.0"></script>
+<script src="src/core/config.js?v=0.20.0"></script>
+<script src="src/core/events.js?v=0.20.0"></script>
+<script src="src/core/perf.js?v=0.20.0"></script>
+<script src="src/core/dom.js?v=0.20.0"></script>
+<script src="src/core/assets.js?v=0.20.0"></script>
+<script src="src/core/input.js?v=0.20.0"></script>
 <!-- services: persistence, economy, telemetry, backend -->
-<script src="src/services/flags.js?v=0.19.0"></script>
-<script src="src/services/analytics.js?v=0.19.0"></script>
-<script src="src/services/save.js?v=0.19.0"></script>
-<script src="src/services/wallet.js?v=0.19.0"></script>
-<script src="src/services/store.js?v=0.19.0"></script>
-<script src="src/services/leaderboard.js?v=0.19.0"></script>
-<script src="src/services/daily.js?v=0.19.0"></script>
-<script src="src/services/pwa.js?v=0.19.0"></script>
-<script src="src/services/nav.js?v=0.19.0"></script>
+<script src="src/services/flags.js?v=0.20.0"></script>
+<script src="src/services/analytics.js?v=0.20.0"></script>
+<script src="src/services/save.js?v=0.20.0"></script>
+<script src="src/services/wallet.js?v=0.20.0"></script>
+<script src="src/services/store.js?v=0.20.0"></script>
+<script src="src/services/leaderboard.js?v=0.20.0"></script>
+<script src="src/services/daily.js?v=0.20.0"></script>
+<script src="src/services/pwa.js?v=0.20.0"></script>
+<script src="src/services/nav.js?v=0.20.0"></script>
+<script src="src/services/shop.js?v=0.20.0"></script>
+<script src="src/services/ads.js?v=0.20.0"></script>
+<script src="src/services/remix.js?v=0.20.0"></script>
 <!-- audio -->
-<script src="src/audio/sfx.js?v=0.19.0"></script>
-<script src="src/audio/music.js?v=0.19.0"></script>
+<script src="src/audio/sfx.js?v=0.20.0"></script>
+<script src="src/audio/music.js?v=0.20.0"></script>
 <!-- data: catalogues + level loader -->
-<script src="src/data/items.js?v=0.19.0"></script>
-<script src="src/data/goals.js?v=0.19.0"></script>
-<script src="src/data/levels.js?v=0.19.0"></script>
+<script src="src/data/items.js?v=0.20.0"></script>
+<script src="src/data/goals.js?v=0.20.0"></script>
+<script src="src/data/levels.js?v=0.20.0"></script>
 <!-- game: simulation + rendering -->
-<script src="src/game/background.js?v=0.19.0"></script>
-<script src="src/game/ambient.js?v=0.19.0"></script>
-<script src="src/game/effects.js?v=0.19.0"></script>
-<script src="src/game/rig.js?v=0.19.0"></script>
-<script src="src/game/puppy.js?v=0.19.0"></script>
-<script src="src/game/mechanics.js?v=0.19.0"></script>
-<script src="src/game/spawner.js?v=0.19.0"></script>
-<script src="src/game/game.js?v=0.19.0"></script>
-<script src="src/game/ftue.js?v=0.19.0"></script>
+<script src="src/game/background.js?v=0.20.0"></script>
+<script src="src/game/ambient.js?v=0.20.0"></script>
+<script src="src/game/effects.js?v=0.20.0"></script>
+<script src="src/game/rig.js?v=0.20.0"></script>
+<script src="src/game/puppy.js?v=0.20.0"></script>
+<script src="src/game/mechanics.js?v=0.20.0"></script>
+<script src="src/game/spawner.js?v=0.20.0"></script>
+<script src="src/game/game.js?v=0.20.0"></script>
+<script src="src/game/ftue.js?v=0.20.0"></script>
 <!-- ui + scenes -->
-<script src="src/ui/hud.js?v=0.19.0"></script>
-<script src="src/ui/modals.js?v=0.19.0"></script>
-<script src="src/scenes/home.js?v=0.19.0"></script>
-<script src="src/scenes/play.js?v=0.19.0"></script>
+<script src="src/ui/hud.js?v=0.20.0"></script>
+<script src="src/ui/modals.js?v=0.20.0"></script>
+<script src="src/scenes/home.js?v=0.20.0"></script>
+<script src="src/scenes/play.js?v=0.20.0"></script>
 <!-- bootstrap -->
-<script src="src/app.js?v=0.19.0"></script>
+<script src="src/app.js?v=0.20.0"></script>
 </body>
 </html>

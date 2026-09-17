@@ -8,13 +8,13 @@
  */
 const Flags = (() => {
   const DEFAULTS = Object.freeze({
-    ads_enabled: false,          // Phase 4 mock ads / Phase 6 real ads
+    ads_enabled: true,           // Phase 4: MOCK ads (src/services/ads.js) / Phase 6 real AdMob
     interstitial_every: 3,       // game-overs between interstitials
     interstitial_min_level: 3,   // never before this level
-    shop_enabled: false,         // Phase 4
+    shop_enabled: true,          // Phase 4: skins (coins / mock IAP), Remove Ads, Club card
     club_enabled: false,         // subscription card
-    remix_enabled: false,        // Daily Remix
-    daily_bonus_enabled: false,
+    remix_enabled: true,         // Daily Remix
+    daily_bonus_enabled: true,
     ftue_enabled: true,
     combo_enabled: true,         // Phase 2
     leaderboard_enabled: true,   // local-first leaderboard with daily sync windows

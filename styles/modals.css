@@ -109,3 +109,60 @@
 .card .btn-mini:active{transform:translateY(2px);box-shadow:0 1px 0 #1e6b1a}
 .card p.small{font-size:clamp(12px,3.4cqmin,15px);opacity:.85}
 .card a.link{color:var(--blue-dk)}
+
+/* --- shop --- */
+.card.shop{padding-bottom:10px}
+.shop-wallet{position:absolute;right:14px;top:-16px;display:flex;align-items:center;gap:4px;background:linear-gradient(#a86c2c,#7a4a1c);border:2px solid #d9a466;border-radius:999px;padding:3px 10px 3px 6px;color:#fff;font-weight:900;font-size:clamp(12px,3.6cqmin,15px);box-shadow:0 3px 0 #4e2e10}
+.shop-wallet img{width:1.3em;height:1.3em}
+.skin-stage{position:relative;height:clamp(150px,34cqmin,200px);margin:-4px 0 6px;background:radial-gradient(ellipse at 50% 85%,#dff3cf,#f6fbef 70%);border-radius:16px;border:2px solid #cfe5c0;overflow:hidden}
+.skin-stage canvas{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:100%;width:auto;image-rendering:auto}
+.skin-name{position:absolute;left:10px;top:8px;font-weight:900;font-size:clamp(14px,4.2cqmin,18px);color:#5a2c0b;text-shadow:0 1px 0 #fff}
+.skin-desc{position:absolute;left:10px;bottom:6px;font-weight:800;font-size:clamp(10px,3cqmin,12px);color:#5a2c0b;opacity:.8}
+.skin-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:4px 0 8px}
+.skin{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px 4px;border-radius:12px;background:#fff6e5;border:2px solid #e8c48f;font:inherit;cursor:pointer;color:#8a4b00}
+.skin .em{font-size:clamp(20px,6cqmin,28px);line-height:1}
+.skin small{font-size:clamp(8px,2.4cqmin,10px);font-weight:900;letter-spacing:.2px;white-space:nowrap}
+.skin.own{background:#e8f7e3;border-color:#8fd47f}
+.skin.sel{background:linear-gradient(#fff3c4,#ffd98a);border-color:#f0b74a;box-shadow:0 0 0 3px #ffd23a88;transform:scale(1.06)}
+.skin-cta{margin:0 auto;display:block;width:min(60cqw,280px);padding:clamp(9px,2.6cqmin,13px) 0;font-size:clamp(16px,4.8cqmin,22px)}
+.btn-gold{background:linear-gradient(#ffe45c,#ffb52e 55%,#e2680a);box-shadow:0 6px 0 #a84a00,0 10px 20px #0005,inset 0 2px 0 #fff9}
+.btn-gold:active{box-shadow:0 2px 0 #a84a00}
+.btn-pink{background:linear-gradient(#ff9ecb,#ff5fa2 55%,#d63d7e);box-shadow:0 7px 0 #8f2454,0 12px 22px #0006,inset 0 2px 0 #fff9}
+.btn-pink:active{box-shadow:0 2px 0 #8f2454}
+.btn-pink small{font-size:.6em;vertical-align:middle}
+.card .btns .btn-mini{width:auto;padding:6px 16px;font-size:clamp(12px,3.6cqmin,15px)}
+.iap-card{background:#fff6e5;border:2px solid #e8c48f;border-radius:16px;padding:10px 12px 14px;margin:4px 0 8px}
+.iap-card.club{background:linear-gradient(#fff8dc,#ffe9a8);border-color:#f0b74a}
+.iap-card .iap-icon{font-size:clamp(28px,9cqmin,44px);line-height:1}
+.iap-card h3{margin:4px 0 2px;font-size:clamp(18px,5.4cqmin,24px);color:#5a2c0b}
+.iap-card p{font-size:clamp(12px,3.5cqmin,15px);margin:2px 0 8px}
+.iap-card ul{list-style:none;padding:0;margin:4px 0 6px;text-align:left;display:inline-block;font-weight:800;font-size:clamp(12px,3.6cqmin,15px)}
+.iap-card ul li{padding:2px 0}
+.iap-card .btn{width:min(70cqw,300px);padding:clamp(8px,2.6cqmin,12px) 0;font-size:clamp(13px,4cqmin,18px)}
+.iap-card .btn:disabled{filter:saturate(.3);box-shadow:0 3px 0 #999;cursor:default}
+/* --- remix --- */
+.rmx-head{display:flex;align-items:center;gap:10px;text-align:left;margin:4px 0 8px}
+.rmx-head img{width:clamp(64px,20cqmin,96px);aspect-ratio:1;object-fit:cover;border-radius:12px;border:3px solid #fff;box-shadow:0 3px 8px #0004}
+.rmx-head div{display:flex;flex-direction:column;gap:2px}
+.rmx-head b{font-size:clamp(15px,4.6cqmin,20px);color:#5a2c0b}
+.rmx-head small{font-size:clamp(11px,3.2cqmin,13px);opacity:.75;font-weight:800}
+.rmx-mods{display:flex;flex-direction:column;gap:6px;margin:0 0 6px}
+.rmx-mods .mod{display:flex;align-items:center;gap:10px;text-align:left;background:#fff6e5;border:2px solid #e8c48f;border-radius:12px;padding:6px 10px}
+.rmx-mods .mod>span{font-size:clamp(20px,6cqmin,28px);line-height:1}
+.rmx-mods .mod div{display:flex;flex-direction:column}
+.rmx-mods .mod b{font-size:clamp(13px,3.9cqmin,16px);color:#5a2c0b}
+.rmx-mods .mod small{font-size:clamp(10px,3cqmin,12px);opacity:.75;font-weight:800}
+.rmx-stats{margin:6px 0 4px}
+.rmx-stats .ghost{font-size:clamp(24px,7cqmin,36px);line-height:1.2}
+/* --- mock ad panel --- */
+.admock{position:absolute;inset:0;z-index:90;display:none;place-items:center;background:#0d1b2ae6;backdrop-filter:blur(3px)}
+.admock.open{display:grid}
+.ad-box{width:min(80cqw,360px);background:#fff;border-radius:18px;padding:14px 16px 16px;text-align:center;color:#223;box-shadow:0 20px 50px #000a}
+.ad-kind{font-weight:900;font-size:clamp(12px,3.6cqmin,15px);opacity:.7;letter-spacing:.5px}
+.ad-body{margin:14px 0;padding:34px 10px;border-radius:12px;background:repeating-linear-gradient(45deg,#e9eef5 0 12px,#f6f8fb 12px 24px);font-size:clamp(28px,9cqmin,44px);line-height:1.2}
+.ad-body small{font-size:clamp(12px,3.6cqmin,15px);font-weight:800;opacity:.7}
+.ad-body em{display:block;font-size:clamp(10px,3cqmin,12px);opacity:.5;font-style:normal;margin-top:6px}
+.ad-btns{display:flex;justify-content:center;align-items:center;gap:12px}
+.ad-done{width:min(50cqw,200px);padding:10px 0;font-size:clamp(16px,4.8cqmin,22px)}
+.ad-done:disabled{filter:saturate(.3) brightness(.95);box-shadow:0 3px 0 #999;cursor:default}
+.ad-skip{width:44px;height:44px;font-size:18px}

@@ -100,7 +100,7 @@
     BG.init();
     Input.bind({ dragSurface: $('#bg'), canvas: $('#bg') }); Input.setPuppyX(() => Game.puppy.x);
     Input.setMode(Store.setting('control', 'drag')); Input.setSensitivity(Store.setting('sens', CONFIG.PUPPY.DRAG_SENS));
-    HomeScene.bind(app); PlayScene.bind(app); bindSettings(); PWA.init(); Nav.init();
+    Shop.init(); HomeScene.bind(app); PlayScene.bind(app); bindSettings(); PWA.init(); Nav.init();
     Leaderboard.init();                                              // local-first; syncs only inside daily windows
     $('#appVersion').textContent = 'v' + CONFIG.VERSION;
     app.go('home');

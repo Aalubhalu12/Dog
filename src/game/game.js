@@ -10,9 +10,10 @@ const Game = (() => {
   const puppy = new Puppy();
 
   function newState(levelIdx, carry) {
-    const L = getLevel(levelIdx);
+    const L = typeof levelIdx === 'object' ? levelIdx : getLevel(levelIdx);        // an object = an ad-hoc level (Daily Remix)
+    if (typeof levelIdx === 'object') levelIdx = Math.max(0, LEVELS.findIndex(x => x.id === L.baseId));
     return {
-      level: L, levelIdx, time: 0,
+      level: L, levelIdx, time: 0, remix: !!L.remix, revived: false,
       score: carry ? carry.score : 0, base: carry ? carry.score : 0,   // score = run total (best/leaderboard); base = what was carried in → level progress = score - base
       coins: carry ? carry.coins : 0, bones: carry ? carry.bones : 0,
       lives: carry ? carry.lives : L.hearts, mult: 1, powers: { magnet: 0, star: 0, shield: 0 },
@@ -26,7 +27,7 @@ const Game = (() => {
   function start(levelIdx = 0, carry = null) {
     S = newState(levelIdx, carry); Goals.init(S); puppy.reset(); running = false; paused = false;
     S.startedAt = performance.now(); S.ended = false;
-    Analytics.track('level_start', { id: S.level.id, idx: levelIdx, carry: !!carry, plays: (Store.levelProgress()[S.level.id] || {}).plays || 0 });
+    Analytics.track('level_start', { id: S.level.id, idx: S.levelIdx, carry: !!carry, remix: S.remix, plays: (Store.levelProgress()[S.level.id] || {}).plays || 0 });
     Store.bumpStat('runs');
     Input.reset(); FX.clear(); BG.setTheme(S.level.theme); BG.setTime(S.level.stages[0].time, true); Music.play(S.level.theme, S.level.stages[0].time);
     Ambient.setDensity(stageAmbient(S)); Ambient.reset();   // background life grows level by level (and thins at night / in rain)
@@ -45,6 +46,7 @@ const Game = (() => {
     step();
   }
   function continueNext() {
+    if (S.remix) return;
     const carry = { score: S.score, coins: S.coins, bones: S.bones, lives: Math.min(S.level.hearts, S.lives + 1) };
     start(Math.min(S.levelIdx + 1, LEVELS.length - 1), carry);
   }
@@ -61,7 +63,7 @@ const Game = (() => {
     hooks.onHUD && hooks.onHUD(S);
   }
   const stageIcon = S => (STAGE_UI[S.level.stages[S.stage].time] || [''])[0];
-  const stageLabel = S => `${S.level.id}.${S.stage + 1}`;
+  const stageLabel = S => `${S.remix ? 'RMX' : S.level.id}.${S.stage + 1}`;
 
   // --- update --------------------------------------------------------------
   function update(dt) {
@@ -143,21 +145,34 @@ const Game = (() => {
   function onLevelClear() {
     Music.stop(.8); SFX.win(); FX.vibrate([30, 30, 30, 30, 80]); FX.banner('LEVEL CLEAR!'); puppy.celebrate();
     FX.burst(puppy.box.cx, puppy.box.y, ['#ffd23a', '#ff7ab6', '#7fe3ff', '#8ef08a', '#fff'], 30, 1.8);
-    S.stars = Goals.stars(S); S.newStars = Store.recordLevel(S.level.id, S.score, true, S.stars);
-    Store.setBest(S.score); endRun('win');
+    S.stars = Goals.stars(S); S.newStars = S.remix ? [] : Store.recordLevel(S.level.id, S.score, true, S.stars);
+    if (S.remix) S.remixReward = Remix.record(S).reward; else Store.setBest(S.score);
+    endRun('win');
     setTimeout(() => { paused = true; hooks.onLevelClear && hooks.onLevelClear(S); }, 1300);
   }
   function onGameOver() {
     running = false; Music.stop(1.2); SFX.over();
-    S.isNewBest = S.score > 0 && Store.setBest(S.score); S.stars = Goals.stars(S); Store.recordLevel(S.level.id, S.score, false, S.stars); endRun('lose');
+    S.stars = Goals.stars(S);
+    if (S.remix) { S.isNewBest = false; Remix.record(S); } else { S.isNewBest = S.score > 0 && Store.setBest(S.score); Store.recordLevel(S.level.id, S.score, false, S.stars); }
+    endRun('lose');
     hooks.onGameOver && hooks.onGameOver(S);
+  }
+
+  /** Rewarded revive (once per run): back to 1 heart, short invincibility, hazards cleared. Called by the game-over card after the ad. */
+  function revive() {
+    if (!S || !S.over || S.revived) return false;
+    S.revived = true; S.over = false; S.ended = false; S.lives = 1; puppy.inv = 2.5; puppy.stun = 0; puppy.setPose('idle', 0);
+    for (const it of S.spawner.items) if (it.def.kind === 'hazard') it.dead = true;
+    FX.banner('REVIVED!'); FX.burst(puppy.box.cx, puppy.box.y, ['#ff5fa2', '#fff', '#ffd23a'], 24, 1.6); SFX.shield(); FX.vibrate([20, 30, 20]);
+    Analytics.track('revive', { id: S.level.id, at: Math.round(S.time), score: S.score }); Store.bumpStat('revives');
+    hooks.onHUD && hooks.onHUD(S); Music.play(S.level.theme, S.level.stages[S.stage].time); paused = false; running = true; return true;
   }
 
   /** One level_end per run (win / lose / quit) + lifetime stats. */
   function endRun(result) {
     if (!S || S.ended) return; S.ended = true;
     const duration = Math.round((performance.now() - S.startedAt) / 1000);
-    Analytics.track('level_end', { id: S.level.id, result, score: S.score, stars: S.stars || Goals.stars(S), starsN: (S.stars || []).filter(Boolean).length, coins: S.coins, bones: S.bones, duration, heartsLost: S.heartsLost || 0, comboBest: S.combo.best, comboMult: S.combo.bestMult, nearMisses: S.nearMisses, shieldSaves: S.shieldSaves, q: Perf.tier });
+    Analytics.track('level_end', { id: S.level.id, result, revived: S.revived, score: S.score, stars: S.stars || Goals.stars(S), starsN: (S.stars || []).filter(Boolean).length, coins: S.coins, bones: S.bones, duration, heartsLost: S.heartsLost || 0, comboBest: S.combo.best, comboMult: S.combo.bestMult, nearMisses: S.nearMisses, shieldSaves: S.shieldSaves, q: Perf.tier });
     Store.bumpStat(result === 'win' ? 'wins' : result === 'lose' ? 'losses' : 'quits'); Store.bumpStat('bones', S.bones); Store.bumpStat('playSec', duration);
   }
 
@@ -165,7 +180,7 @@ const Game = (() => {
   function draw(c, t) { if (!S) return; puppy.draw(c, t, S.powers.magnet > 0, S.powers.shield > 0); Mechanics.drawFront(c, t); S.spawner.draw(c, t); FX.draw(c); }
 
   return {
-    init(h) { hooks = h; }, start, update, draw, continueNext,
+    init(h) { hooks = h; }, start, update, draw, continueNext, revive,
     pause() { if (S && !S.over) paused = true; },
     resume() { paused = false; if (cdResume) { const r = cdResume; cdResume = null; r(); } },
     stop() { if (S && !S.ended && !S.over) { Analytics.track('quit', { id: S.level.id, at: Math.round(S.time), score: S.score }); endRun('quit'); } running = false; paused = false; S = null; clearTimeout(cdTimer); cdTimer = null; cdResume = null; FX.clear(); hooks.onCountdown && hooks.onCountdown(null); },

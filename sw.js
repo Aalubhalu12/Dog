@@ -9,7 +9,7 @@
  *   • activate : delete caches of older versions, take control right away.
  * The page listens for 'controllerchange' and shows a "new version — tap to reload" toast (src/services/pwa.js).
  */
-const VERSION = '0.19.0';
+const VERSION = '0.20.0';
 const CACHE = 'bonk-' + VERSION;
 const SHELL = [
   './',
@@ -38,13 +38,16 @@ const SHELL = [
   'src/game/spawner.js',
   'src/scenes/home.js',
   'src/scenes/play.js',
+  'src/services/ads.js',
   'src/services/analytics.js',
   'src/services/daily.js',
   'src/services/flags.js',
   'src/services/leaderboard.js',
   'src/services/nav.js',
   'src/services/pwa.js',
+  'src/services/remix.js',
   'src/services/save.js',
+  'src/services/shop.js',
   'src/services/store.js',
   'src/services/wallet.js',
   'src/ui/hud.js',

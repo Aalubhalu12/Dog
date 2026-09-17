@@ -42,6 +42,45 @@ const Rig = (() => {
     idleT: 0, fidget: null, fidgetT: 0, nextFidget: 4, dizzyT: 0, breath: 0,
   };
   const img = k => Assets.img(k);
+  // --- skins: cosmetic overlays drawn in rig space (vector, so they scale/rotate with the parts) ------
+  // Each skin lists layers keyed by where they attach: neck (after torso, under the head), head (over the
+  // ears), face (over the eye). Layers draw in canvas space around the joint (x right = nose, y DOWN) —
+  // a head anchor [x, y] from H becomes translate(x, -y).
+  let skin = 'classic';
+  const SKIN_LAYERS = {
+    classic: {},
+    bandana: { neck: c => {                                                  // red scarf: band round the neck, triangle hangs down the chest (drawn over the head base)
+      c.save(); c.translate(40, 30);
+      c.fillStyle = '#d3302a'; c.beginPath(); c.moveTo(-95, -30); c.quadraticCurveTo(0, -62, 100, -22); c.quadraticCurveTo(105, 6, 95, 18); c.quadraticCurveTo(0, -20, -95, 14); c.closePath(); c.fill();   // band
+      c.fillStyle = '#c0281f'; c.beginPath(); c.moveTo(-40, 6); c.quadraticCurveTo(0, -8, 60, 2); c.lineTo(22, 120); c.closePath(); c.fill();                                                            // hanging triangle
+      c.fillStyle = '#e94a3f'; c.beginPath(); c.moveTo(-30, 4); c.lineTo(22, 110); c.lineTo(26, 60); c.closePath(); c.fill();                                                                            // fold highlight
+      c.fillStyle = '#fff'; for (const [x, y, r] of [[-60, -8, 6], [-20, -22, 5], [30, -22, 6], [75, -6, 5], [10, 40, 5], [30, 80, 4]]) { c.beginPath(); c.arc(x, y, r, 0, 6.28); c.fill(); }
+      c.restore();
+    } },
+    party: { head: c => {                                                    // cone hat with pompom, sits between the ears
+      c.save(); c.translate(80, -205); c.rotate(.20); c.scale(.8, .8);
+      c.fillStyle = '#3a8ee6'; c.beginPath(); c.moveTo(-95, 0); c.lineTo(95, 0); c.lineTo(0, -250); c.closePath(); c.fill();
+      c.fillStyle = '#ffd23a'; for (let i = 0; i < 3; i++) { const y = -55 - i * 65, w = 95 * (1 + y / 250); c.beginPath(); c.moveTo(-w, y - 11); c.lineTo(w, y - 11); c.lineTo(w * (1 - 22 / (250 + y)), y + 11); c.lineTo(-w * (1 - 22 / (250 + y)), y + 11); c.closePath(); c.fill(); }
+      c.fillStyle = '#ff5fa2'; c.beginPath(); c.arc(0, -255, 30, 0, 6.28); c.fill(); c.fillStyle = '#ffffff88'; c.beginPath(); c.arc(-9, -265, 10, 0, 6.28); c.fill();
+      c.fillStyle = '#1f5fb0'; c.beginPath(); c.ellipse(0, 0, 97, 18, 0, 0, 6.28); c.fill(); c.restore();
+    } },
+    shades: { face: c => {                                                   // cool sunglasses over the eye (+ bridge to the far side)
+      c.save(); c.translate(4, -2); c.fillStyle = '#1b1b24'; c.strokeStyle = '#ffd23a'; c.lineWidth = 8;
+      c.beginPath(); c.ellipse(6, 0, 58, 42, .1, 0, 6.28); c.fill(); c.stroke();
+      c.beginPath(); c.moveTo(-50, -6); c.quadraticCurveTo(-95, -4, -135, 30); c.stroke();                    // arm to the far ear
+      c.beginPath(); c.moveTo(62, -8); c.quadraticCurveTo(80, -14, 92, -10); c.stroke();                      // nose bridge stub
+      c.fillStyle = '#ffffff55'; c.beginPath(); c.ellipse(-14, -16, 22, 10, -.5, 0, 6.28); c.fill(); c.restore();
+    } },
+    crown: { head: c => {                                                    // golden crown with jewels (Club)
+      c.save(); c.translate(80, -208); c.rotate(.10); c.scale(1.05, 1.05);
+      c.fillStyle = '#f5c53a'; c.strokeStyle = '#b8860b'; c.lineWidth = 5; c.beginPath();
+      c.moveTo(-78, 0); c.lineTo(-84, -90); c.lineTo(-42, -48); c.lineTo(0, -110); c.lineTo(42, -48); c.lineTo(84, -90); c.lineTo(78, 0); c.closePath(); c.fill(); c.stroke();
+      c.fillStyle = '#ffe9a0'; c.fillRect(-78, -14, 156, 10);
+      for (const [x, col] of [[-84, '#e53d3d'], [0, '#3d8ee5'], [84, '#3fc46a']]) { c.fillStyle = col; c.beginPath(); c.arc(x, x ? -92 : -112, 12, 0, 6.28); c.fill(); }
+      c.fillStyle = '#e53d3d'; c.beginPath(); c.arc(0, -30, 13, 0, 6.28); c.fill(); c.restore();
+    } },
+  };
+  const skinLayer = (c, at) => { const L = SKIN_LAYERS[skin] && SKIN_LAYERS[skin][at]; if (L) L(c); };
   const step = (sp, target, dt) => { sp.v += (sp.k * (target - sp.x) - sp.d * sp.v) * dt; sp.x += sp.v * dt; return sp.x; };
   const lerp = (a, b, k) => a + (b - a) * k;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -146,14 +185,20 @@ const Rig = (() => {
     push('legHindB', hip, L.hB.ang + lean, 1, L.hB.len, .9, L.hB.shear || 0);
     push('legFrontB', sho, L.fB.ang + lean, 1, L.fB.len, .9, L.fB.shear || 0);
     push('torso', [0, tcy], lean);
+    if (SKIN_LAYERS[skin] && SKIN_LAYERS[skin].neck) q.push([7.5, 'skin:neck', nk[0], nk[1], lean, 1, 1, null, 0]);
     push('legHindF', hip, L.hF.ang + lean, 1, L.hF.len, null, L.hF.shear || 0);
     push('legFrontF', sho, L.fF.ang + lean, 1, L.fF.len, null, L.fF.shear || 0);
     push('head', nk, headA, 1 - Math.abs(S.lookX) * .05, 1);
     if (S.mouthOpen > .05) push('mouth', mo, headA - .1, 1, .3 + .7 * S.mouthOpen);
     push('earNear', en, earBase + S.earNear.x);
+    if (SKIN_LAYERS[skin] && SKIN_LAYERS[skin].head) q.push([10, 'skin:head', nk[0], nk[1], headA, 1, 1, null, 0]);
     q.sort((a, b) => a[0] - b[0]);
-    for (const [, nm, px, py, a, sx, sy, al, sh] of q) part(c, nm, px, py, a, sx, sy, al, sh);
+    for (const [, nm, px, py, a, sx, sy, al, sh] of q) {
+      if (nm.startsWith('skin:')) { c.save(); c.translate(px, py); c.rotate(-a); skinLayer(c, nm.slice(5)); c.restore(); }   // layers draw in canvas space (y down) around the joint
+      else part(c, nm, px, py, a, sx, sy, al, sh);
+    }
     drawEye(c, eye, headA, st);
+    if (SKIN_LAYERS[skin] && SKIN_LAYERS[skin].face) { c.save(); c.translate(eye[0], eye[1]); c.rotate(-headA); skinLayer(c, 'face'); c.restore(); }
     if (st === 'dizzy') { c.save(); c.translate(nk[0] + 80, nk[1] - 330); c.scale(face, 1); c.fillStyle = '#ffd23a'; c.font = 'bold 64px sans-serif'; c.textAlign = 'center';
       for (let i = 0; i < 3; i++) { const a = S.dizzyT * 4 + i * 2.09; c.globalAlpha = .7 + .3 * Math.sin(a); c.fillText('★', Math.cos(a) * 120, Math.sin(a) * 26); } c.restore(); }
     c.restore();
@@ -175,5 +220,6 @@ const Rig = (() => {
     kick(v) { S.earNear.v += v; S.earFar.v += v * .9; S.tail.v += v * 1.4; S.head.v += v * .5; },
     reset() { Object.assign(S, { stride: 0, bounce: 0, pb: 0, lean: 0, squash: 1, prevSpeed: 0, accel: 0, blink: 0, lookX: 0, lookY: 0, mouthOpen: 0, idleT: 0, fidget: null, dizzyT: 0 }); for (const k of ['earNear', 'earFar', 'tail', 'head']) { S[k].x = 0; S[k].v = 0; } },
     get S() { return S; }, PARTS, TOTAL_H,
+    get skin() { return skin; }, setSkin(id) { skin = SKIN_LAYERS[id] ? id : 'classic'; }, SKINS: Object.keys(SKIN_LAYERS),
   };
 })();

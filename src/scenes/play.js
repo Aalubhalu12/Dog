@@ -17,7 +17,7 @@ const PlayScene = (() => {
       onHUD: HUD.update,
       onLifeLost: S => HUD.hearts(S, true),
       onLevelClear: Modals.levelClear,
-      onGameOver: S => { Modals.gameOver(S); armInstantRetry(); },
+      onGameOver: S => { Modals.gameOver(S); armInstantRetry(); Ads.interstitial('game_over', { levelId: S.level.id, stars: (S.stars || []).filter(Boolean).length }); },
       onCombo: HUD.combo,
     });
     // Instant retry: on the game-over card, press R / Enter / Space (desktop) — the TRY AGAIN button is already the primary tap target.
@@ -28,9 +28,11 @@ const PlayScene = (() => {
     $('#btnResume').onclick = () => { SFX.click(); Modals.close('#modalPause'); Music.duck(false); Game.resume(); };
     $('#btnRestart').onclick = () => { SFX.click(); Modals.close('#modalPause'); Analytics.track('retry', { id: Game.state.level.id, from: 'pause' }); Game.start(Game.state.levelIdx); };
     $('#btnQuit').onclick = () => { SFX.click(); app.goHome(); };
+    $('#btnRevive').onclick = async () => { SFX.click(); const b = $('#btnRevive'); b.disabled = true; const ok = await Ads.rewarded('revive'); b.disabled = false; if (!ok) { Modals.toast('No reward — ad skipped'); return; } Modals.close('#modalOver'); Game.revive(); };
+    $('#btnDouble').onclick = async () => { SFX.click(); const S = Game.state; const b = $('#btnDouble'); b.disabled = true; const ok = await Ads.rewarded('double_coins'); b.disabled = false; if (!ok || !S) { Modals.toast('No reward — ad skipped'); return; } S.doubled = true; Store.addCoins(S.coins, 'double'); S.coins *= 2; $('#wCoins').textContent = S.coins; b.hidden = true; SFX.goldbone(); Modals.toast(`🪙 Coins doubled → ${S.coins}`); };
     $('#btnAgain').onclick = () => { SFX.click(); Modals.close('#modalOver'); Analytics.track('retry', { id: Game.state.level.id, from: 'gameover' }); Game.start(Game.state.levelIdx); };
     $('#btnHome').onclick = () => { SFX.click(); app.goHome(); };
-    $('#btnContinue').onclick = () => { SFX.click(); Modals.close('#modalWin'); Analytics.track('continue', { from: Game.state.level.id }); Game.continueNext(); };
+    $('#btnContinue').onclick = () => { SFX.click(); Modals.close('#modalWin'); if (Game.state.remix) { app.goHome(); return; } Analytics.track('continue', { from: Game.state.level.id }); Game.continueNext(); };
     $('#btnWinHome').onclick = () => { SFX.click(); app.goHome(); };
     $('#btnWinMap').onclick = () => { SFX.click(); app.goHome(); };
     $('#btnWinRetry').onclick = () => { SFX.click(); Modals.close('#modalWin'); Analytics.track('retry', { id: Game.state.level.id, from: 'win' }); Game.start(Game.state.levelIdx); };

@@ -2,6 +2,31 @@
 
 All notable changes to BONK! are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.20.0] — 2026-09-17 — Shop · 5 skins · Daily Remix · mock ads & store (Phase 4, slice B)
+### Added
+- **Skins on the rig** (`Rig.SKIN_LAYERS`): vector overlays drawn in rig space so they follow every head turn,
+  ear flop and squash — Classic · **Red Bandana** (300 coins) · **Party Pup** hat (600 coins) · **Cool Pup** shades
+  (₹79, mock IAP) · **Golden Bonk** crown (Club-only, not purchasable). Cosmetic only — no stats, ever.
+- **Shop** (bone counter ➕): Skins tab with a **live idle-rig preview** (looks around, blinks), buy / equip, not-enough-
+  coins nudge; Ads tab (Remove Ads ₹149 one-time); Club tab (benefits, ₹99/mo, "Coming on Android" — disabled on web);
+  Restore purchases. `Shop.setStore(adapter)` swaps the mock (900 ms sheet; QA `?mockpay=cancel|fail`) for
+  Razorpay / Play Billing later without touching UI code.
+- **Daily Remix** (🎲): date-seeded pick from the levels you've reached + 1–2 modifiers (Fast Fall, Bone Rain,
+  No Magnet, Gold Rush, Gusty, Night Shift, One Heart), target 75 % of the base level, +150 coins once per day on
+  clear, today's best + yesterday's ghost, countdown. Runs as an ad-hoc level (`id: 'remix'`, HUD `RMX.1`) — never
+  touches level progress or the global best. Everyone gets the same Remix on a given day.
+- **Ad layer** (`src/services/ads.js`): rules live in the game, adapters stay dumb. Rewarded **Revive** (once per run,
+  offered only when ≥ 25 % through the level; 1 ❤, 2.5 s shield, hazards cleared) and **2× coins** on the win card.
+  Interstitial after game-over only from level 3, every 3rd game-over, ≥ 3 min apart, never after a 3★ win, never for
+  Remove-Ads / Club owners. Mock panel = 3-second timer, rewarded is skippable (→ no reward).
+- Flags `shop_enabled` / `remix_enabled` / `ads_enabled` / `daily_bonus_enabled` now default ON (mock).
+### Verified (headless)
+- Buy with coins (short → nudge; enough → owned+equipped, balance −300), ₹ skin through the mock store, Club skin
+  locked, re-equip, skin visible in a run and back to equipped after closing the shop; Remove Ads → owned, revoke →
+  restore; Remix run → win card "Remix done", +150 once, level progress untouched; 2× coins wallet 41 → 82; revive →
+  run resumes with 1 ❤, second game-over hides revive; interstitials at L4 game-overs: [no, no, **yes**, no]; with
+  Remove Ads: none. check.py PASS · sim_play 26/26 · L1–3 sweep PASS · 0 console errors.
+
 ## [0.19.0] — 2026-09-10 — PWA · daily bonus · profile · back navigation (Phase 4, slice A)
 ### Added
 - **Installable app (PWA):** `manifest.webmanifest` (fullscreen, portrait, id `/Dog/`), icons 192/512 + maskable +

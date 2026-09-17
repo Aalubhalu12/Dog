@@ -68,6 +68,8 @@ const HomeScene = (() => {
     renderGrid(); select(selected);
     $('#mapCoins').textContent = Store.coins().toLocaleString();
     $('#dailyDot').style.display = Daily.status().claimable ? '' : 'none';
+    const rmx = Flags.get('remix_enabled'); $('#btnRemix').hidden = !rmx; if (rmx) { const R = Remix.today(); $('#remixDot').style.display = R.claimed ? 'none' : ''; }
+    $('#btnShop').style.display = Shop.enabled() ? '' : 'none';
   }
 
   let shownDaily = false;                              // the daily popup opens itself once per session (first visit to home after FTUE)
@@ -76,7 +78,12 @@ const HomeScene = (() => {
     $('#lsPlay').onclick  = () => { SFX.unlock(); SFX.click(); app.goPlay(selected); };
     $('#btnHow').onclick = () => { SFX.click(); Modals.open('#modalHow'); };
     $('#btnSettings').onclick = () => { SFX.click(); Modals.open('#modalSettings'); };
-    $('#btnShop').onclick = () => { SFX.click(); Modals.toast('🛍️ Shop coming soon!'); };
+    $('#btnShop').onclick = () => { SFX.click(); if (Shop.enabled()) Modals.shop('skins'); else Modals.toast('🛍️ Shop coming soon!'); };
+    $('#btnRemix').onclick = () => { SFX.click(); Modals.remix(); };
+    $('#btnRemixPlay').onclick = () => { SFX.unlock(); SFX.click(); Modals.close('#modalRemix'); app.goPlay(Remix.today().level); };
+    $('#btnRemoveAds').onclick = async () => { SFX.click(); const b = $('#btnRemoveAds'); b.disabled = true; const r = await Shop.buy('remove_ads'); if (r === 'ok') { SFX.goldbone(); Modals.toast('🚫 Ads removed — thank you!'); } else if (r === 'cancel') Modals.toast('Payment cancelled'); else if (r === 'fail') Modals.toast('Payment failed — nothing was charged'); Modals.shop('ads'); };
+    $('#btnShopRestore').onclick = async () => { SFX.click(); const ids = await Shop.restore(); Modals.toast(ids.length ? `♻️ Restored: ${ids.join(', ')}` : 'Nothing to restore'); Modals.shop(); };
+    Events.on('coins:short', () => { if ($('#sceneHome').classList.contains('active') && !Modals.isOpen('#modalShop')) Modals.toast('🪙 Not enough coins yet'); });
     $('#btnDaily').onclick = () => { SFX.click(); Modals.daily(); };
     $('#btnProfile').onclick = () => { SFX.click(); Modals.profile(); };
     $('#btnClaim').onclick = () => { const r = Daily.claim(); if (!r) return; SFX.goldbone(); FX.vibrate([20, 40, 20]); Modals.toast(`🦴 +${r.coins} coins — day ${r.day} of 7!`); Modals.daily(); render(); };

@@ -78,17 +78,17 @@ From you: optional music track (or I use a generated/royalty-free loop); Playtes
 
 Build
 - ~~Daily bonus ladder (7 days, soft streak) + popup~~ ✅ v0.19.0
-- Daily Remix: seeded level + modifiers, ghost best, once-a-day reward, countdown
-- Shop: Skins tab (5 skins as overlays, live preview on idle animation, equip), Remove Ads card, Bonk Club card (benefits, price, "coming on Android" on web)
+- ~~Daily Remix: seeded level + modifiers, ghost best, once-a-day reward, countdown~~ ✅ v0.20.0
+- ~~Shop: Skins tab (5 skins as overlays, live preview on idle animation, equip), Remove Ads card, Bonk Club card~~ ✅ v0.20.0
 - ~~Profile: name, stars, coins, streak, sign-in placeholder, Restore~~ ✅ v0.19.0 (equipped skin arrives with the shop)
 - Settings: music, SFX, vibration, EN/HI toggle, privacy/ToS links, consent, credits, version, reset progress, FTUE reset, analytics export
-- Mock ad layer (fake rewarded/interstitial panels) with the real placement rules; mock store (buy/restore/revoke)
+- ~~Mock ad layer (fake rewarded/interstitial panels) with the real placement rules; mock store (buy/restore/revoke)~~ ✅ v0.20.0
 - ~~Android hardware-back semantics (history stack), offline banner~~ ✅ v0.19.0 · rate-us prompt logic (with the store build)
 - ~~PWA: manifest, icons, service worker (offline play), install prompt~~ ✅ v0.19.0
 
 Done when
 - [ ] Navigation map in LAUNCH_PLAN §2 fully reachable, no dead ends, back works everywhere
-- [ ] Buy skin → equip → visible in game; Remove Ads (mock) suppresses interstitials; revoke restores them
+- [x] Buy skin → equip → visible in game; Remove Ads (mock) suppresses interstitials; revoke restores them (v0.20.0, headless-verified)
 - [x] Installs as PWA and plays offline (v0.19.0 — verified headless: 132-file shell cached, boot + play L3 with network off)
 - [ ] **Playtest #2** on the link: full flow from first launch to level 5 without confusion
 

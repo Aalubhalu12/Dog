@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.19.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.20.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -59,7 +59,10 @@ bonk/
 │   │   └── leaderboard.js     #   local-first leaderboard, cached view, daily sync windows (Mock / Http adapter)
 │   │   ├── daily.js           #   7-day daily bonus ladder, soft streak (miss a day → back one rung)
 │   │   ├── pwa.js             #   service-worker registration, install prompt, update toast, offline events
-│   │   └── nav.js             #   Android/browser back: closes the top modal, pauses a run, double-back exits
+│   │   ├── nav.js             #   Android/browser back: closes the top modal, pauses a run, double-back exits
+│   │   ├── shop.js            #   skins catalogue, coin/IAP purchase, equip, mock store adapter (Razorpay/Play later), entitlements
+│   │   ├── ads.js             #   ad layer: placement RULES here (interstitial cadence, never for owners) + mock 3-s panel adapter
+│   │   └── remix.js           #   Daily Remix: date-seeded level + 1–2 modifiers, once-a-day reward, yesterday's ghost
 │   ├── audio/
 │   │   ├── sfx.js             #   procedural SFX + puppy voice (Web Audio) → SFX.play('key')
 │   │   └── music.js           #   procedural background music: 8-bar pentatonic loop, key/tempo per location, darker at night/rain
@@ -122,6 +125,9 @@ bonk/
 | Change puppy speed / size | `src/core/config.js` → `PUPPY` | |
 | Add a sound | `src/audio/sfx.js` | reference by key from an item |
 | Change daily bonus amounts | `src/services/daily.js` → `LADDER` | |
+| Add a skin | `src/game/rig.js` → `SKIN_LAYERS` (canvas overlay at neck/head/face) + `src/services/shop.js` → `SKINS` | preview is live on the rig |
+| Add a Remix modifier | `src/services/remix.js` → `MODS` | `apply(L)` returns level overrides |
+| Tune ad cadence | `src/services/flags.js` (`interstitial_every`, `interstitial_min_level`) | QA: `?flag_ads_enabled=0` |
 | Ship a new version | `python3 tools/bump.py X.Y.Z` | also regenerates `sw.js` (VERSION + pre-cache list) |
 | Change the music for a location | `src/audio/music.js` → `THEMES` (key, bpm, shaker, brightness) | melody in `PHRASE_A/B` (pentatonic indices) |
 | Add a location | `src/game/background.js` → `THEMES` + 2 keyed layers in `assets/images/bg/` | set `theme:` on a level |

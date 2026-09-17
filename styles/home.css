@@ -117,3 +117,4 @@
 .hm-gift:active{transform:scale(.92)}
 .hm-gift i{position:absolute;right:6%;top:2%;width:28%;height:28%;border-radius:50%;background:#ff3d3d;border:2px solid #fff;box-shadow:0 0 0 2px #ff3d3d55;animation:pulse 1.2s infinite}
 @keyframes giftBob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-4%) rotate(4deg)}}
+.hm-remix{top:29.4%}

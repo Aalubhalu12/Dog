@@ -1,5 +1,5 @@
 # BONK! — Status & Next Steps
-_Updated 2026-09-10 · current build **v0.19.0** (Phases 1–3 done; Phase 4 slice A shipped: PWA install + offline, daily bonus, profile, back navigation — slice B = shop/skins, Daily Remix, mock ads) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
+_Updated 2026-09-17 · current build **v0.20.0** (Phases 1–4 done: PWA, daily bonus, profile, back-nav, shop + 5 skins, Daily Remix, mock ads/store — next: Playtest #2, then Phase 5 Firebase) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
 
 ---
 
