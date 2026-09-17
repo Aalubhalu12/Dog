@@ -103,10 +103,17 @@
   background:linear-gradient(#e7c496,#c99a62 70%,#b98950);border:3px solid #8e5726;box-shadow:inset 0 0 0 2px #f2d6a666,0 4px 0 #5a2c0b,0 6px 12px #0005}
 .hm-post.l span{transform:rotate(-1.5deg)}.hm-post.r span{transform:rotate(1.5deg)}
 .hm-post:active{transform:translateY(3px)}
-.hm-sound{left:4.5%;top:12%;width:8%;aspect-ratio:1;border-radius:50%;border:2px solid #d9a466;background:#7a4a1ccc;color:#fff;font-size:clamp(12px,3.6cqw,20px);display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 6px #0005;padding:0}
+.hm-sound{left:4.5%;top:9.4%;width:8%;z-index:3;aspect-ratio:1;border-radius:50%;border:2px solid #d9a466;background:#7a4a1ccc;color:#fff;font-size:clamp(12px,3.6cqw,20px);display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 6px #0005;padding:0}
 
 /* keyframes */
 @keyframes menuIn{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
 @keyframes nodeIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
 @keyframes ringBlue{0%,100%{box-shadow:0 5px 0 #124e8e,0 8px 14px #0005,0 0 0 3px #bfe6ff88,inset 0 2px 0 #fff8}50%{box-shadow:0 5px 0 #124e8e,0 8px 14px #0005,0 0 0 9px #bfe6ff22,inset 0 2px 0 #fff8}}
 @keyframes nudgeX{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* --- profile (under the sound toggle) + daily gift (under the bone counter) --- */
+.hm-profile{top:16.2%;font-size:clamp(13px,3.9cqw,22px)}
+.hm-gift{left:3.6%;top:22.6%;width:10%;z-index:3;aspect-ratio:1;border:none;background:none;cursor:pointer;padding:0;font-size:clamp(20px,6cqw,36px);line-height:1;filter:drop-shadow(0 3px 3px #0006);animation:giftBob 2.4s ease-in-out infinite}
+.hm-gift:active{transform:scale(.92)}
+.hm-gift i{position:absolute;right:6%;top:2%;width:28%;height:28%;border-radius:50%;background:#ff3d3d;border:2px solid #fff;box-shadow:0 0 0 2px #ff3d3d55;animation:pulse 1.2s infinite}
+@keyframes giftBob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-4%) rotate(4deg)}}

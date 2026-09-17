@@ -3,14 +3,15 @@
  * Add a modal: create a `.modal` element in index.html, then open('#id').
  */
 const Modals = (() => {
-  const STICKY = ['modalPause', 'modalOver', 'modalWin'];         // can't be dismissed by tapping outside
-  const open = id => $(id).classList.add('open');
-  const close = id => $(id).classList.remove('open');
-  const closeAll = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
+  const STICKY = ['modalPause', 'modalOver', 'modalWin'];         // can't be dismissed by tapping outside / hardware back
+  // Every open modal is a Nav layer: Android back / Escape closes the top-most one (sticky ones are result cards — back there = their primary button is the only way on)
+  const open = id => { $(id).classList.add('open'); if (!STICKY.includes(id.slice(1))) Nav.push(id, () => close(id, true)); };
+  const close = (id, fromBack) => { $(id).classList.remove('open'); if (!fromBack) Nav.pop(id); };
+  const closeAll = () => document.querySelectorAll('.modal').forEach(m => close('#' + m.id));
   const isOpen = id => $(id).classList.contains('open');
 
-  document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => { SFX.click(); b.closest('.modal').classList.remove('open'); });
-  document.querySelectorAll('.modal').forEach(m => m.addEventListener('pointerdown', e => { if (e.target === m && !STICKY.includes(m.id)) m.classList.remove('open'); }));
+  document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => { SFX.click(); close('#' + b.closest('.modal').id); });
+  document.querySelectorAll('.modal').forEach(m => m.addEventListener('pointerdown', e => { if (e.target === m && !STICKY.includes(m.id)) close('#' + m.id); }));
 
   function toast(msg) { const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 1600); }
 
@@ -64,5 +65,23 @@ const Modals = (() => {
     const list = $('#lbList'), me = list.querySelector('.lb-row.me');       // mid-pack: land on my neighbourhood, top 10 stays one flick above
     list.scrollTop = me && !v.inTop ? Math.max(0, me.offsetTop - list.clientHeight * .55) : 0;
   }
-  return { open, close, closeAll, isOpen, toast, gameOver, levelClear, leaderboard };
+  // ---- daily bonus ladder ----
+  function daily() {
+    const st = Daily.status();
+    $('#dailyHead').innerHTML = st.claimable ? `Day <b>${st.day}</b> of 7 — claim today's bone!` : `Claimed! Next bone in <b>${fmtLeft(st.next)}</b>`;
+    $('#dailyLadder').innerHTML = st.ladder.map(r => `<div class="rung${r.done ? ' done' : ''}${r.today ? ' today' : ''}${r.big ? ' big' : ''}"><small>DAY ${r.day}</small><img src="${Assets.url(r.big ? 'goldbone' : 'bone')}" alt=""><b>+${r.coins}</b>${r.done ? '<i>✓</i>' : ''}</div>`).join('');
+    const btn = $('#btnClaim'); btn.disabled = !st.claimable; btn.querySelector('span').textContent = st.claimable ? '🦴 CLAIM' : '✓ SEE YOU TOMORROW';
+    open('#modalDaily');
+  }
+  const fmtLeft = ms => { const h = Math.floor(ms / 36e5), m = Math.floor(ms % 36e5 / 6e4); return h ? `${h}h ${m}m` : `${m}m`; };
+  // ---- profile ----
+  function profile() {
+    const p = Leaderboard.profile(), st = Save.get('stats', {}), lp = Store.levelProgress(), cleared = Object.values(lp).filter(l => l.cleared).length;
+    $('#pfName').value = p.name; $('#pfCountry').textContent = `${Leaderboard.flag(p.country)} ${p.country || '—'}`;
+    $('#pfStars').textContent = `${Store.totalStars()}/${LEVELS.length * 3}`; $('#pfBest').textContent = Store.best().toLocaleString(); $('#pfCoins').textContent = Store.coins().toLocaleString();
+    const d = Daily.status();
+    $('#pfExtra').innerHTML = `<span>🗺️ ${cleared}/${LEVELS.length} levels</span><span>🔥 ${d.streak}-day streak</span><span>🦴 ${(st.bones || 0).toLocaleString()} bones</span><span>⏱ ${Math.round((st.playSec || 0) / 60)} min played</span>`;
+    open('#modalProfile');
+  }
+  return { open, close, closeAll, isOpen, toast, gameOver, levelClear, leaderboard, daily, profile };
 })();

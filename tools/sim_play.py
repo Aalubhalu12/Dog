@@ -83,7 +83,10 @@ with sync_playwright() as p:
     board=pg.evaluate('() => ({ done: document.querySelectorAll(".tile.done").length, cur: document.querySelectorAll(".tile.current").length, locked: document.querySelectorAll(".tile.locked").length })')
     check('Level board reflects progress', board['done']>=1, json.dumps(board))
     pg.screenshot(path=str(SHOTS / 'sim_board.jpg'),quality=75,type='jpeg')
-    # ---- pause / resume / hardware-ish flows
+    # ---- pause / resume / hardware-ish flows (the daily-bonus popup opens itself once per session after a reload — claim it like a player)
+    daily=pg.evaluate('Modals.isOpen("#modalDaily")'); c0=pg.evaluate('Store.coins()')
+    if daily: pg.click('#btnClaim',force=True); pg.wait_for_timeout(200); pg.click('#modalDaily .btn-x',force=True); pg.wait_for_timeout(200)
+    check('Daily bonus popup + claim', daily and pg.evaluate('Store.coins()')>c0 and not pg.evaluate('Modals.isOpen("#modalDaily")'), f'coins {c0}→{pg.evaluate("Store.coins()")}')
     pg.click('#lsPlay',force=True); pg.wait_for_function('Game.active',timeout=15000)
     pg.evaluate('window.dispatchEvent(new KeyboardEvent("keydown",{key:"Escape"}))'); pg.wait_for_timeout(300)
     paused=pg.evaluate('Game.paused && Modals.isOpen("#modalPause")')

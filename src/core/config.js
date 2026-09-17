@@ -6,7 +6,7 @@
  * Item definitions live in src/data/items.js
  */
 const CONFIG = Object.freeze({
-  VERSION: '0.18.0',
+  VERSION: '0.19.0',
   STORAGE_PREFIX: 'bonk_',
 
   /** Player (puppy) */

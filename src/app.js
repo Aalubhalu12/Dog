@@ -36,6 +36,15 @@
       r.onchange = () => { Store.setSetting(key, +r.value); if (key === 'sfxVol') SFX.bone(); };
     };
     vol('sfx', 'sfxVol', 1, v => SFX.setVolume(v)); vol('music', 'musicVol', .7, v => Music.setVolume(v));
+    // install / about
+    const syncInstall = () => { $('#installRow').hidden = !PWA.canInstall || PWA.standalone; $('#iosHint').hidden = !(PWA.ios && !PWA.standalone); };
+    Events.on('pwa:installable', syncInstall); Events.on('pwa:installed', () => { syncInstall(); Modals.toast('📲 Installed — find BONK! on your home screen'); }); syncInstall();
+    $('#btnInstall').onclick = async () => { SFX.click(); const r = await PWA.install(); if (r === 'accepted') syncInstall(); };
+    $('#btnCredits').onclick = () => { SFX.click(); Modals.open('#modalCredits'); };
+    $('#setVersion').textContent = $('#crVersion').textContent = 'v' + CONFIG.VERSION + (PWA.standalone ? ' · app' : '');
+    Events.on('pwa:update', () => { const t = $('#toast'); Modals.toast('✨ New version ready — tap to update'); t.onclick = () => { t.onclick = null; PWA.applyUpdate(); }; });
+    const net = on => $('#netbar').classList.toggle('show', !on); Events.on('net', ({ online }) => net(online)); net(navigator.onLine);
+    Events.on('nav:pause', () => PlayScene.pause && PlayScene.pause());
     syncSound(Store.setting('sound')); BG.setTilt(Store.setting('tilt'));
     // controls: scheme segmented buttons + drag sensitivity slider
     const seg = document.querySelectorAll('#ctrlMode button'), slider = $('#sensRange'), sensRow = $('#sensRow');
@@ -91,7 +100,7 @@
     BG.init();
     Input.bind({ dragSurface: $('#bg'), canvas: $('#bg') }); Input.setPuppyX(() => Game.puppy.x);
     Input.setMode(Store.setting('control', 'drag')); Input.setSensitivity(Store.setting('sens', CONFIG.PUPPY.DRAG_SENS));
-    HomeScene.bind(app); PlayScene.bind(app); bindSettings();
+    HomeScene.bind(app); PlayScene.bind(app); bindSettings(); PWA.init(); Nav.init();
     Leaderboard.init();                                              // local-first; syncs only inside daily windows
     $('#appVersion').textContent = 'v' + CONFIG.VERSION;
     app.go('home');

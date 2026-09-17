@@ -1,0 +1,20 @@
+{
+  "name": "BONK! Puppy Adventure",
+  "short_name": "BONK!",
+  "description": "Catch bones, dodge rocks. A cute puppy catch-and-dodge game.",
+  "id": "/Dog/",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "portrait",
+  "background_color": "#2f8fe0",
+  "theme_color": "#2f8fe0",
+  "lang": "en",
+  "categories": ["games", "kids"],
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

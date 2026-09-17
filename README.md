@@ -3,7 +3,7 @@
 A polished 2D catch-and-dodge mobile web game with a Pixar-style parallax world.
 Move the puppy left/right, catch bones and coins, grab power-ups, and dodge falling rocks and bombs.
 
-**Version:** 0.18.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
+**Version:** 0.19.0 · **Stack:** vanilla HTML5 Canvas + JS + CSS (no build step, no dependencies)
 
 ![BONK! gameplay](docs/screenshots/00_overview.jpg)
 
@@ -57,6 +57,9 @@ bonk/
 │   │   ├── wallet.js          #   coins: bounded add / spend, events
 │   │   ├── store.js           #   Store facade: best, per-level {best,cleared,stars,plays}, settings, stats
 │   │   └── leaderboard.js     #   local-first leaderboard, cached view, daily sync windows (Mock / Http adapter)
+│   │   ├── daily.js           #   7-day daily bonus ladder, soft streak (miss a day → back one rung)
+│   │   ├── pwa.js             #   service-worker registration, install prompt, update toast, offline events
+│   │   └── nav.js             #   Android/browser back: closes the top modal, pauses a run, double-back exits
 │   ├── audio/
 │   │   ├── sfx.js             #   procedural SFX + puppy voice (Web Audio) → SFX.play('key')
 │   │   └── music.js           #   procedural background music: 8-bar pentatonic loop, key/tempo per location, darker at night/rain
@@ -118,6 +121,8 @@ bonk/
 | Add a power-up | `items.js` (`POWERS`) + handle in `game.js` / `spawner.js` | |
 | Change puppy speed / size | `src/core/config.js` → `PUPPY` | |
 | Add a sound | `src/audio/sfx.js` | reference by key from an item |
+| Change daily bonus amounts | `src/services/daily.js` → `LADDER` | |
+| Ship a new version | `python3 tools/bump.py X.Y.Z` | also regenerates `sw.js` (VERSION + pre-cache list) |
 | Change the music for a location | `src/audio/music.js` → `THEMES` (key, bpm, shaker, brightness) | melody in `PHRASE_A/B` (pentatonic indices) |
 | Add a location | `src/game/background.js` → `THEMES` + 2 keyed layers in `assets/images/bg/` | set `theme:` on a level |
 | Change a level's acts (time of day) | `data/levels/L*.json` → `stages` | grades live in `BG.TIMES` |

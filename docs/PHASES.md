@@ -77,19 +77,19 @@ From you: optional music track (or I use a generated/royalty-free loop); Playtes
 **Goal:** every screen of the final game exists and is navigable; monetization flows run on mocks.
 
 Build
-- Daily bonus ladder (7 days, soft streak) + popup
+- ~~Daily bonus ladder (7 days, soft streak) + popup~~ ✅ v0.19.0
 - Daily Remix: seeded level + modifiers, ghost best, once-a-day reward, countdown
 - Shop: Skins tab (5 skins as overlays, live preview on idle animation, equip), Remove Ads card, Bonk Club card (benefits, price, "coming on Android" on web)
-- Profile: name, equipped skin, stars, coins, streak, sign-in placeholder, Restore
+- ~~Profile: name, stars, coins, streak, sign-in placeholder, Restore~~ ✅ v0.19.0 (equipped skin arrives with the shop)
 - Settings: music, SFX, vibration, EN/HI toggle, privacy/ToS links, consent, credits, version, reset progress, FTUE reset, analytics export
 - Mock ad layer (fake rewarded/interstitial panels) with the real placement rules; mock store (buy/restore/revoke)
-- Android hardware-back semantics (history stack), offline banner, rate-us prompt logic
-- PWA: manifest, icons, service worker (offline play), install prompt
+- ~~Android hardware-back semantics (history stack), offline banner~~ ✅ v0.19.0 · rate-us prompt logic (with the store build)
+- ~~PWA: manifest, icons, service worker (offline play), install prompt~~ ✅ v0.19.0
 
 Done when
 - [ ] Navigation map in LAUNCH_PLAN §2 fully reachable, no dead ends, back works everywhere
 - [ ] Buy skin → equip → visible in game; Remove Ads (mock) suppresses interstitials; revoke restores them
-- [ ] Installs as PWA and plays offline
+- [x] Installs as PWA and plays offline (v0.19.0 — verified headless: 132-file shell cached, boot + play L3 with network off)
 - [ ] **Playtest #2** on the link: full flow from first launch to level 5 without confusion
 
 From you: skin ideas/preferences (colours, hats), final names & prices, Playtest #2. **Start creating accounts now** (see P5/P6 lists) if not done.

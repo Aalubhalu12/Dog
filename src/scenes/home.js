@@ -67,14 +67,23 @@ const HomeScene = (() => {
     page = Math.floor(selected / PER_PAGE);
     renderGrid(); select(selected);
     $('#mapCoins').textContent = Store.coins().toLocaleString();
+    $('#dailyDot').style.display = Daily.status().claimable ? '' : 'none';
   }
 
+  let shownDaily = false;                              // the daily popup opens itself once per session (first visit to home after FTUE)
   function bind(a) {
     app = a;
     $('#lsPlay').onclick  = () => { SFX.unlock(); SFX.click(); app.goPlay(selected); };
     $('#btnHow').onclick = () => { SFX.click(); Modals.open('#modalHow'); };
     $('#btnSettings').onclick = () => { SFX.click(); Modals.open('#modalSettings'); };
     $('#btnShop').onclick = () => { SFX.click(); Modals.toast('🛍️ Shop coming soon!'); };
+    $('#btnDaily').onclick = () => { SFX.click(); Modals.daily(); };
+    $('#btnProfile').onclick = () => { SFX.click(); Modals.profile(); };
+    $('#btnClaim').onclick = () => { const r = Daily.claim(); if (!r) return; SFX.goldbone(); FX.vibrate([20, 40, 20]); Modals.toast(`🦴 +${r.coins} coins — day ${r.day} of 7!`); Modals.daily(); render(); };
+    $('#pfName').onchange = () => { const v = $('#pfName').value.trim().slice(0, 14); if (!v) { $('#pfName').value = Leaderboard.profile().name; return; } Save.set('profile.name', v); Analytics.track('rename'); };
+    $('#btnSignIn').onclick = () => { SFX.click(); Modals.toast('☁️ Google sign-in arrives with cloud save (Phase 5)'); };
+    $('#btnRestore').onclick = () => { SFX.click(); Modals.toast('🛍️ Nothing to restore yet'); };
+    Events.on('coins', () => { if ($('#sceneHome').classList.contains('active')) $('#mapCoins').textContent = Store.coins().toLocaleString(); });
     $('#btnBoard').onclick = () => { SFX.click(); Modals.leaderboard(); };
     $('#lsPrev').onclick  = () => { SFX.click(); page = Math.max(0, page - 1); renderGrid(); };
     $('#lsNext').onclick  = () => { SFX.click(); page = Math.min(pageCount() - 1, page + 1); renderGrid(); };
@@ -88,7 +97,7 @@ const HomeScene = (() => {
 
   return {
     bind,
-    enter() { render(); Music.play('home'); },
+    enter() { render(); Music.play('home'); if (Daily.status().claimable && Store.ftueDone() && !shownDaily) { shownDaily = true; setTimeout(() => { if ($('#sceneHome').classList.contains('active')) Modals.daily(); }, 500); } },
     exit() {},
     frame() {},   // home is a painted plate (assets/images/home/plate.webp) + DOM — nothing to draw on the canvas
   };

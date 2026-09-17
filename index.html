@@ -4,8 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2f8fe0">
+<meta name="description" content="Catch bones, dodge rocks. A cute puppy catch-and-dodge game — play free in your browser or install it.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BONK!">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="assets/icons/favicon.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <title>BONK! — Catch. Dodge. Don't get bonked.</title>
-<link rel="stylesheet" href="styles/main.css?v=0.18.0">
+<link rel="stylesheet" href="styles/main.css?v=0.19.0">
 </head>
 <body>
 <div id="backdrop"></div>
@@ -33,6 +41,8 @@
     <button class="hm-play" id="lsPlay"><span class="paw">🐾</span><span class="tri">▶</span><span class="txt">Play</span><span class="paw">🐾</span></button>
     <button class="hm-post r" id="btnBoard"><span>You<br>Can<br>Do It!<br>♥</span></button>
     <button class="hm-sound" id="btnSound" aria-label="Sound">🔊</button>
+    <button class="hm-sound hm-profile" id="btnProfile" aria-label="Profile">🐶</button>
+    <button class="hm-gift" id="btnDaily" aria-label="Daily bonus"><span>🎁</span><i id="dailyDot"></i></button>
       </div>
 
   <div class="scene" id="hud">
@@ -98,7 +108,10 @@
       <div class="row"><span>🌤 Parallax tilt</span><button class="toggle on" data-setting="tilt"></button></div>
       <div class="row"><span>🕹️ Controls</span><span class="seg" id="ctrlMode"><button data-mode="drag">Slide</button><button data-mode="hold">Hold ◀ ▶</button></span></div>
       <div class="row" id="sensRow"><span>👆 Sensitivity <b id="sensVal">1.3×</b></span><input type="range" id="sensRange" min="0.8" max="2.0" step="0.1" value="1.3"></div>
+      <div class="row" id="installRow" hidden><span>📲 Install app</span><button class="btn btn-mini" id="btnInstall">INSTALL</button></div>
+      <div class="row small" id="iosHint" hidden><span>📲 iPhone: Share <b>⎙</b> → <b>Add to Home Screen</b> to install</span></div>
       <div class="row small"><span>Data</span><span class="links"><button class="link" id="btnExportLog">Export log</button> · <button class="link danger" id="btnResetProgress">Reset progress</button></span></div>
+      <div class="row small"><span>About</span><span class="links"><button class="link" id="btnCredits">Credits</button> · <a class="link" href="https://github.com/Aalubhalu12/Dog" target="_blank" rel="noopener">GitHub</a> · <span id="setVersion"></span></span></div>
       <button class="btn btn-primary close" data-close>DONE</button>
     </div>
   </div>
@@ -152,6 +165,42 @@
     </div>
   </div>
 
+  <div class="modal" id="modalDaily">
+    <div class="card">
+      <h2>Daily Bonus</h2>
+      <p id="dailyHead">Come back every day — the bone gets bigger!</p>
+      <div class="ladder" id="dailyLadder"></div>
+      <div class="btns"><button class="btn btn-primary btn-green" id="btnClaim"><span>🦴 CLAIM</span></button></div>
+      <button class="btn-x close" data-close aria-label="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="modal" id="modalProfile">
+    <div class="card">
+      <h2>Profile</h2>
+      <div class="pf-head"><img src="assets/images/home/dog_sit.webp" alt=""><div><input id="pfName" maxlength="14" spellcheck="false" autocomplete="off" aria-label="Your name"><small>tap to rename · <span id="pfCountry"></span></small></div></div>
+      <div class="stats pf-stats">
+        <div class="stat"><img src="assets/images/ui/star_gold.webp" alt=""><b id="pfStars">0</b><span>STARS</span></div>
+        <div class="stat"><img src="assets/images/ui/trophy.webp" alt=""><b id="pfBest">0</b><span>BEST</span></div>
+        <div class="stat"><img src="assets/images/items/coin.webp" alt=""><b id="pfCoins">0</b><span>COINS</span></div>
+      </div>
+      <div class="minirow" id="pfExtra"></div>
+      <div class="row small"><span>Account</span><span class="links"><button class="link" id="btnSignIn" title="Coming with cloud save">Sign in with Google</button> · <button class="link" id="btnRestore" title="Coming with the shop">Restore purchases</button></span></div>
+      <button class="btn btn-primary close" data-close>DONE</button>
+    </div>
+  </div>
+
+  <div class="modal" id="modalCredits">
+    <div class="card">
+      <h2>Credits</h2>
+      <p><b>BONK! Puppy Adventure</b><br><span id="crVersion"></span></p>
+      <p class="small">Design, code, art direction & procedural audio: the BONK! team.<br>Built with plain HTML5 Canvas + Web Audio — no engine, no trackers, no ads yet.</p>
+      <p class="small"><a class="link" href="https://github.com/Aalubhalu12/Dog" target="_blank" rel="noopener">Source on GitHub</a></p>
+      <button class="btn btn-primary close" data-close>DONE</button>
+    </div>
+  </div>
+
+  <div class="netbar" id="netbar">📡 Offline — playing locally, scores sync later</div>
   <div class="toast" id="toast"></div>
   <div class="version" id="appVersion"></div>
  </div>
@@ -160,42 +209,45 @@
 
 <!-- Load order = dependency order (plain <script>, no bundler). Layers: core → services → data → game → ui → scenes → app -->
 <!-- core: engine-agnostic plumbing -->
-<script src="src/core/config.js?v=0.18.0"></script>
-<script src="src/core/events.js?v=0.18.0"></script>
-<script src="src/core/perf.js?v=0.18.0"></script>
-<script src="src/core/dom.js?v=0.18.0"></script>
-<script src="src/core/assets.js?v=0.18.0"></script>
-<script src="src/core/input.js?v=0.18.0"></script>
+<script src="src/core/config.js?v=0.19.0"></script>
+<script src="src/core/events.js?v=0.19.0"></script>
+<script src="src/core/perf.js?v=0.19.0"></script>
+<script src="src/core/dom.js?v=0.19.0"></script>
+<script src="src/core/assets.js?v=0.19.0"></script>
+<script src="src/core/input.js?v=0.19.0"></script>
 <!-- services: persistence, economy, telemetry, backend -->
-<script src="src/services/flags.js?v=0.18.0"></script>
-<script src="src/services/analytics.js?v=0.18.0"></script>
-<script src="src/services/save.js?v=0.18.0"></script>
-<script src="src/services/wallet.js?v=0.18.0"></script>
-<script src="src/services/store.js?v=0.18.0"></script>
-<script src="src/services/leaderboard.js?v=0.18.0"></script>
+<script src="src/services/flags.js?v=0.19.0"></script>
+<script src="src/services/analytics.js?v=0.19.0"></script>
+<script src="src/services/save.js?v=0.19.0"></script>
+<script src="src/services/wallet.js?v=0.19.0"></script>
+<script src="src/services/store.js?v=0.19.0"></script>
+<script src="src/services/leaderboard.js?v=0.19.0"></script>
+<script src="src/services/daily.js?v=0.19.0"></script>
+<script src="src/services/pwa.js?v=0.19.0"></script>
+<script src="src/services/nav.js?v=0.19.0"></script>
 <!-- audio -->
-<script src="src/audio/sfx.js?v=0.18.0"></script>
-<script src="src/audio/music.js?v=0.18.0"></script>
+<script src="src/audio/sfx.js?v=0.19.0"></script>
+<script src="src/audio/music.js?v=0.19.0"></script>
 <!-- data: catalogues + level loader -->
-<script src="src/data/items.js?v=0.18.0"></script>
-<script src="src/data/goals.js?v=0.18.0"></script>
-<script src="src/data/levels.js?v=0.18.0"></script>
+<script src="src/data/items.js?v=0.19.0"></script>
+<script src="src/data/goals.js?v=0.19.0"></script>
+<script src="src/data/levels.js?v=0.19.0"></script>
 <!-- game: simulation + rendering -->
-<script src="src/game/background.js?v=0.18.0"></script>
-<script src="src/game/ambient.js?v=0.18.0"></script>
-<script src="src/game/effects.js?v=0.18.0"></script>
-<script src="src/game/rig.js?v=0.18.0"></script>
-<script src="src/game/puppy.js?v=0.18.0"></script>
-<script src="src/game/mechanics.js?v=0.18.0"></script>
-<script src="src/game/spawner.js?v=0.18.0"></script>
-<script src="src/game/game.js?v=0.18.0"></script>
-<script src="src/game/ftue.js?v=0.18.0"></script>
+<script src="src/game/background.js?v=0.19.0"></script>
+<script src="src/game/ambient.js?v=0.19.0"></script>
+<script src="src/game/effects.js?v=0.19.0"></script>
+<script src="src/game/rig.js?v=0.19.0"></script>
+<script src="src/game/puppy.js?v=0.19.0"></script>
+<script src="src/game/mechanics.js?v=0.19.0"></script>
+<script src="src/game/spawner.js?v=0.19.0"></script>
+<script src="src/game/game.js?v=0.19.0"></script>
+<script src="src/game/ftue.js?v=0.19.0"></script>
 <!-- ui + scenes -->
-<script src="src/ui/hud.js?v=0.18.0"></script>
-<script src="src/ui/modals.js?v=0.18.0"></script>
-<script src="src/scenes/home.js?v=0.18.0"></script>
-<script src="src/scenes/play.js?v=0.18.0"></script>
+<script src="src/ui/hud.js?v=0.19.0"></script>
+<script src="src/ui/modals.js?v=0.19.0"></script>
+<script src="src/scenes/home.js?v=0.19.0"></script>
+<script src="src/scenes/play.js?v=0.19.0"></script>
 <!-- bootstrap -->
-<script src="src/app.js?v=0.18.0"></script>
+<script src="src/app.js?v=0.19.0"></script>
 </body>
 </html>

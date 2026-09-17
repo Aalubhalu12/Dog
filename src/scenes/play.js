@@ -38,6 +38,7 @@ const PlayScene = (() => {
     $('#btnPauseMap').onclick = () => { SFX.click(); app.goHome(); };
   }
   return { bind,
+    pause,
     enter(levelIdx) { BG.setAmp(CONFIG.PARALLAX.GAME_AMP); Game.start(levelIdx); FTUE.start(levelIdx); },
     exit() { Game.stop(); FTUE.stop(); },
     frame(now, dt, simOnly, renderDt) { if (dt > 0) { Game.update(dt); FTUE.update(dt); } if (!simOnly) { if (Game.state) HUD.update(Game.state); BG.draw(now, renderDt || 1 / 60, { overlay: (c, t) => Game.draw(c, t), lightX: Game.puppy.box.cx }); } } };

@@ -1,5 +1,5 @@
 # BONK! — Status & Next Steps
-_Updated 2026-09-09 · current build **v0.18.0** (Phases 1–3 done: 4 locations × 4 levels × 3 acts, music + sliders — playtest balance open) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
+_Updated 2026-09-10 · current build **v0.19.0** (Phases 1–3 done; Phase 4 slice A shipped: PWA install + offline, daily bonus, profile, back navigation — slice B = shop/skins, Daily Remix, mock ads) · roadmap reference: `PHASE2_PLAN.md` (locked v3)_
 
 ---
 
